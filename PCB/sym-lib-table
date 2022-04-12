@@ -1,0 +1,6 @@
+(sym_lib_table
+  (lib (name EK-TM4C123GXL)(type Legacy)(uri ${KIPRJMOD}/EK-TM4C123GXL.lib)(options "")(descr ""))
+  (lib (name MC34119)(type Legacy)(uri ${KIPRJMOD}/MC34119.lib)(options "")(descr ""))
+  (lib (name ST7735)(type Legacy)(uri ${KIPRJMOD}/ST7735.lib)(options "")(descr ""))
+  (lib (name Main-Board-rescue)(type Legacy)(uri "${KIPRJMOD}/Main Board-rescue.lib")(options "")(descr ""))
+)

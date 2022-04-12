@@ -1,0 +1,8 @@
+(fp_lib_table
+  (lib (name ST7735)(type KiCad)(uri ${KIPRJMOD}/ST7735.pretty)(options "")(descr ""))
+  (lib (name EK-TM4C123GXL)(type KiCad)(uri ${KIPRJMOD}/EK-TM4C123GXL.pretty)(options "")(descr ""))
+  (lib (name MC34119)(type KiCad)(uri ${KIPRJMOD}/MC34119.pretty)(options "")(descr ""))
+  (lib (name SamacSys_Parts)(type KiCad)(uri ${KIPRJMOD}/SamacSys_Parts.pretty)(options "")(descr ""))
+  (lib (name AST-03008MR-R)(type KiCad)(uri ${KIPRJMOD}/AST-03008MR-R.pretty)(options "")(descr ""))
+  (lib (name Logos)(type KiCad)(uri ${KIPRJMOD}/Logos.pretty)(options "")(descr ""))
+)

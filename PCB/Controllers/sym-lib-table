@@ -1,0 +1,6 @@
+(sym_lib_table
+  (lib (name EK-TM4C123GXL)(type Legacy)(uri "C:/Users/IshDeshpa/IshDeshpaCode/KiCAD/319K Lab 10/EK-TM4C123GXL.lib")(options "")(descr ""))
+  (lib (name MC34119)(type Legacy)(uri "C:/Users/IshDeshpa/IshDeshpaCode/KiCAD/319K Lab 10/MC34119.lib")(options "")(descr ""))
+  (lib (name ST7735)(type Legacy)(uri ${KIPRJMOD}/ST7735.lib)(options "")(descr ""))
+  (lib (name COM-09032)(type Legacy)(uri ${KIPRJMOD}/COM-09032/COM-09032.lib)(options "")(descr ""))
+)

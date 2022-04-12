@@ -1,0 +1,5 @@
+(fp_lib_table
+  (lib (name ST7735)(type KiCad)(uri ${KIPRJMOD}/ST7735.pretty)(options "")(descr ""))
+  (lib (name COM-09032)(type KiCad)(uri ${KIPRJMOD}/COM-09032)(options "")(descr ""))
+  (lib (name Logos)(type KiCad)(uri "C:/Users/IshDeshpa/IshDeshpaCode/KiCAD/319K Lab 10/Logos.pretty")(options "")(descr ""))
+)
