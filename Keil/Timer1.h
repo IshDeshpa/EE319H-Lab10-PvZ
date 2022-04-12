@@ -2,14 +2,14 @@
 // Runs on LM4F120/TM4C123
 // Use Timer1 in 32-bit periodic mode to request interrupts at a periodic rate
 // Daniel Valvano
-// 11/15/2021
+// 1/17/2020
 
 /* This example accompanies the book
    "Embedded Systems: Real Time Interfacing to Arm Cortex M Microcontrollers",
-   ISBN: 978-1463590154, Jonathan Valvano, copyright (c) 2013
+   ISBN: 978-1463590154, Jonathan Valvano, copyright (c) 2020
   Program 7.5, example 7.6
 
- Copyright 2021 by Jonathan W. Valvano, valvano@mail.utexas.edu
+ Copyright 2020 by Jonathan W. Valvano, valvano@mail.utexas.edu
     You may use, edit, run or distribute this file
     as long as the above copyright notice remains
  THIS SOFTWARE IS PROVIDED "AS IS".  NO WARRANTIES, WHETHER EXPRESS, IMPLIED
@@ -24,11 +24,12 @@
 #ifndef __TIMER1INTS_H__ // do not include more than once
 #define __TIMER1INTS_H__
 #include <stdint.h>
-// ***************** Timer1_Init ****************
-// Activate TIMER1 interrupts to run user task periodically
-// Inputs:  period in units (1/clockfreq)
-//          priority is 0 (high) to 7 (low)
-// Outputs: none
-void Timer1_Init(uint32_t period, uint32_t priority);
 
-#endif // __TIMER2INTS_H__
+// ***************** Timer1_Init ****************
+// Activate Timer1 interrupts to run user task periodically
+// Inputs:  task is a pointer to a user function
+//          period in units (1/clockfreq)
+// Outputs: none
+void Timer1_Init(void(*task)(void), uint32_t period);
+
+#endif // __TIMER1INTS_H__

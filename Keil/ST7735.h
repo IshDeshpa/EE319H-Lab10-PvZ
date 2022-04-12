@@ -21,15 +21,16 @@
 // Low level drivers for the ST7735 160x128 LCD based off of
 // the file described above.
 //    16-bit color, 128 wide by 160 high LCD
-// Daniel Valvano, 1/11/2022
+// Daniel Valvano, 
+// 1/12/2022
 // Augmented 7/17/2014 to have a simple graphics facility
-// Tested with LaunchPadDLL.dll simulator 10/25/2017
+// Tested with LaunchPadDLL.dll simulator 9/2/2014
 
 /* This example accompanies the book
    "Embedded Systems: Real Time Interfacing to Arm Cortex M Microcontrollers",
-   ISBN: 978-1463590154, Jonathan Valvano, copyright (c) 2017
+   ISBN: 978-1463590154, Jonathan Valvano, copyright (c) 2022
 
- Copyright 2014 by Jonathan W. Valvano, valvano@mail.utexas.edu
+ Copyright 2022 by Jonathan W. Valvano, valvano@mail.utexas.edu
     You may use, edit, run or distribute this file
     as long as the above copyright notice remains
  THIS SOFTWARE IS PROVIDED "AS IS".  NO WARRANTIES, WHETHER EXPRESS, IMPLIED
@@ -87,7 +88,6 @@
 // Z– (NC) analog input Z-axis from ADXL335 accelerometer
 // Backlight + - Light, backlight connected to +3.3 V
 
-
 // **********HiLetgo ST7735 TFT and SDC (SDC not tested)*******************
 // ST7735
 // LED-   (pin 16) TFT, connected to ground
@@ -116,8 +116,9 @@
 // Gnd (pin 2) connected to ground
 // VCC (pin 1) connected to +3.3 V
 
-#ifndef ST7735_H
-#define ST7735_H
+#ifndef _ST7735H_
+#define _ST7735H_
+
 #include <stdint.h>
 
 // some flags for ST7735_InitR()
@@ -212,26 +213,6 @@ void ST7735_FillScreen(uint16_t color);
 // Output: none
 void ST7735_FillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
 
-
-//------------ST7735_DrawSmallCircle------------
-// Draw a small circle (diameter of 6 pixels)
-// rectangle at the given coordinates with the given color.
-// Requires (11*6+24*2)=114 bytes of transmission (assuming image fully on screen)
-// Input: x     horizontal position of the top left corner of the circle, columns from the left edge
-//        y     vertical position of the top left corner of the circle, rows from the top edge
-//        color 16-bit color, which can be produced by ST7735_Color565()
-// Output: none
-void ST7735_DrawSmallCircle(int16_t x, int16_t y, uint16_t color);
-
-//------------ST7735_DrawCircle------------
-// Draw a small circle (diameter of 10 pixels)
-// rectangle at the given coordinates with the given color.
-// Requires (11*10+68*2)=178 bytes of transmission (assuming image on screen)
-// Input: x     horizontal position of the top left corner of the circle, columns from the left edge
-//        y     vertical position of the top left corner of the circle, rows from the top edge
-//        color 16-bit color, which can be produced by ST7735_Color565()
-// Output: none
-void ST7735_DrawCircle(int16_t x, int16_t y, uint16_t color);
 
 //------------ST7735_Color565------------
 // Pass 8-bit (each) R,G,B and get back 16-bit packed color.
@@ -464,7 +445,7 @@ void ST7735_PlotNextErase(void);
 // Color set by ST7735_SetTextColor
 // Inputs: 8-bit ASCII character
 // Outputs: none
-void ST7735_OutChar(char ch);
+extern "C" void ST7735_OutChar(char ch);
 
 //********ST7735_OutString*****************
 // Print a string of characters to the ST7735 LCD.
@@ -473,7 +454,7 @@ void ST7735_OutChar(char ch);
 // The string will not automatically wrap.
 // inputs: ptr  pointer to NULL-terminated ASCII string
 // outputs: none
-void ST7735_OutString(char *ptr);
+extern "C" void ST7735_OutString(char *ptr);
 
 // ************** ST7735_SetTextColor ************************
 // Sets the color in which the characters will be printed 
@@ -490,19 +471,5 @@ void ST7735_SetTextColor(uint16_t color);
 // Outputs: none
 void Output_Init(void);
 
-// Clear display
-void Output_Clear(void);
-
-// Turn off display (low power)
-void Output_Off(void);
-
-// Turn on display
-void Output_On(void);
-
-// set the color for future output
-// Background color is fixed at black
-// Input:  16-bit packed color
-// Output: none
-void Output_Color(uint32_t newColor); 
 
 #endif

@@ -1,10 +1,8 @@
 // TExaS.h
-// Runs on TM4C123
-// Periodic timer Timer4A, ADC1, PD3, and UART0 used to create the scope
-// Periodic timer Timer5A which will interact with debugger and grade the lab 
-// It initializes on reset and runs whenever interrupts are enabled
+// Runs on LM4F120/TM4C123
+// Periodic timer Timer5A to implement scope
 // Jonathan Valvano
-// 1/12/2022 
+// March 28, 2018 
 
 /* This example accompanies the book
    "Embedded Systems: Real Time Operating Systems for ARM Cortex M Microcontrollers",
@@ -24,32 +22,15 @@
  */
 #ifndef TEXAS_H
 #define TEXAS_H
-
-// 0 for TExaS oscilloscope on PD3, 
-// 1 for PA7-2 logic analyzer A
-// 2 for PB6-0 logic analyzer B
-// 3 for PC7-4 logic analyzer C
-// 4 for PE5-0 logic analyzer E
-// 5 for PF4-0 logic analyzer F
-enum TExaSmode{
-  SCOPE,
-  LOGICANALYZERA,
-  LOGICANALYZERB,
-  LOGICANALYZERC,
-  LOGICANALYZERE,
-  LOGICANALYZERF,
-	NONE
-};
-
 // ************TExaS_Init*****************
-// Initialize scope or logic analyzer, triggered by periodic timer
-// This needs to be called once
-// Inputs: Scope or Logic analyzer or Grader or None
+// Initialize scope, triggered by timer 5A
+// This needs to be called once 
+// Inputs: none
 // Outputs: none
-void TExaS_Init(enum TExaSmode mode);
+void TExaS_Init(void);
 
 // ************TExaS_Stop*****************
-// Stop the transfer
+// Stop the transfer 
 // Inputs:  none
 // Outputs: none
 void TExaS_Stop(void);

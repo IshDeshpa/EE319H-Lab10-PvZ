@@ -2,14 +2,14 @@
 // Runs on LM4F120/TM4C123
 // A software function to change the bus frequency using the PLL.
 // Daniel Valvano
-// 11/15/2021
-
+// 1/17/2020
+#include <stdint.h>
 /* This example accompanies the book
    "Embedded Systems: Real Time Interfacing to Arm Cortex M Microcontrollers",
-   ISBN: 978-1463590154, Jonathan Valvano, copyright (c) 2015
+   ISBN: 978-1463590154, Jonathan Valvano, copyright (c) 2017
    Program 2.10, Figure 2.37
 
- Copyright 2021 by Jonathan W. Valvano, valvano@mail.utexas.edu
+ Copyright 2018 by Jonathan W. Valvano, valvano@mail.utexas.edu
     You may use, edit, run or distribute this file
     as long as the above copyright notice remains
  THIS SOFTWARE IS PROVIDED "AS IS".  NO WARRANTIES, WHETHER EXPRESS, IMPLIED
@@ -20,13 +20,13 @@
  For more information about my classes, my research, and my books, see
  http://users.ece.utexas.edu/~valvano/
  */
-#include <stdint.h>
 
 // The #define statement SYSDIV2 initializes
 // the PLL to the desired frequency.
 // SYSDIV = 400/freq -1
 // bus frequency is 400MMHz/(SYSDIV+1)
-
+#ifndef __PLL_H__
+#define __PLL_H__
 // configure the system to get its clock from the PLL
 void PLL_Init(uint32_t freq);
 #define Bus80MHz     4
@@ -162,6 +162,6 @@ void PLL_Init(uint32_t freq);
 #define Bus3_150MHz 126
 #define Bus3_125MHz 127
 
-
+#endif
 
 
