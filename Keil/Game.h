@@ -9,7 +9,6 @@
 #define FX_BUFFER_SIZE 16
 
 // This is a comment leftover from a test issue
-// Another comment
 
 // Sprite contains a pointer to a bitmap, and has a length and width in pixels.
 typedef struct Sprite SpriteType;
