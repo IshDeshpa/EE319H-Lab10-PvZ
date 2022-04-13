@@ -16,7 +16,7 @@ struct{
 	uint16_t* bmp;	// Bitmap of half words to encode RGB info
 	uint8_t length;	// Length
 	uint8_t width;	// Width
-	const SpriteType* nextSprite;	// Sprite pointer for animation FSM (each sprite only has one next sprite
+	const SpriteType* nextSprite;	// Sprite pointer for animation FSM (each sprite only has one next sprite)
 } Sprite;
 
 // Sound stored on SD Card
@@ -61,7 +61,7 @@ class Music: private Sound{
 // Any object on the screen that needs to be rendered/unrendered and does something
 class GameObject{
 	protected:
-		SpriteType* animationFSM;	// FSM containing frames of animation
+		SpriteType* sprite;	// Sprite pointer
 		Sound* soundFX;	// Sound effect
 		uint8_t x;	// X position
 		uint8_t y;	// Y position
@@ -88,6 +88,23 @@ class GameObject{
 		
 		// Unrender, advance to next state of the game object and render
 		void refresh();
+};
+
+// GameObject with health (plants and zombies)
+class Entity: public GameObject{
+	protected:
+		uint8_t health;	// Health
+		uint8_t animationTick;	// Animation Tick
+		
+		// Advance to the next state of the entity
+		void advance();
+};
+
+// Projectile
+class Projectile: public GameObject{
+	protected:
+		uint8_t speed;	// Speed
+		void advance();
 };
 
 // Collection of all game objects, background, music, etc. pertinent to the current area of the game
