@@ -1,12 +1,14 @@
 #ifndef GAME_H
 #define GAME_H
-//hello
+
 #include <stdint.h>
 #include "ff.h"
 #include "diskio.h"
 
 #define MUSIC_BUFFER_SIZE 16
 #define FX_BUFFER_SIZE 16
+
+// This is a comment leftover from a test issue
 
 // Sprite contains a pointer to a bitmap, and has a length and width in pixels.
 typedef struct Sprite SpriteType;
