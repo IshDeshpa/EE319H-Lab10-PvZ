@@ -32,5 +32,10 @@ class Peashooter : public Plant{
 		Peashooter();
 };
 		
+class Repeater : public Peashooter{
+	protected:
+		//time in between 1st and 2nd pea
+		uint8_t repeatTime;
 
+}
 #endif
