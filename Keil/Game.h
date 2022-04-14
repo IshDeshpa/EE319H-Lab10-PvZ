@@ -76,6 +76,9 @@ class GameObject{
 	public:
 		// Constructor
 		GameObject();
+	
+		// Constructor with parameters
+		GameObject(SpriteType* sp, Sound* sfx, uint8_t x, uint8_t y);
 		
 		// Destructor
 		~GameObject();
@@ -94,13 +97,16 @@ class GameObject{
 class Entity: public GameObject{
 	protected:
 		uint8_t health;	// Health
-		uint8_t animationTick;	// Animation Tick
+		uint8_t animationTime;	// time to switch animation sprites
 		uint8_t hostile; //0 or 1
 		
 		// Advance to the next state of the entity
 		void advance();
 		// do attacking sequence if hostile
 		void attack();
+	public:
+		//constructor with all new parameters, calls parent constructor for first 4
+		Entity(SpriteType* sp, Sound* sfx, uint8_t xpos, uint8_t ypos, uint8_t hp, uint8_t anim, uint8_t hostl);
 };
 
 // Projectile
@@ -108,6 +114,9 @@ class Projectile: public GameObject{
 	protected:
 		uint8_t speed;	// Speed
 		void advance();
+	public:
+		//constructor with all neww parameters, calls parent constructor for first 4
+		Projectile(SpriteType* sp, Sound* sfx, uint8_t xpos, uint8_t ypos, uint8_t spd);
 };
 
 // Collection of all game objects, background, music, etc. pertinent to the current area of the game
