@@ -3567,7 +3567,7 @@
       <Doc>
         <Name>.\main.cpp</Name>
         <ColumnNumber>18</ColumnNumber>
-        <TopLine>61</TopLine>
+        <TopLine>58</TopLine>
         <CurrentLine>63</CurrentLine>
         <Folding>1</Folding>
         <ContractedFolders></ContractedFolders>
@@ -3575,18 +3575,18 @@
       </Doc>
       <Doc>
         <Name>Game.h</Name>
-        <ColumnNumber>18</ColumnNumber>
-        <TopLine>90</TopLine>
-        <CurrentLine>106</CurrentLine>
+        <ColumnNumber>29</ColumnNumber>
+        <TopLine>97</TopLine>
+        <CurrentLine>119</CurrentLine>
         <Folding>1</Folding>
         <ContractedFolders></ContractedFolders>
         <PaneID>0</PaneID>
       </Doc>
       <Doc>
         <Name>C:\Users\Luke\Desktop\PvZ\EE319H-Lab10-PvZ\Keil\Plant.h</Name>
-        <ColumnNumber>37</ColumnNumber>
-        <TopLine>33</TopLine>
-        <CurrentLine>41</CurrentLine>
+        <ColumnNumber>0</ColumnNumber>
+        <TopLine>102</TopLine>
+        <CurrentLine>24</CurrentLine>
         <Folding>1</Folding>
         <ContractedFolders></ContractedFolders>
         <PaneID>0</PaneID>

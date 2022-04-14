@@ -112,11 +112,12 @@ class Entity: public GameObject{
 // Projectile
 class Projectile: public GameObject{
 	protected:
+		uint8_t damage;	// Damage
 		uint8_t speed;	// Speed
 		void advance();
 	public:
-		//constructor with all neww parameters, calls parent constructor for first 4
-		Projectile(SpriteType* sp, Sound* sfx, uint8_t xpos, uint8_t ypos, uint8_t spd);
+		//constructor with all new parameters, calls parent constructor for first 4
+		Projectile(SpriteType* sp, Sound* sfx, uint8_t xpos, uint8_t ypos, uint8_t spd, uint8_t dam);
 };
 
 // Collection of all game objects, background, music, etc. pertinent to the current area of the game
