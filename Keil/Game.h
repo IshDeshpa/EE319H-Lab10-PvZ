@@ -95,9 +95,12 @@ class Entity: public GameObject{
 	protected:
 		uint8_t health;	// Health
 		uint8_t animationTick;	// Animation Tick
+		uint8_t hostile; //0 or 1
 		
 		// Advance to the next state of the entity
 		void advance();
+		// do attacking sequence if hostile
+		void attack();
 };
 
 // Projectile
