@@ -7,6 +7,8 @@
 // Basic zombie.
 class Zombie: public Entity{
     protected:
+        SpriteType* walkFSM;	// Walk animation pointer
+        SpriteType* eatFSM; // Eat animation pointer
         uint8_t speed;  // Speed of zombie
         uint8_t isEating;   // Is the zombie eating?
         
@@ -18,26 +20,61 @@ class Zombie: public Entity{
     public:
         // Constructor
         Zombie();
+
+        // Constructor
+        Zombie(SpriteType* sp, Sound* sfx, uint8_t xpos, uint8_t ypos, uint8_t hp, 
+					uint8_t anim, uint8_t speed, uint8_t isEating);
 };
 
-// Conehead zombie. Only thing different is that it has a different sprite and different health.
-class ConeZombie: public Zombie{
+// Regular zombie with a flag. Has random zombies in a wave formation following.
+// Scene should have a generate function that generates wave
+class FlagZombie: public Zombie{
+    public:
+        FlagZombie(uint8_t x, uint8_t y);
+};
+
+// Any zombie with extra health and headwear
+class ArmorZombie: public Zombie{
     protected:
+        SpriteType* fullWalkFSM;    // Headwear on, undamaged
+        SpriteType* fullEatFSM;
+        SpriteType* damagedWalkFSM; // Headwear on, damaged
+        SpriteType* damagedEatFSM;
         // Redefine advance to change sprite at certain health
         void advance();
     public:
         // Constructor
-        ConeZombie(uint8_t x);
+        ArmorZombie(uint8_t x, uint8_t y);
+};
+
+// Conehead zombie. Only thing different is that it has a different sprite and different health.
+class ConeZombie: public ArmorZombie{
+    public:
+        // Constructor
+        ConeZombie(uint8_t x, uint8_t y);
 };
 
 // Buckethead zombie. Only thing different is that it has a different sprite and different health.
-class BucketZombie: public Zombie{
-    protected:
-        // Redefine advance to change sprites at certain health
+class BucketZombie: public ArmorZombie{
+    public:
+        // Constructor
+        BucketZombie(uint8_t x, uint8_t y);
+};
+
+// Football zombie. Only thing different is that it has a different sprite, different health, and different speed.
+class FootballZombie: public ArmorZombie{
+    public:
+        // Constructor
+        FootballZombie(uint8_t x, uint8_t y);
+};
+
+// Newspaper zombie. Only thing different is that it has a different sprite, different health, and conditional speed.
+class NewsZombie: public ArmorZombie{
+    private:
         void advance();
     public:
         // Constructor
-        BucketZombie();
+        NewsZombie(uint8_t x, uint8_t y);
 };
 
 // Polevault zombie. Jumps over plants.
@@ -52,7 +89,7 @@ class PoleZombie: public Zombie{
         void attack();
     public:
         // Constructor
-        PoleZombie();
+        PoleZombie(uint8_t x, uint8_t y);
 };
 
 
