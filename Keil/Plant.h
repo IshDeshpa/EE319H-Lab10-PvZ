@@ -19,7 +19,6 @@ class Plant : public Entity{
 		uint8_t attackRate;
 		Projectile projectile;
 		void advance();
-	
 };
 
 class Peashooter : public Plant{
