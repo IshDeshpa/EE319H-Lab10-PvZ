@@ -3,34 +3,6 @@
 
 
 
-
-
-array = [(normal, 36), (bucket, 40), (flag, 40)]
-
-if array[currINdx].time < currtime(
-	spawnZombie(array[curINdx}.name);
-
-spawnZombie(zombnum){
-	if(zombnum, = 1)
-		urrentzombuies[currentzombieslength] = new flagzombie()
-		generate(num);
-	if(zombnum = 2)
-		urrentzombuies[currentzombieslength] = new buscketzombie()
-		
-	
-
-Flagzombie()
-	call zombie
-
-	
-generate(num)
-	for(int i = 0; i<num; i++)
-		spawnZombie(random(0-7));
-	
-	
-
-
-
 #include <stdint.h>
 #include "Game.h"
 
@@ -109,19 +81,63 @@ class Wallnut : public Plant{
 
 class CherryBomb : public Plant{
 	protected:
-		//after attacking, destroy the cherry bomb
+		//after attacking, destroy the cherry bomb. also, no range detection
 		void advance();
 	
 	public:
 			//constructor calls Plant constructor with defined cherry bomb sprite, explosion sound, x and y arguments, 
-		  //defined cherry bomb health, generic plant animation time, hostile = 1, atkRt as generic plant attack rate maybe, 
+		  //defined generic plant health, generic plant animation time, hostile = 1, atkRt as generic plant attack rate maybe, 
 			//explosion projectile
-			CherryBomb();
+			CherryBomb(uint8_t x, uint8_t y);
 };
 
 class PotatoMine : public Plant{
-	protected;
+	protected:
+		SpriteType* growing; //this might not be implemented
+		SpriteType* aboveGround;
 		//can only attack if it's grown
 		uint8_t grown; //1 or 0
-		uint8_t
+		//after attacking, destroy the PotatoMine. cannot attack if underground (or transitioning). also, different range detection
+		void advance();
+	
+	public:
+			//constructor calls Plant constructor with defined potato mine sprite, explosion sound, x and y arguments,
+			//defined generic plant health, generic plant animation time, hostile = 1, atkRt as more instantaneous
+			//small explosion projectile
+			//set growing and aboveGround to sprites
+			//set grown to 0
+			PotatoMine(uint8_t x, uint8_t y);
+};
+
+class Sunflower : public Plant{
+		//to me, it makes sense for the sun to be a projectile, maybe just have sun incorporate different behavior
+	protected:
+		//no range detection
+		void advance();
+	public:
+		//constructor calls Plant constructor with defined sunflower sprite, null or sun sound, x and y arguments
+		//defined generic plant health, generic plant animation time, hostile = 1, atkRt as more slow
+		//sun projectile (we can change it from a projectile if we want and just change up the attack function)
+		Sunflower(uint8_t x, uint8_t y);
+			
+};
+
+class Chomper : public Plant{
+	protected:	
+		SpriteType* full;	//for when zombie in mouth
+		SpriteType* empty;	//for when no zombie in mouth
+		uint8_t mouthFull; //1 or 0
+		//change range detection to one tile
+		void advance();
+		//if no invisible hitbox projectile, we need to make attack do the collision
+		void attack();
+		
+	public:
+			//constructor calls Plant constructor with defined chomper empty sprite, defined chomp sound, x and y arguments
+			//defined generic plant health, generic plant animation time, hostile = 1, atkRt as faster than standard
+			//null projectile or invisible hitbox?
+			//set full sprite to defined full chomper sprite, and empty to empty sprite
+			//mouthFull = 0
+		Chomper(uint8_t x, uint8_t y);
+};
 #endif

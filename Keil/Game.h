@@ -100,7 +100,7 @@ class Entity: public GameObject{
 		uint8_t animationTime;	// time to switch animation sprites
 		uint8_t hostile; //0 or 1
 		
-		// Advance to the next state of the entity
+		// Advance to the next state of the entity and call attack?
 		void advance();
 		// do attacking sequence if hostile
 		void attack();
@@ -114,6 +114,7 @@ class Projectile: public GameObject{
 	protected:
 		uint8_t damage;	// Damage
 		uint8_t speed;	// Speed
+		uint8_t collision; //1 or 0
 		void advance();
 	public:
 		//constructor with all new parameters, calls parent constructor for first 4
