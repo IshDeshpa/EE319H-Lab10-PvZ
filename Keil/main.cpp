@@ -62,6 +62,9 @@
 #include "Game.h"
 #include "Plant.h"
 
+#include "Zombie.h"
+
+
 extern "C" void DisableInterrupts(void);
 extern "C" void EnableInterrupts(void);
 extern "C" void SysTick_Handler(void);

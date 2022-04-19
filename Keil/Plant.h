@@ -71,6 +71,7 @@ class Wallnut : public Plant{
 		//new advance function will check health, and change sprite if it reaches defined threshold
 		void advance();
 
+
 	public:
 		//constructor calls Plant constructor with defined Walnut sprite, 
 		//null sount, x and y arguments, defined walnut health,

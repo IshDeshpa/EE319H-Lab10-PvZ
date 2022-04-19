@@ -14,3 +14,5 @@
 .\main.o: integer.h
 .\main.o: ffconf.h
 .\main.o: diskio.h
+.\main.o: Plant.h
+.\main.o: Zombie.h

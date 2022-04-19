@@ -121,7 +121,7 @@ class GameObject{
 		// Clear the current pixels of the game object
 		void unrender();
 		
-		// Advance to the next state of the game object
+		// Advance to the next state of the game object (should be overloaded)
 		void advance();
 	
 		// Render the current state of the game object
