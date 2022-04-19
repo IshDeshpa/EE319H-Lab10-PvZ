@@ -60,6 +60,7 @@
 #include "Timer0.h"
 #include "Timer1.h"
 #include "Game.h"
+#include "Plant.h"
 
 extern "C" void DisableInterrupts(void);
 extern "C" void EnableInterrupts(void);
