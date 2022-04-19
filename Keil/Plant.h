@@ -26,7 +26,6 @@ class Plant : public Entity{
 };
 
 class Peashooter : public Plant{
-		
 	protected: 
 		//check if time>attackRate, then create pea if it is
 		void advance();
