@@ -1,4 +1,9 @@
 .\dac.o: DAC.cpp
 .\dac.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 .\dac.o: inc/tm4c123gh6pm.h
+.\dac.o: Timer0.h
 .\dac.o: DAC.h
+.\dac.o: diskio.h
+.\dac.o: integer.h
+.\dac.o: ff.h
+.\dac.o: ffconf.h

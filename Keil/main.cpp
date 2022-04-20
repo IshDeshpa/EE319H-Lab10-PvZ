@@ -52,18 +52,19 @@
 #include <stdint.h>
 #include "inc/tm4c123gh6pm.h"
 #include "PLL.h"
-#include "ST7735.h"
-#include "Random.h"
-#include "SlidePot.h"
-#include "Images.h"
-#include "UART.h"
+#include "DAC.h"
+//#include "ST7735.h"
+//#include "Random.h"
+//#include "SlidePot.h"
+//#include "Images.h"
+//#include "UART.h"
 #include "Timer0.h"
 #include "Timer1.h"
 #include "Game.h"
 #include "Plant.h"
-
 #include "Zombie.h"
 
+//Music* activeMusic = new Music("test.wav", 128);  // test.wav, 128 bytes
 
 extern "C" void DisableInterrupts(void);
 extern "C" void EnableInterrupts(void);
@@ -72,14 +73,13 @@ extern "C" void SysTick_Handler(void);
 int main(void){
   PLL_Init(Bus80MHz);       // Bus clock is 80 MHz 
   // TExaS_Init();
-  Random_Init(1);
-  Output_Init();
+  //Random_Init(1);
+  //Output_Init();
   //Timer0_Init(&background,1600000); // 50 Hz
   //Timer1_Init(&clock,80000000); // 1 Hz
-  EnableInterrupts();
-  
+  DAC_Init();
+	EnableInterrupts();
   while(1){
-  
   }
 
 }
