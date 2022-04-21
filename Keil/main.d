@@ -7,6 +7,7 @@
 .\main.o: integer.h
 .\main.o: ff.h
 .\main.o: ffconf.h
+.\main.o: TExaS.h
 .\main.o: Timer0.h
 .\main.o: Timer1.h
 .\main.o: Game.h

@@ -58,6 +58,7 @@
 //#include "SlidePot.h"
 //#include "Images.h"
 //#include "UART.h"
+#include "TExaS.h"
 #include "Timer0.h"
 #include "Timer1.h"
 #include "Game.h"
@@ -72,14 +73,20 @@ extern "C" void SysTick_Handler(void);
 
 int main(void){
   PLL_Init(Bus80MHz);       // Bus clock is 80 MHz 
-  // TExaS_Init();
+  TExaS_Init();
   //Random_Init(1);
   //Output_Init();
   //Timer0_Init(&background,1600000); // 50 Hz
   //Timer1_Init(&clock,80000000); // 1 Hz
   DAC_Init();
 	EnableInterrupts();
-  while(1){
+  //int i=1;
+	while(1){
+		//DAC_Out(i);
+		//i*=2;
+		//if(i > 255){
+			//i = 0;
+		//}
   }
 
 }
