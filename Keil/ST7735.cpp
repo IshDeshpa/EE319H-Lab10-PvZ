@@ -174,13 +174,13 @@ uint16_t StTextColor = ST7735_YELLOW;
 #define ST7735_GMCTRP1 0xE0
 #define ST7735_GMCTRN1 0xE1
 
-#define TFT_CS                  (*((volatile uint32_t *)0x40004020))
+#define TFT_CS                  (*((volatile uint32_t *)0x40004020))	// PA3
 #define TFT_CS_LOW              0           // CS normally controlled by hardware
 #define TFT_CS_HIGH             0x08
-#define DC                      (*((volatile uint32_t *)0x40004100))
+#define DC                      (*((volatile uint32_t *)0x40004100))	// PA6
 #define DC_COMMAND              0
 #define DC_DATA                 0x40
-#define RESET                   (*((volatile uint32_t *)0x40004200))
+#define RESET                   (*((volatile uint32_t *)0x40004200))	// PA7
 #define RESET_LOW               0
 #define RESET_HIGH              0x80
 

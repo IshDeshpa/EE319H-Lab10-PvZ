@@ -18,7 +18,8 @@
 #include "integer.h"
 #include "diskio.h"
 #define SDC_CS_PB0 0
-#define SDC_CS_PD7 1
+#define SDC_CS_PD7 0
+#define SDC_CS_PD0 1
 
 // SDC CS is PD7 or PB0 , TFT CS is PA3
 // to change CS to another GPIO, change SDC_CS and CS_Init
@@ -95,6 +96,29 @@ void CS_Init(void){
   SDC_CS = SDC_CS_HIGH;
 }
 #endif
+// PD0 output used for SDC CS
+#if SDC_CS_PD0
+#define SDC_CS						(*((volatile uint32_t*)0x40007004))
+#define SDC_CS_LOW				0
+#define SDC_CS_HIGH				0x01
+void CS_Init(void){
+  SYSCTL_RCGCGPIO_R |= 0x08;            // activate clock for Port D
+  while((SYSCTL_PRGPIO_R&0x08) == 0){}; // allow time for clock to stabilize
+  //GPIO_PORTD_LOCK_R = 0x4C4F434B;       // unlock GPIO Port D
+  //GPIO_PORTD_CR_R = 0xFF;               // allow changes to PD7-0
+  // only PD7 needs to be unlocked, other bits can't be locked
+  GPIO_PORTD_DIR_R |= 0x01;             // make PD7 out
+  GPIO_PORTD_AFSEL_R &= ~0x01;          // disable alt funct on PD7
+  GPIO_PORTD_DR4R_R |= 0x01;            // 4mA drive on outputs
+  GPIO_PORTD_PUR_R |= 0x01;             // enable weak pullup on PD7
+  GPIO_PORTD_DEN_R |= 0x01;             // enable digital I/O on PD7
+                                        // configure PD7 as GPIO
+  GPIO_PORTD_PCTL_R = (GPIO_PORTD_PCTL_R&0x0FFFFFFF)+0x00000000;
+  GPIO_PORTD_AMSEL_R &= ~0x01;          // disable analog functionality on PD7
+  SDC_CS = SDC_CS_HIGH;
+}
+#endif
+
 //********SSI0_Init*****************
 // Initialize SSI0 interface to SDC
 // inputs:  clock divider to set clock frequency

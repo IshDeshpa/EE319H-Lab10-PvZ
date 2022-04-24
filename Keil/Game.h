@@ -59,8 +59,6 @@
 
 
 
-
-
 // This is a comment leftover from a test issue
 
 // Sprite contains a pointer to a bitmap, and has a length and width in pixels.

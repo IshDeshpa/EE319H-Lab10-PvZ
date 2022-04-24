@@ -53,7 +53,7 @@
 #include "inc/tm4c123gh6pm.h"
 #include "PLL.h"
 #include "DAC.h"
-//#include "ST7735.h"
+#include "ST7735.h"
 //#include "Random.h"
 //#include "SlidePot.h"
 //#include "Images.h"
@@ -64,6 +64,9 @@
 #include "Game.h"
 #include "Plant.h"
 #include "Zombie.h"
+
+#include "diskio.h"
+#include "ff.h"
 
 //Music* activeMusic = new Music("test.wav", 128);  // test.wav, 128 bytes
 
