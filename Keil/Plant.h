@@ -29,7 +29,7 @@ class Plant : public Entity{
 		Plant(SpriteType* sp, Sound* sfx, uint8_t xpos, uint8_t ypos, uint8_t hp, 
 					uint8_t anim, uint8_t hostile, uint8_t atkRt, Projectile proj);
 		
-		void TakeDamage(uint8_t damage);
+		void takeDamage(uint8_t damage);
 		
 		
 };

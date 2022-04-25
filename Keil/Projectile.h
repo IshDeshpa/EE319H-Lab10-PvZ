@@ -18,9 +18,10 @@ class FrozenPea : public Projectile{
 		void collided();
 };
 
+// One hit KO (e.g. Cherry Bomb, Potato Mine, Chomper)
 class Ohko: public Projectile{
 	public:
-		//set projectile variable to defined Okho damage, Okho (transparent) sprite, sfx, speed = 0, collision = 1
+		//set projectile variable to defined OHKO damage, OHKO (transparent) sprite, sfx, speed = 0, collision = 1
 		Ohko(uint8_t x, uint8_t y);
 		//Special constructor does same as other constructor, but sets sprite to argument
 		Ohko(uint8_t x, uint8_t y, SpriteType sprite);	
@@ -59,11 +60,12 @@ class Chomp : public Ohko{
 
 class Sun : public Projectile{
 	protected:
+                uint8_t distance;
 		//change advance so if collision with cursor, collect sun
 		void advance();
 	public:
 		//call projectile constructor, use sun sprite, sun sfx, speed as defined sun speed, collision = 0, damage = 0
-		Sun();
+		Sun(uint8_t x, uint8_t y, uint8_t isMoving);
 };
 
 #endif

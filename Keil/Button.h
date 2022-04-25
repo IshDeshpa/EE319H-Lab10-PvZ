@@ -18,7 +18,6 @@ class Button : public GameObject{
 
 class MenuButton : public Button{
 	protected:
-		SpriteType* currentSprite;
 		SpriteType* english;
 		SpriteType* espanol;
 	
@@ -60,7 +59,7 @@ class LanguageButton : public MenuButton{
 
 class SeedPacket : public Button{
 	protected:
-    SpriteType* currentSprite;
+                uint8_t isReady; // Tracks if ready to be planted
 		SpriteType* ready;
 		SpriteType* gray;
 		uint8_t loadTime;
