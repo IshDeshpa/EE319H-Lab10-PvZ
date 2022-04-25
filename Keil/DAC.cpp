@@ -53,7 +53,7 @@ void DAC_Init(void){
 	GPIO_PORTB_PUR_R = 0x00;
 	GPIO_PORTB_DR8R_R |= 0xFF;
 	//void (*dacout)(void) = &temp;
-	Timer0_Init(temp, 355);
+	//Timer0_Init(temp, 355);
 }
 
 // **************DAC_Out*********************

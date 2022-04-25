@@ -7,10 +7,9 @@
 .\main.o: integer.h
 .\main.o: ff.h
 .\main.o: ffconf.h
-.\main.o: ST7735.h
-.\main.o: TExaS.h
+.\main.o: Random.h
 .\main.o: Timer0.h
-.\main.o: Timer1.h
 .\main.o: Game.h
 .\main.o: Plant.h
 .\main.o: Zombie.h
+.\main.o: ST7735.h
