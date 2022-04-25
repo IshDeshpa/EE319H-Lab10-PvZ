@@ -63,11 +63,20 @@
 #include "Plant.h"
 
 #include "Zombie.h"
+#include "Button.h"
+#include "Projectile.h"
+
 
 
 extern "C" void DisableInterrupts(void);
 extern "C" void EnableInterrupts(void);
 extern "C" void SysTick_Handler(void);
+
+Scene currentScene;
+
+uint8_t language = 0; //0 = english, 1 = espanol
+
+void loadScene();
 
 int main(void){
   PLL_Init(Bus80MHz);       // Bus clock is 80 MHz 
