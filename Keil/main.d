@@ -8,6 +8,7 @@
 .\main.o: ff.h
 .\main.o: ffconf.h
 .\main.o: Random.h
+.\main.o: TExaS.h
 .\main.o: Timer0.h
 .\main.o: Game.h
 .\main.o: Plant.h

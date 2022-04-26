@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "ff.h"
 #include "diskio.h"
+#include "DAC.h"
 
 #define MUSIC_BUFFER_SIZE 16
 #define FX_BUFFER_SIZE 16
@@ -55,8 +56,6 @@
 #define FootballAnimationRate 0.1*defaultAnimationTime
 #define PoleVaultAnimationRate 0.1*defaultAnimationTime
 #define EatingZombieAnimationRate 0.1*defaultAnimationTime
-
-
 
 
 // This is a comment leftover from a test issue

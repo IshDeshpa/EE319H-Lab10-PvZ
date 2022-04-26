@@ -78,6 +78,8 @@
 #define _ST7735H_
 
 #include <stdint.h>
+#include "diskio.h"
+#include "ff.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -466,6 +468,10 @@ void Output_On(void);
 // Input:  16-bit packed color
 // Output: none
 void Output_Color(uint32_t newColor);
+
+int fputcLCD(int ch, FIL *f);
+int fgetcLCD(FIL *f);
+void ferrorLCD(char* name);
 
 #ifdef __cplusplus
 }

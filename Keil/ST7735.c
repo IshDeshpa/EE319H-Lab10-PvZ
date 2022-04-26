@@ -77,6 +77,7 @@
 
 #include <cstdio>
 #include <stdint.h>
+#include "ff.h"
 #include "ST7735.h"
 #include "inc/tm4c123gh6pm.h"
 
@@ -617,14 +618,14 @@ void static writecommand(unsigned char c) {
 
 
 void static writedata(unsigned char c) {
-  volatile uint32_t response;
+	volatile uint32_t response;
                                         // wait until SSI0 not busy/transmit FIFO empty
   while((SSI0_SR_R&SSI_SR_BSY)==SSI_SR_BSY){};
   SDC_CS = SDC_CS_HIGH;
   TFT_CS = TFT_CS_LOW;
   DC = DC_DATA;
   SSI0_DR_R = c;                        // data out
-  while((SSI0_SR_R&SSI_SR_RNE)==0){};   // wait until response
+	while((SSI0_SR_R&SSI_SR_RNE)==0){};   // wait until response
   TFT_CS = TFT_CS_HIGH;
   response = SSI0_DR_R;                 // acknowledge response
 }
@@ -824,7 +825,7 @@ void static commandList(const uint8_t *addr) {
     ms       = numArgs & DELAY;          //   If hibit set, delay follows args
     numArgs &= ~DELAY;                   //   Mask out delay bit
     while(numArgs--) {                   //   For each argument...
-      writedata(*(addr++));              //     Read, issue argument
+			writedata(*(addr++));              //     Read, issue argument
     }
 
     if(ms) {
@@ -1765,18 +1766,19 @@ void ST7735_SetTextColor(uint16_t color){
 }
 
 // Print a character to ST7735 LCD.
-int fputcLCD(int ch, FILE *f){
+int fputcLCD(int ch, FIL *f){
   ST7735_OutChar(ch);
   return 1;
 }
 // No input from Nokia, always return data.
-int fgetcLCD(FILE *f){
+int fgetcLCD(FIL *f){
   return 0;
 }
 // Function called when file error occurs.
-int ferrorLCD(FILE *f){
-  // Your implementation of ferror
-  return EOF;
+void ferrorLCD(char* name){
+  ST7735_DrawString(0, 0, "f_write error ", ST7735_Color565(0, 0, 255));
+	ST7735_DrawString(14, 0, name, ST7735_Color565(0, 255, 0));
+	while(1){}
 }
 
 // Abstraction of general output device
