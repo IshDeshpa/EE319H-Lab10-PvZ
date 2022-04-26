@@ -57,7 +57,7 @@
 //#include "SlidePot.h"
 //#include "Images.h"
 //#include "UART.h"
-#include "TExaS.h"
+//#include "TExaS.h"
 #include "Timer0.h"
 //#include "Timer1.h"
 #include "Game.h"
@@ -272,18 +272,22 @@ void FileSystemTest(void){
 }
 
 Sound* s;
+uint8_t soundBuffer[24000];
 
 int main(void){
 	DisableInterrupts();
   PLL_Init(Bus80MHz);       // Bus clock is 80 MHz 
-  TExaS_Init();
+  //TExaS_Init();
   Random_Init(1);
   Output_Init();
   //Timer0_Init(&background,1600000); // 50 Hz
   //Timer1_Init(&clock,80000000); // 1 Hz
 	DAC_Init();
 	EnableInterrupts();
-	s = new Sound("test.wav", 80);
+	for(int i=0; i<800; i++){
+		soundBuffer[i] = 0;
+	}
+	s = new Sound("test.wav", soundBuffer, 24000);
 	Sound_Init(s);
 	//FileSystemTest();
 	while(1){};

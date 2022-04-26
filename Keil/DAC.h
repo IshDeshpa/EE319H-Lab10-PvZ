@@ -20,7 +20,7 @@ class Sound{
 		uint32_t dataSize;	// Size of data section
 		
 		uint8_t* soundBuffer;	// Sound buffer
-		uint8_t bufferPtr;	// Current location in buffer (offset from soundBuffer)
+		uint16_t bufferPtr;	// Current location in buffer (offset from soundBuffer)
 		uint16_t defaultBufferSize;	// Size of a default buffer; number of bytes
 		uint16_t currentBufferSize;	// Size of current buffer; number of bytes
 		
@@ -31,7 +31,7 @@ class Sound{
 		void loadFile();
 	public:
 		// Constructor
-		Sound(char* path, uint16_t bufferSize);
+		Sound(char* path, uint8_t* soundBuffer, uint16_t bufferSize);
 		
 		// Destructor
 		~Sound();

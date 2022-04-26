@@ -18,8 +18,8 @@ Sound* sounds[NUM_SOUNDS] = {0};
 extern "C" void DisableInterrupts(void);
 extern "C" void EnableInterrupts(void);
 
-Sound::Sound(char* path, uint16_t bufferSize){
-	this->soundBuffer = new uint8_t[bufferSize];
+Sound::Sound(char* path, uint8_t* soundBuffer, uint16_t bufferSize){
+	this->soundBuffer = soundBuffer;
 	this->defaultBufferSize = bufferSize;
 	this->currentBufferSize = bufferSize;
 	this->path = path;
@@ -57,7 +57,9 @@ Sound::Sound(char* path, uint16_t bufferSize){
 }
 
 Sound::~Sound(){
-	delete [] soundBuffer;
+	for(int i=0; i<this->defaultBufferSize; i++){
+		soundBuffer[i] = 0;
+	}
 	delete &soundFile;
 }
 
@@ -78,7 +80,9 @@ void Sound::increment(){
 			file_res = f_close(&(this->soundFile));
 			assert();
 
-			delete [] this->soundBuffer;			
+			for(int i=0; i<this->defaultBufferSize; i++){
+				soundBuffer[i] = 0;
+			}
 		}
 		
 		return;
@@ -86,7 +90,6 @@ void Sound::increment(){
 }
 
 void Sound::loadFile(){
-	Timer0_Arm(0);
 	// Read into buffer
 	uint16_t bs = this->currentBufferSize;
 	if(chunkPtr*bs > this->dataSize){
@@ -94,16 +97,17 @@ void Sound::loadFile(){
 	}
 	
 	if((chunkPtr+1) * bs > this->dataSize){	// If next load of complete buffer size goes over file boundary, we want to shrink buffer to only have remaining data
-		delete [] this->soundBuffer;
+		//delete [] this->soundBuffer;
 		this->currentBufferSize = this->dataSize - this->chunkPtr*bs;
-		this->soundBuffer = new uint8_t[this->dataSize - this->chunkPtr*bs];	// Buffer size is now remaining amount of data
+		//this->soundBuffer = new uint8_t[this->dataSize - this->chunkPtr*bs];	// Buffer size is now remaining amount of data
 	}
 	
 	br = 0;
+	Timer0_Arm(0);
 	file_res = f_read(&(this->soundFile), this->soundBuffer, bs, (UINT*)&br);
 	assert();
-	this->chunkPtr++;
 	Timer0_Arm(1);
+	this->chunkPtr++;
 }
 
 uint8_t Sound::getSample(){
