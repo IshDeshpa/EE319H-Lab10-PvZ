@@ -63,6 +63,9 @@
 #include "Game.h"
 #include "Plant.h"
 #include "Zombie.h"
+#include "Button.h"
+#include "Projectile.h"
+
 
 #include "diskio.h"
 #include "ff.h"
@@ -74,8 +77,15 @@ extern "C" void DisableInterrupts(void);
 extern "C" void EnableInterrupts(void);
 extern "C" void SysTick_Handler(void);
 
+
 Sound* s;
 uint8_t soundBuffer[24000];
+
+Scene currentScene;
+
+uint8_t language = 0; //0 = english, 1 = espanol
+
+void loadScene();
 
 int main(void){
 	DisableInterrupts();

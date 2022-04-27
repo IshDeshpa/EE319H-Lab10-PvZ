@@ -72,11 +72,15 @@ struct{
 // Any object on the screen that needs to be rendered/unrendered and does something
 class GameObject{
 	protected:
+		SpriteType* previousSprite; //when we advance, set the previousSprite to the sprite if we change sprites
 		SpriteType* sprite;	// Sprite pointer
+		uint8_t redraw; //1 or 0, initialize to 1, only render if 0
 		Sound* soundFX;	// Sound effect
 		uint8_t x;	// X position
 		uint8_t y;	// Y position
-		// Clear the current pixels of the game object
+		uint8_t oldx;
+		uint8_t oldy;
+		// Clear the current pixels of the game object, replacing them with the background
 		void unrender();
 		
 		// Advance to the next state of the game object (should be overloaded)
@@ -84,6 +88,9 @@ class GameObject{
 	
 		// Render the current state of the game object
 		void render();
+	
+		// unrender pixels and replace them one at a time
+		void rerender();
 	public:
 		// Constructor
 		GameObject();
