@@ -14,3 +14,4 @@
 .\main.o: Plant.h
 .\main.o: Zombie.h
 .\main.o: Display.h
+.\main.o: TestFS.h
