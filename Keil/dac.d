@@ -5,6 +5,7 @@
 .\dac.o: integer.h
 .\dac.o: ffconf.h
 .\dac.o: diskio.h
-.\dac.o: ST7735.h
+.\dac.o: ST7735SD.h
+.\dac.o: Display.h
 .\dac.o: Timer0.h
 .\dac.o: DAC.h

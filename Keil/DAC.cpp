@@ -5,7 +5,7 @@
 
 #include "ff.h"
 #include "diskio.h"
-#include "ST7735.h"
+#include "Display.h"
 #include "Timer0.h"
 #include "DAC.h"
 

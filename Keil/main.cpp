@@ -66,7 +66,7 @@
 
 #include "diskio.h"
 #include "ff.h"
-#include "ST7735.h"
+#include "Display.h"
 
 extern "C" void DisableInterrupts(void);
 extern "C" void EnableInterrupts(void);
@@ -284,10 +284,10 @@ int main(void){
   //Timer1_Init(&clock,80000000); // 1 Hz
 	DAC_Init();
 	EnableInterrupts();
-	for(int i=0; i<800; i++){
+	for(int i=0; i<24000; i++){
 		soundBuffer[i] = 0;
 	}
-	s = new Sound("test.wav", soundBuffer, 24000);
+	s = new Sound("music.wav", soundBuffer, 24000);
 	Sound_Init(s);
 	//FileSystemTest();
 	while(1){};

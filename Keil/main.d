@@ -5,6 +5,7 @@
 .\main.o: DAC.h
 .\main.o: diskio.h
 .\main.o: integer.h
+.\main.o: ST7735SD.h
 .\main.o: ff.h
 .\main.o: ffconf.h
 .\main.o: Random.h
@@ -12,4 +13,4 @@
 .\main.o: Game.h
 .\main.o: Plant.h
 .\main.o: Zombie.h
-.\main.o: ST7735.h
+.\main.o: Display.h
