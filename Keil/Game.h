@@ -22,6 +22,7 @@
 #define sunSpeed 1*speedMultiplier
 #define zombieSpeed 1*speedMultiplier
 #define poleVaultSpeed zombieSpeed*2
+#define lawnmowerSpeed 5
 
 #define peaDamage 1*damageRatio
 #define ohkoDamage 50*damageRatio
@@ -30,6 +31,7 @@
 #define smallExplosionDamage ohkoDamage
 #define jackInTheBoxDamage ohkoDamage
 #define zombieDamage 1*damageRatio
+#define lawnmowerDamage 50*damageRatio
 
 #define defaultPlantHealth 8*healthRatio
 #define wallNutHealth 100*healthRatio
@@ -56,10 +58,12 @@
 #define PoleVaultAnimationRate 0.1*defaultAnimationTime
 #define EatingZombieAnimationRate 0.1*defaultAnimationTime
 
-
-
-
-
+#define cmpButtonXSize
+#define cmpButtonYSize
+#define	vsButtonXSize
+#define vsButtonYSize
+#define langButtonXSize
+#define langButtonYSize
 
 // This is a comment leftover from a test issue
 
@@ -114,14 +118,14 @@ class Music: private Sound{
 // Any object on the screen that needs to be rendered/unrendered and does something
 class GameObject{
 	protected:
-		SpriteType* previousSprite; //when we advance, set the previousSprite to the sprite if we change sprites
+		//SpriteType* previousSprite; //when we advance, set the previousSprite to the sprite if we change sprites
 		SpriteType* sprite;	// Sprite pointer
 		uint8_t redraw; //1 or 0, initialize to 1, only render if 0
 		Sound* soundFX;	// Sound effect
 		uint8_t x;	// X position
 		uint8_t y;	// Y position
-		uint8_t oldx;
-		uint8_t oldy;
+		//uint8_t oldx;
+		//uint8_t oldy;
 		// Clear the current pixels of the game object, replacing them with the background
 		void unrender();
 		
@@ -179,19 +183,52 @@ class Projectile: public GameObject{
 	public:
 		//constructor with all new parameters, calls parent constructor for first 4
 		Projectile(SpriteType* sp, Sound* sfx, uint8_t xpos, uint8_t ypos, uint8_t spd, uint8_t dam);
+		void collided();
 };
 
+class LawnMower: public Projectile{
+	protected:
+		uint8_t isMoving; //1 or 0
+		//change advance so it only moves if isMoving == 1
+	public:
+		//constructer calls Projectile with lawnmower sprite, lawnmower sfx, x and y arguments, lawnmower speed, lawnmower damage
+		//set isMoving to 0
+		LawnMower(uint8_t x, uint8_t y);
+		//change collided so it doesn't kill lawnmower, sets isMoving to 1 and deals damage to zombies
+		void collided();
+};	
+
+class GameObjectList{
+	private:
+		GameObject* objects[256];
+		uint8_t indexPtr;
+	public:
+		//Constructor
+		GameObjectList(GameObject** GOlist);
+		//Destructor
+		~GameObjectList();
+		//Add Object
+		void GOAdd(GameObject* add);
+		//Access Object at index
+		GameObject* operator[](uint8_t i);
+		//Remove Object at index
+		void GORmv(uint8_t i);
+};
 // Collection of all game objects, background, music, etc. pertinent to the current area of the game
 class Scene{
 	private:
-		GameObject* objects;	// List of all objects on the scene
+		GameObjectList* Zombies;	// List of all objects on the scene these are arrays of pointers
+		GameObjectList* Plants;
+		GameObjectList* Buttons;
+		GameObjectList* Lawnmowers;
+		GameObjectList* Projectiles;
 		uint16_t* backgroundBMP;	// Background of the scene as a bitmap
+		Music* music;
 	public:
 		// Constructor
-		Scene();
-		
+		Scene(GameObjectList* but, GameObjectList* lwm, uint16_t* bg, Music* msc);
 		// Destructor
-		~Scene();
+		//~Scene();
 	
 		// Copy Constructor
 		Scene(const Scene& other);

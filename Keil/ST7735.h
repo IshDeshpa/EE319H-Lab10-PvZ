@@ -249,7 +249,7 @@ uint16_t ST7735_SwapColor(uint16_t x) ;
 //        h     number of pixels tall
 // Output: none
 // Must be less than or equal to 128 pixels wide by 160 pixels high
-void ST7735_DrawBitmap(int16_t x, int16_t y, const uint16_t *image, int16_t w, int16_t h);
+void ST7735_DrawBitmap(int16_t x, int16_t y, const uint16_t *image, int16_t w, int16_t h, int16_t backgroundColor);
 
 //------------ST7735_DrawCharS------------
 // Simple character draw function.  This is the same function from

@@ -61,11 +61,11 @@
 #include "Timer1.h"
 #include "Game.h"
 #include "Plant.h"
+#include "GameObjects.h"
 
 #include "Zombie.h"
 #include "Button.h"
 #include "Projectile.h"
-
 
 
 extern "C" void DisableInterrupts(void);
@@ -74,9 +74,9 @@ extern "C" void SysTick_Handler(void);
 
 Scene currentScene;
 
-uint8_t language = 0; //0 = english, 1 = espanol
+uint8_t lang = 0; //0 = english, 1 = espanol
 
-void loadScene();
+void loadScene(Scene s);
 
 int main(void){
   PLL_Init(Bus80MHz);       // Bus clock is 80 MHz 
@@ -86,7 +86,6 @@ int main(void){
   //Timer0_Init(&background,1600000); // 50 Hz
   //Timer1_Init(&clock,80000000); // 1 Hz
   EnableInterrupts();
-  
   while(1){
   
   }

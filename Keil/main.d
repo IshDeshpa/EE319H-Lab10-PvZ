@@ -15,4 +15,7 @@
 .\main.o: ffconf.h
 .\main.o: diskio.h
 .\main.o: Plant.h
+.\main.o: GameObjects.h
+.\main.o: Projectile.h
 .\main.o: Zombie.h
+.\main.o: Button.h
