@@ -2,14 +2,17 @@
 // Runs on LM4F120/TM4C123
 // A software function to change the bus frequency using the PLL.
 // Daniel Valvano
-// 1/17/2020
+// Jan 12, 2020
+/* This example accompanies the books
+   "Embedded Systems: Introduction to ARM Cortex M Microcontrollers",
+      ISBN: 978-1469998749, Jonathan Valvano, copyright (c) 2020
+   "Embedded Systems: Real Time Interfacing to ARM Cortex M Microcontrollers",
+      ISBN: 978-1463590154, Jonathan Valvano, copyright (c) 2020
+   "Embedded Systems: Real-Time Operating Systems for ARM Cortex-M Microcontrollers",
+      ISBN: 978-1466468863, Jonathan Valvano, copyright (c) 2020
+   Vol 2, Program 2.10, Figure 2.37
 
-/* This example accompanies the book
-   "Embedded Systems: Real Time Interfacing to Arm Cortex M Microcontrollers",
-   ISBN: 978-1463590154, Jonathan Valvano, copyright (c) 2017
-   Program 2.10, Figure 2.37
-
- Copyright 2018 by Jonathan W. Valvano, valvano@mail.utexas.edu
+ Copyright 2020 by Jonathan W. Valvano, valvano@mail.utexas.edu
     You may use, edit, run or distribute this file
     as long as the above copyright notice remains
  THIS SOFTWARE IS PROVIDED "AS IS".  NO WARRANTIES, WHETHER EXPRESS, IMPLIED

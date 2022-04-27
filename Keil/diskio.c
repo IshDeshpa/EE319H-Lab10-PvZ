@@ -14,10 +14,12 @@
 // Feb 22, 2016
 // added PB0 as a choice for SDC CS
 #include <stdint.h>
-#include "../inc/tm4c123gh6pm.h"
+#include "inc/tm4c123gh6pm.h"
 #include "integer.h"
+#include "ST7735SD.h"
 #include "diskio.h"
 #define SDC_CS_PB0 0
+#define SDC_CS_PD0 0
 #define SDC_CS_PD7 1
 
 // SDC CS is PD7 or PB0 , TFT CS is PA3
@@ -46,109 +48,30 @@
 // CS   - PA3 TFT_CS, active low to enable TFT
 // *CS  - PD7/PB0 SDC_CS, active low to enable SDC
 // MISO - PA4 MISO SPI data from SDC to microcontroller
-// SDA  – (NC) I2C data for ADXL345 accelerometer
-// SCL  – (NC) I2C clock for ADXL345 accelerometer
-// SDO  – (NC) I2C alternate address for ADXL345 accelerometer
+// SDA  ? (NC) I2C data for ADXL345 accelerometer
+// SCL  ? (NC) I2C clock for ADXL345 accelerometer
+// SDO  ? (NC) I2C alternate address for ADXL345 accelerometer
 // Backlight + - Light, backlight connected to +3.3 V
 
-#define TFT_CS           (*((volatile uint32_t *)0x40004020))
-#define TFT_CS_LOW       0 // CS controlled by software PA3
-#define TFT_CS_HIGH      0x08
-#if SDC_CS_PD7
-// PD7 output used for SDC CS
-#define SDC_CS           (*((volatile uint32_t *)0x40007200))
-#define SDC_CS_LOW       0           // CS controlled by software
-#define SDC_CS_HIGH      0x80
-void CS_Init(void){
-  SYSCTL_RCGCGPIO_R |= 0x08;            // activate clock for Port D
-  while((SYSCTL_PRGPIO_R&0x08) == 0){}; // allow time for clock to stabilize
-  GPIO_PORTD_LOCK_R = 0x4C4F434B;       // unlock GPIO Port D
-  GPIO_PORTD_CR_R = 0xFF;               // allow changes to PD7-0
-  // only PD7 needs to be unlocked, other bits can't be locked
-  GPIO_PORTD_DIR_R |= 0x80;             // make PD7 out
-  GPIO_PORTD_AFSEL_R &= ~0x80;          // disable alt funct on PD7
-  GPIO_PORTD_DR4R_R |= 0x80;            // 4mA drive on outputs
-  GPIO_PORTD_PUR_R |= 0x80;             // enable weak pullup on PD7
-  GPIO_PORTD_DEN_R |= 0x80;             // enable digital I/O on PD7
-                                        // configure PD7 as GPIO
-  GPIO_PORTD_PCTL_R = (GPIO_PORTD_PCTL_R&0x0FFFFFFF)+0x00000000;
-  GPIO_PORTD_AMSEL_R &= ~0x80;          // disable analog functionality on PD7
-  SDC_CS = SDC_CS_HIGH;
+/*
+ * Configure again the transmission line of the SSI that is being used
+ */
+void tx_SSI()
+{
+	GPIO_PORTA_AFSEL_R |= 0x20;           // enable alt funct on PA5
+	GPIO_PORTA_PCTL_R = (GPIO_PORTA_PCTL_R&0xFF0FFFFF)+0x00200000;
 }
-#endif
-// PB0 output used for SDC CS
-#if SDC_CS_PB0
-#define SDC_CS           (*((volatile uint32_t *)0x40005004))
-#define SDC_CS_LOW       0           // CS controlled by software
-#define SDC_CS_HIGH      0x01
-void CS_Init(void){
-  SYSCTL_RCGCGPIO_R |= 0x02;            // activate clock for Port B
-  while((SYSCTL_PRGPIO_R&0x02) == 0){}; // allow time for clock to stabilize
-  GPIO_PORTB_DIR_R |= 0x01;             // make PB0 out
-  GPIO_PORTB_AFSEL_R &= ~0x01;          // disable alt funct on PB0
-  GPIO_PORTB_DR4R_R |= 0x01;            // 4mA drive on outputs
-  GPIO_PORTB_PUR_R |= 0x01;             // enable weak pullup on PB0
-  GPIO_PORTB_DEN_R |= 0x01;             // enable digital I/O on PB0
-                                        // configure PB0 as GPIO
-  GPIO_PORTB_PCTL_R = (GPIO_PORTB_PCTL_R&0xFFFFFFF0)+0x00000000;
-  GPIO_PORTB_AMSEL_R &= ~0x01;          // disable analog functionality on PB0
-  SDC_CS = SDC_CS_HIGH;
+
+/*
+ * Writes a '1' in the transmission line of the SSI that is being used
+ */
+void tx_high()
+{
+	GPIO_PORTA_AFSEL_R &= ~0x20;           // disable alt funct on PA5
+	GPIO_PORTA_PCTL_R = (GPIO_PORTA_PCTL_R&0xFF0FFFFF);
+	GPIO_PORTA_DATA_R |= 0x20;            // PA5 high
 }
-#endif
-//********SSI0_Init*****************
-// Initialize SSI0 interface to SDC
-// inputs:  clock divider to set clock frequency
-// outputs: none
-// SSIClk = PIOSC / (CPSDVSR * (1 + SCR)) = 16 MHz/CPSDVSR
-// 40 for   400,000 bps slow mode, used during initialization
-// 2  for 8,000,000 bps fast mode, used during disk I/O
-void Timer5_Init(void);
-void SSI0_Init(uint32_t CPSDVSR){
-  Timer5_Init();                        // initialize Timer5 for 1 ms interrupts
-  CS_Init();                            // initialize whichever GPIO pin is CS for the SD card
-  // initialize Port A
-  SYSCTL_RCGCGPIO_R |= 0x01;            // activate clock for Port A
-  while((SYSCTL_PRGPIO_R&0x01) == 0){}; // allow time for clock to stabilize
-  GPIO_PORTA_DIR_R |= 0x08;             // make PA3 out
-  GPIO_PORTA_AFSEL_R |= 0x34;           // enable alt funct on PA2,4,5
-  GPIO_PORTA_AFSEL_R &= ~0x08;          // disable alt funct on PA3
-  GPIO_PORTA_DR4R_R |= 0xFC;            // 4mA drive on outputs
-  GPIO_PORTA_PUR_R |= 0x3C;             // enable weak pullup on PA2,3,4,5
-  GPIO_PORTA_DEN_R |= 0x3C;             // enable digital I/O on PA2,3,4,5
-                                        // configure PA2,4,5 as SSI
-  GPIO_PORTA_PCTL_R = (GPIO_PORTA_PCTL_R&0xFF00F0FF)+0x00220200;
-                                        // configure PA3 as GPIO
-  GPIO_PORTA_PCTL_R = (GPIO_PORTA_PCTL_R&0xFFFF0FFF)+0x00000000;
-  GPIO_PORTA_AMSEL_R &= ~0x3C;          // disable analog functionality on PA2,3,4,5
-  TFT_CS = TFT_CS_HIGH;                 // disable LCD
-  // initialize SSI0
-  SYSCTL_RCGCSSI_R |= 0x01;             // activate clock for SSI0
-  while((SYSCTL_PRSSI_R&0x01) == 0){};  // allow time for clock to stabilize
-  SSI0_CR1_R &= ~SSI_CR1_SSE;           // disable SSI
-  SSI0_CR1_R &= ~SSI_CR1_MS;            // master mode
-                                        // configure for clock from source PIOSC for baud clock source
-  SSI0_CC_R = (SSI0_CC_R&~SSI_CC_CS_M)+SSI_CC_CS_PIOSC;
-                                        // clock divider for SSIClk (16 MHz PIOSC/CPSDVSR)
-  SSI0_CPSR_R = (SSI0_CPSR_R&~SSI_CPSR_CPSDVSR_M)+CPSDVSR;
-  // CPSDVSR must be even from 2 to 254
-  SSI0_CR0_R &= ~(SSI_CR0_SCR_M |       // SCR = 0 (16/CPSDVSR Mbps data rate)
-                  SSI_CR0_SPH |         // SPH = 0
-                  SSI_CR0_SPO);         // SPO = 0
-                                        // FRF = Freescale format
-  SSI0_CR0_R = (SSI0_CR0_R&~SSI_CR0_FRF_M)+SSI_CR0_FRF_MOTO;
-                                        // DSS = 8-bit data
-  SSI0_CR0_R = (SSI0_CR0_R&~SSI_CR0_DSS_M)+SSI_CR0_DSS_8;
-  SSI0_CR1_R |= SSI_CR1_SSE;            // enable SSI
-}
-//void MakeTxhigh(void){
-//  GPIO_PORTA_AFSEL_R &= ~0x10;          // disable alt funct on PA4
-//  GPIO_PORTA_PCTL_R = (GPIO_PORTA_PCTL_R&0xFFF0FFFF);
-//  GPIO_PORTA_DATA_R |= 0x10;            // PA4 high
-//}
-//void MakeTxSSI(void){
-//  GPIO_PORTA_AFSEL_R |= 0x10;           // enable alt funct on PA4
-//  GPIO_PORTA_PCTL_R = (GPIO_PORTA_PCTL_R&0xFFF0FFFF)+0x000F0000;
-//}
+
 
 // SSIClk = PIOSC / (CPSDVSR * (1 + SCR)) = 16 MHz/CPSDVSR
 // 40 for   400,000 bps slow mode, used during initialization
@@ -156,10 +79,6 @@ void SSI0_Init(uint32_t CPSDVSR){
 #define FCLK_SLOW() { SSI0_CPSR_R = (SSI0_CPSR_R&~SSI_CPSR_CPSDVSR_M)+40; }
 #define FCLK_FAST() { SSI0_CPSR_R = (SSI0_CPSR_R&~SSI_CPSR_CPSDVSR_M)+2; }
 
-// de-asserts the CS pin to the card
-#define CS_HIGH()  SDC_CS = SDC_CS_HIGH;
-// asserts the CS pin to the card
-#define CS_LOW()  SDC_CS = SDC_CS_LOW;
 //#define  MMC_CD    !(GPIOC_IDR & _BV(4))  /* Card detect (yes:true, no:false, default:true) */
 #define  MMC_CD    1  /* Card detect (yes:true, no:false, default:true) */
 #define  MMC_WP    0 /* Write protected (yes:true, no:false, default:false) */
@@ -208,25 +127,13 @@ static BYTE CardType;      /* Card type flags */
 /*-----------------------------------------------------------------------*/
 
 /* Initialize MMC interface */
+void Timer1_Init(void);
 static void init_spi(void){
-  SPIxENABLE();    /* Enable SPI function */
-  CS_HIGH();       /* Set CS# high */
+  Timer1_Init();
+	SPIxENABLE();    /* Enable SPI function */
+  TurnSD(OFF);
 
-  for (Timer1 = 10; Timer1; ) ;  /* 10ms */
-}
-
-
-/* Exchange a byte */
-// Inputs:  byte to be sent to SPI
-// Outputs: byte received from SPI
-// assumes it has been selected with CS low
-static BYTE xchg_spi(BYTE dat){ BYTE volatile rcvdat;
-// wait until SSI0 not busy/transmit FIFO empty
-  while((SSI0_SR_R&SSI_SR_BSY)==SSI_SR_BSY){};
-  SSI0_DR_R = dat;                      // data out
-  while((SSI0_SR_R&SSI_SR_RNE)==0){};   // wait until response
-  rcvdat = SSI0_DR_R;                   // acknowledge response
-  return rcvdat;
+  Delay1ms(10);
 }
 
 /*-----------------------------------------------------------------------*/
@@ -279,22 +186,42 @@ static void xmit_spi_multi(const BYTE *buff, UINT btx){
 // Output: 1:Ready, 0:Timeout
 static int wait_ready(UINT wt){
   BYTE d;
-  Timer2 = wt;
+	Timer1_Arm(1);
+	Timer2 = wt;
   do {
-    d = xchg_spi(0xFF);
+    d = xchg_spi(0xFF, TO_SD, DC_COMMAND);
     /* This loop takes a time. Insert rot_rdq() here for multitask environment. */
   } while (d != 0xFF && Timer2);  /* Wait for card goes ready or timeout */
-  return (d == 0xFF) ? 1 : 0;
+  Timer1_Arm(0);
+	return (d == 0xFF) ? 1 : 0;
 }
 
+/*
+ * Makes use of the clock along with CS and MOSI to make the SD card readable using SPI
+ */
+void dummy_clock()
+{
+	unsigned int i;
+	//In order to initialize and set SPI mode, there should be at least 74 clock cycles with MOSI and CS set to 1
+	for ( i = 0; i < 2; i++);
+	//CS set high
+	TurnSD(OFF);
+	//Disables SSI on TX/MOSI pin to send a 1
+	tx_high();
+	for ( i = 0; i < 10; i++)
+	{
+		xchg_spi(0xFF,TO_SD, DC_DATA);
+	}
+	tx_SSI();
+}
 
 
 /*-----------------------------------------------------------------------*/
 /* Deselect card and release SPI                                         */
 /*-----------------------------------------------------------------------*/
 static void deselect(void){
-  CS_HIGH();       /* CS = H */
-  xchg_spi(0xFF);  /* Dummy clock (force DO hi-z for multiple slave SPI) */
+  TurnSD(OFF);
+  xchg_spi(0xFF, TO_SD, DC_DATA);  /* Dummy clock (force DO hi-z for multiple slave SPI) */
 }
 
 
@@ -305,9 +232,8 @@ static void deselect(void){
 // Input:  none
 // Output: 1:OK, 0:Timeout in 500ms
 static int select(void){
-  TFT_CS = TFT_CS_HIGH; // make sure TFT is off
-  CS_LOW();
-  xchg_spi(0xFF);  /* Dummy clock (force DO enabled) */
+  SwitchToSD();
+  xchg_spi(0xFF, TO_SD, DC_DATA);  /* Dummy clock (force DO enabled) */
   if(wait_ready(500)) return 1;  /* OK */
   deselect();
   return 0;  /* Timeout */
@@ -323,16 +249,18 @@ static int select(void){
 // Output: 1:OK, 0:Error on timeout
 static int rcvr_datablock(BYTE *buff, UINT btr){
   BYTE token;
+	Timer1_Arm(1);
   Timer1 = 200;
   do {              /* Wait for DataStart token in timeout of 200ms */
-    token = xchg_spi(0xFF);
+    token = xchg_spi(0xFF, TO_SD, DC_DATA);
     /* This loop will take a time. Insert rot_rdq() here for multitask envilonment. */
   } while ((token == 0xFF) && Timer1);
   if(token != 0xFE) return 0;    /* Function fails if invalid DataStart token or timeout */
 
   rcvr_spi_multi(buff, btr);    /* Store trailing data to the buffer */
-  xchg_spi(0xFF); xchg_spi(0xFF);      /* Discard CRC */
-  return 1;            /* Function succeeded */
+  xchg_spi(0xFF, TO_SD, DC_DATA); xchg_spi(0xFF, TO_SD, DC_DATA);      /* Discard CRC */
+  Timer1_Arm(0);
+	return 1;            /* Function succeeded */
 }
 
 
@@ -349,12 +277,12 @@ static int xmit_datablock(const BYTE *buff, BYTE token){
   BYTE resp;
   if (!wait_ready(500)) return 0;    /* Wait for card ready */
 
-  xchg_spi(token);                   /* Send token */
+  xchg_spi(token, TO_SD, DC_DATA);                   /* Send token */
   if (token != 0xFD) {               /* Send data if token is other than StopTran */
     xmit_spi_multi(buff, 512);       /* Data */
-    xchg_spi(0xFF); xchg_spi(0xFF);  /* Dummy CRC */
+    xchg_spi(0xFF, TO_SD, DC_DATA); xchg_spi(0xFF, TO_SD, DC_DATA);      /* Discard CRC */
 
-    resp = xchg_spi(0xFF);        /* Receive data resp */
+    resp = xchg_spi(0xFF, TO_SD, DC_DATA);        /* Receive data resp */
     if ((resp & 0x1F) != 0x05)    /* Function fails if the data packet was not accepted */
       return 0;
   }
@@ -384,21 +312,21 @@ static BYTE send_cmd(BYTE cmd, DWORD arg){
   }
 
   /* Send command packet */
-  xchg_spi(0x40 | cmd);        /* Start + command index */
-  xchg_spi((BYTE)(arg >> 24));    /* Argument[31..24] */
-  xchg_spi((BYTE)(arg >> 16));    /* Argument[23..16] */
-  xchg_spi((BYTE)(arg >> 8));      /* Argument[15..8] */
-  xchg_spi((BYTE)arg);        /* Argument[7..0] */
+  xchg_spi(0x40 | cmd, TO_SD, DC_COMMAND);        /* Start + command index */
+  xchg_spi((BYTE)(arg >> 24), TO_SD, DC_DATA);    /* Argument[31..24] */
+  xchg_spi((BYTE)(arg >> 16), TO_SD, DC_DATA);    /* Argument[23..16] */
+  xchg_spi((BYTE)(arg >> 8), TO_SD, DC_DATA);      /* Argument[15..8] */
+  xchg_spi((BYTE)arg, TO_SD, DC_DATA);        /* Argument[7..0] */
   n = 0x01;              /* Dummy CRC + Stop */
   if (cmd == CMD0) n = 0x95;      /* Valid CRC for CMD0(0) */
   if (cmd == CMD8) n = 0x87;      /* Valid CRC for CMD8(0x1AA) */
-  xchg_spi(n);
+  xchg_spi(n, TO_SD, DC_DATA);
 
   /* Receive command resp */
-  if (cmd == CMD12) xchg_spi(0xFF);  /* Diacard following one byte when CMD12 */
+  if (cmd == CMD12) xchg_spi(0xFF, TO_SD, DC_DATA);  /* Diacard following one byte when CMD12 */
   n = 10;                /* Wait for response (10 bytes max) */
   do
-    res = xchg_spi(0xFF);
+    res = xchg_spi(0xFF, TO_SD, DC_DATA);
   while ((res & 0x80) && --n);
 
   return res;              /* Return received response */
@@ -427,17 +355,19 @@ DSTATUS disk_initialize(BYTE drv){
   if (Stat & STA_NODISK) return Stat;  /* Is card existing in the soket? */
 
   FCLK_SLOW();
-  for (n = 10; n; n--) xchg_spi(0xFF);  /* Send 80 dummy clocks */
+	dummy_clock();
+  //for (n = 10; n; n--) xchg_spi(0xFF, TO_SD, DC_DATA);  /* Send 80 dummy clocks */
 
   ty = 0;
+	Timer1_Arm(1);
   if (send_cmd(CMD0, 0) == 1) {      /* Put the card SPI/Idle state */
     Timer1 = 1000;            /* Initialization timeout = 1 sec */
     if (send_cmd(CMD8, 0x1AA) == 1) {  /* SDv2? */
-      for (n = 0; n < 4; n++) ocr[n] = xchg_spi(0xFF);  /* Get 32 bit return value of R7 resp */
+      for (n = 0; n < 4; n++) ocr[n] = xchg_spi(0xFF, TO_SD, DC_DATA);  /* Get 32 bit return value of R7 resp */
       if (ocr[2] == 0x01 && ocr[3] == 0xAA) {        /* Is the card supports vcc of 2.7-3.6V? */
         while (Timer1 && send_cmd(ACMD41, 1UL << 30)) ;  /* Wait for end of initialization with ACMD41(HCS) */
         if (Timer1 && send_cmd(CMD58, 0) == 0) {    /* Check CCS bit in the OCR */
-          for (n = 0; n < 4; n++) ocr[n] = xchg_spi(0xFF);
+          for (n = 0; n < 4; n++) ocr[n] = xchg_spi(0xFF, TO_SD, DC_DATA);
           ty = (ocr[0] & 0x40) ? CT_SD2 | CT_BLOCK : CT_SD2;  /* Card id SDv2 */
         }
       }
@@ -452,6 +382,7 @@ DSTATUS disk_initialize(BYTE drv){
         ty = 0;
     }
   }
+	Timer1_Arm(0);
   CardType = ty;  /* Card type */
   deselect();
 
@@ -595,9 +526,9 @@ DRESULT disk_ioctl(BYTE drv, BYTE cmd, void *buff){
   case GET_BLOCK_SIZE :  /* Get erase block size in unit of sector (DWORD) */
     if (CardType & CT_SD2) {  /* SDC ver 2.00 */
       if (send_cmd(ACMD13, 0) == 0) {  /* Read SD status */
-        xchg_spi(0xFF);
+        xchg_spi(0xFF, TO_SD, DC_DATA);
         if (rcvr_datablock(csd, 16)) {        /* Read partial block */
-          for (n = 64 - 16; n; n--) xchg_spi(0xFF);  /* Purge trailing data */
+          for (n = 64 - 16; n; n--) xchg_spi(0xFF, TO_SD, DC_DATA);  /* Purge trailing data */
           *(DWORD*)buff = 16UL << (csd[10] >> 4);
           res = RES_OK;
         }
@@ -668,24 +599,29 @@ void disk_timerproc (void)
 }
 
 
-void Timer5_Init(void){
-  SYSCTL_RCGCTIMER_R |= 0x20;
-  while((SYSCTL_PRTIMER_R&0x20) == 0){};
-  TIMER5_CTL_R = 0x00000000;       // 1) disable timer5 during setup
-  TIMER5_CFG_R = 0x00000000;       // 2) configure for 32-bit mode
-  TIMER5_TAMR_R = 0x00000002;      // 3) configure for periodic mode, default down-count settings
-  TIMER5_TAILR_R = 79999;          // 4) reload value, 1 ms, 80 MHz clock
-  TIMER5_TAPR_R = 0;               // 5) bus clock resolution
-  TIMER5_ICR_R = 0x00000001;       // 6) clear timer5A timeout flag
-  TIMER5_IMR_R = 0x00000001;       // 7) arm timeout interrupt
-  NVIC_PRI23_R = (NVIC_PRI23_R&0xFFFFFF00)|0x00000040; // 8) priority 2
+void Timer1_Init(void){
+  SYSCTL_RCGCTIMER_R |= 0x02;
+  while((SYSCTL_PRTIMER_R&0x02) == 0){};
+  TIMER1_CTL_R = 0x00000000;       // 1) disable timer1 during setup
+  TIMER1_CFG_R = 0x00000000;       // 2) configure for 32-bit mode
+  TIMER1_TAMR_R = 0x00000002;      // 3) configure for periodic mode, default down-count settings
+  TIMER1_TAILR_R = 79999;          // 4) reload value, 1 ms, 80 MHz clock
+  TIMER1_TAPR_R = 0;               // 5) bus clock resolution
+  TIMER1_ICR_R = 0x00000001;       // 6) clear timer5A timeout flag
+  TIMER1_IMR_R = 0x00000001;       // 7) arm timeout interrupt
+  NVIC_PRI5_R = (NVIC_PRI5_R&0xFFFFFF00)|0x00000040; // 8) priority 2
 // interrupts enabled in the main program after all devices initialized
 // vector number 108, interrupt number 92
-  NVIC_EN2_R = 0x10000000;         // 9) enable interrupt 92 in NVIC
-  TIMER5_CTL_R = 0x00000001;       // 10) enable timer5A
+  NVIC_EN0_R = 1<<21;           // 9) enable IRQ 21 in NVIC
+  TIMER1_CTL_R = 0x00000001;    // 10) enable TIMER1A
 }
 // Executed every 1 ms
-void Timer5A_Handler(void){
-  TIMER5_ICR_R = 0x00000001;       // acknowledge timer5A timeout
+void Timer1A_Handler(void){
+  TIMER1_ICR_R = 0x00000001;       // acknowledge timer1A timeout
   disk_timerproc();
+}
+
+void Timer1_Arm(uint8_t isArmed){
+	TIMER1_CTL_R = 0x01 & isArmed;
+	TIMER1_IMR_R = 0x01 & isArmed;
 }
