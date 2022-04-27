@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include "ff.h"
 #include "diskio.h"
+#include "DAC.h"
+
 
 #define MUSIC_BUFFER_SIZE 16
 #define FX_BUFFER_SIZE 16
@@ -75,45 +77,6 @@ struct{
 	uint8_t width;	// Width
 	const SpriteType* nextSprite;	// Sprite pointer for animation FSM (each sprite only has one next sprite)
 } Sprite;
-
-// Sound stored on SD Card
-class Sound{
-	protected:
-		FIL soundFile;	// Sound file
-		char* path;	// Path to file
-		uint8_t* soundBuffer;	// Sound buffer
-		uint8_t bufferPtr;	// Current location in buffer (offset from soundBuffer)
-		uint16_t bufferSize;	// Size of buffer; number of bytes
-		
-		// Load sound effect into local memory
-		void loadFile();
-	public:
-		// Constructor
-		Sound();
-	
-		// Constructor
-		Sound(char* path, uint16_t bufferSize);
-		
-		// Destructor
-		~Sound();
-	
-		// Go to next sample. If reached end, free buffer and close file but DON'T destroy sound.
-		void increment();
-		
-		// Play sound
-		void play();
-};
-
-// Music stored on SD Card; inherits from sound
-class Music: private Sound{
-	private:
-		uint64_t chunkPtr;	// Points to chunk in file that buffer is currently at
-		uint16_t musicSize;	// Size of total music; number of bytes
-		uint64_t musicOfs;	// Offset from original file pointer (use f_lseek)
-	public:
-		// Go to next sample. If reached end of buffer, change offset and read into local memory. If reached end of music, loop.
-		void increment();
-};
 
 // Any object on the screen that needs to be rendered/unrendered and does something
 class GameObject{
@@ -223,10 +186,10 @@ class Scene{
 		GameObjectList* Lawnmowers;
 		GameObjectList* Projectiles;
 		uint16_t* backgroundBMP;	// Background of the scene as a bitmap
-		Music* music;
+		Sound* music;
 	public:
 		// Constructor
-		Scene(GameObjectList* but, GameObjectList* lwm, uint16_t* bg, Music* msc);
+		Scene(GameObjectList* but, GameObjectList* lwm, uint16_t* bg, Sound* msc);
 		// Destructor
 		//~Scene();
 	

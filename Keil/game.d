@@ -5,3 +5,5 @@
 .\game.o: integer.h
 .\game.o: ffconf.h
 .\game.o: diskio.h
+.\game.o: ST7735SD.h
+.\game.o: DAC.h

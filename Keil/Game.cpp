@@ -28,7 +28,7 @@ void GameObjectList::GORmv(uint8_t i){
 	}
 }
 
-Scene::Scene(GameObjectList* but, GameObjectList* lwm, uint16_t* bg, Music* msc){
+Scene::Scene(GameObjectList* but, GameObjectList* lwm, uint16_t* bg, Sound* msc){
 		this->Buttons = but;
 		this->Plants = new GameObjectList(0);
 		this->Zombies = new GameObjectList(0);

@@ -52,25 +52,32 @@
 #include <stdint.h>
 #include "inc/tm4c123gh6pm.h"
 #include "PLL.h"
-#include "ST7735.h"
+#include "DAC.h" 
 #include "Random.h"
-#include "SlidePot.h"
-#include "Images.h"
-#include "UART.h"
+//#include "SlidePot.h"
+//#include "Images.h"
+//#include "UART.h"
+//#include "TExaS.h"
 #include "Timer0.h"
-#include "Timer1.h"
+//#include "Timer1.h"
 #include "Game.h"
 #include "Plant.h"
 #include "GameObjects.h"
-
 #include "Zombie.h"
 #include "Button.h"
 #include "Projectile.h"
-
+#include "diskio.h"
+#include "ff.h"
+#include "Display.h"
+#include "TestFS.h"
 
 extern "C" void DisableInterrupts(void);
 extern "C" void EnableInterrupts(void);
 extern "C" void SysTick_Handler(void);
+
+
+Sound* s;
+uint8_t soundBuffer[24000];
 
 Scene currentScene;
 
@@ -79,19 +86,20 @@ uint8_t lang = 0; //0 = english, 1 = espanol
 void loadScene(Scene s);
 
 int main(void){
+	DisableInterrupts();
   PLL_Init(Bus80MHz);       // Bus clock is 80 MHz 
-  // TExaS_Init();
+  //TExaS_Init();
   Random_Init(1);
   Output_Init();
   //Timer0_Init(&background,1600000); // 50 Hz
   //Timer1_Init(&clock,80000000); // 1 Hz
   EnableInterrupts();
-  while(1){
-  
-  }
-
+	DAC_Init();
+	//for(int i=0; i<24000; i++){
+		//soundBuffer[i] = 0;
+	//}
+	//s = new Sound("music.wav", soundBuffer, 24000);
+	//Sound_Init(s);
+	FileSystemTest();
+	while(1){};
 }
-
-
-
-

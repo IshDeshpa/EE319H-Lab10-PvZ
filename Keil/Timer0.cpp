@@ -24,7 +24,7 @@
 #include <stdint.h>
 #include "Timer0.h"
 #include "inc/tm4c123gh6pm.h"
-extern "C" void TIMER0A_Handler(void);
+extern "C" void Timer0A_Handler(void);
 
 void (*PeriodicTask0)(void);   // user function
 
@@ -49,7 +49,12 @@ void Timer0_Init(void(*task)(void), uint32_t period){
   NVIC_EN0_R = 1<<19;           // 9) enable IRQ 19 in NVIC
   TIMER0_CTL_R = 0x00000001;    // 10) enable TIMER0A
 }
-void TIMER0A_Handler(void){
+void Timer0A_Handler(void){
   TIMER0_ICR_R = TIMER_ICR_TATOCINT;// acknowledge TIMER0A timeout
   (*PeriodicTask0)();                // execute user task
+}
+
+void Timer0_Arm(uint8_t isArmed){
+	TIMER0_CTL_R = 0x01 & isArmed;
+	TIMER0_IMR_R = 0x01 & isArmed;
 }

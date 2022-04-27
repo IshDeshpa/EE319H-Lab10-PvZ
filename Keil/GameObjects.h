@@ -7,6 +7,7 @@
 #include "Zombie.h"
 #include "Button.h"
 
+
 //macros
 #define CmpButtonXpos 10
 #define CmpButtonYpos 50
@@ -64,8 +65,8 @@ LawnMower* LM4 = new LawnMower(0, Lane1Ypos);
 LawnMower* LM5 = new LawnMower(0, Lane1Ypos);
 
 //Music classes
-Music* menuMusic = new Music();
-Music* levelMusic = new Music();
+Sound* menuMusic = new Sound(0, 0, 0);
+Sound* levelMusic = new Sound(0, 0, 0);
 //TO-DO
 
 //Game Object lists
