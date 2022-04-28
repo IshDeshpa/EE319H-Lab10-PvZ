@@ -8,13 +8,8 @@
 .\main.o: ST7735SD.h
 .\main.o: ff.h
 .\main.o: ffconf.h
-.\main.o: Random.h
-.\main.o: Timer0.h
-.\main.o: Game.h
-.\main.o: Plant.h
-.\main.o: GameObjects.h
-.\main.o: Projectile.h
-.\main.o: Zombie.h
-.\main.o: Button.h
 .\main.o: Display.h
+.\main.o: Timer0.h
+.\main.o: Random.h
 .\main.o: TestFS.h
+.\main.o: Game.h

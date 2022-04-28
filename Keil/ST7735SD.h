@@ -178,29 +178,29 @@ typedef struct {
 extern "C" {
 #endif
 
-void SDC_CS_Init(void);
+extern void SDC_CS_Init(void);
 
-void TurnDisplay(uint8_t s);
+extern void TurnDisplay(uint8_t s);
 
-void TurnSD(uint8_t s);
+extern void TurnSD(uint8_t s);
 
-void SwitchToDisplay(void);
+extern void SwitchToDisplay(void);
 
-void SwitchToSD(void);
+extern void SwitchToSD(void);
 
-void D_C(uint8_t b);
+extern void D_C(uint8_t b);
 
-void Reset(uint8_t b);
+extern void Reset(uint8_t b);
 
-uint8_t xchg_spi(unsigned char c, uint8_t periph, uint8_t dc);
+extern uint8_t xchg_spi(unsigned char c, uint8_t periph, uint8_t dc);
 
-void commandList(const cmdList* c, uint8_t periph);
+extern void commandList(const cmdList* c, uint8_t periph);
 
-void Delay(uint32_t u1Count);
+extern void Delay(uint32_t u1Count);
 
-void Delay1ms(uint32_t n);
+extern void Delay1ms(uint32_t n);
 
-void SSI0_Init(uint32_t CPSDVSR);
+extern void SSI0_Init(uint32_t CPSDVSR);
 
 #ifdef __cplusplus
 }

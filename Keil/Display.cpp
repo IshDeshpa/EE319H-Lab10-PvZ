@@ -481,6 +481,11 @@ void Display_DrawBitmap(int16_t x, int16_t y, const uint16_t *image, int16_t w, 
   }
 }
 
+void Display_RenderSprite(int16_t x, int16_t y, const uint16_t *image, int16_t w, int16_t h, uint16_t greenScreen, const uint16_t* bg){}
+void Display_UnrenderSprite(int16_t x, int16_t y, int16_t w, int16_t h, const uint16_t* bg){}
+void Display_RenderCursor(int16_t x, int16_t y, int16_t w, int16_t h, const uint16_t* bg){}
+void Display_UnrenderCursor(int16_t x, int16_t y, int16_t w, int16_t h, const uint16_t* bg){}
+
 
 //------------Display_DrawCharS------------
 // Simple character draw function.  This is the same function from
