@@ -509,12 +509,11 @@ DRESULT disk_ioctl(BYTE drv, BYTE cmd, void *buff){
 
   res = RES_ERROR;
 	
+	SwitchToSD();
   switch (cmd) {
   case CTRL_SYNC :    /* Wait for end of internal write process of the drive */
     if (select()) res = RES_OK;
     break;
-	
-	SwitchToSD();
 	
   case GET_SECTOR_COUNT :  /* Get drive capacity in unit of sector (DWORD) */
     if ((send_cmd(CMD9, 0) == 0) && rcvr_datablock(csd, 16)) {

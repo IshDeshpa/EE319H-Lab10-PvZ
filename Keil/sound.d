@@ -4,5 +4,6 @@
 .\sound.o: DAC.h
 .\sound.o: diskio.h
 .\sound.o: integer.h
+.\sound.o: ST7735SD.h
 .\sound.o: ff.h
 .\sound.o: ffconf.h

@@ -2,12 +2,8 @@
 // put your names here, date
 #include <stdint.h>
 #include "inc/tm4c123gh6pm.h"
-
-#include "ff.h"
-#include "diskio.h"
-#include "Display.h"
-#include "Timer0.h"
 #include "DAC.h"
+
 
 FRESULT file_res;
 static FATFS g_sFatFs;
@@ -17,7 +13,9 @@ Sound* sounds[NUM_SOUNDS] = {0};
 
 extern "C" void DisableInterrupts(void);
 extern "C" void EnableInterrupts(void);
-
+void Sound::play(){
+	//TO-DO
+}
 Sound::Sound(char* path, uint8_t* soundBuffer, uint16_t bufferSize){
 	this->soundBuffer = soundBuffer;
 	this->defaultBufferSize = bufferSize;

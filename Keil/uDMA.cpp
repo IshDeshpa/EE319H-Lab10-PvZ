@@ -20,7 +20,7 @@ static void SSI0DMAConfiguration(void){
 		SYSCTL_RCGCDMA_R = 0x01; 	//Enable clock for DMA
 		UDMA_CFG_R = 0x01;	//Enable uDMA controller
 		UDMA_CTLBASE_R = (uint32_t)udma_control_structure;//Using Primary control structure
-		UDMA_ALTCLR_R = (uint32_t)(1<<10); 	// Ch. 10 and 11 for SSI0Rx
+		UDMA_ALTCLR_R = (uint32_t)(1<<10); 	// Ch. 10 for SSI0Rx
 		UDMA_PRIOSET_R = (1<<10);		//Setting high priority for Receiving from SSI0
 		UDMA_CHMAP1_R  = (1<<8 /*Map channel 10 to SSI0 Rx*/ );
 		UDMA_REQMASKSET_R = ~(uint32_t)(1<<10);	// Enable Ch. 10 for request

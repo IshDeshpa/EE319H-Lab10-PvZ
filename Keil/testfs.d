@@ -9,4 +9,5 @@
 .\testfs.o: inc/tm4c123gh6pm.h
 .\testfs.o: PLL.h
 .\testfs.o: DAC.h
+.\testfs.o: Timer0.h
 .\testfs.o: TestFS.h

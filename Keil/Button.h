@@ -2,20 +2,10 @@
 #define BUTTON_H
 
 #include <stdint.h>
-#include "Game.h"
 
-class Button : public GameObject{
-	protected:
-		//does nothing in Button
-		void buttonFunction();
-	public:
-		//calls gameobject with parameters as passed in
-		Button(uint8_t x, uint8_t y, SpriteType* sprite, Sound sfx);
-		//plays sound, calls buttonFunction
-		void buttonHit();
 
-};
 
+<<<<<<< HEAD
 class MenuButton : public Button{
 	protected:
 		SpriteType* english;
@@ -73,4 +63,6 @@ class SeedPacket : public Button{
 		
 	
 };
+=======
+>>>>>>> main
 #endif
