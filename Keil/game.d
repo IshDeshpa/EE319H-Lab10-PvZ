@@ -1,0 +1,11 @@
+.\game.o: Game.cpp
+.\game.o: Game.h
+.\game.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\game.o: DAC.h
+.\game.o: diskio.h
+.\game.o: integer.h
+.\game.o: ST7735SD.h
+.\game.o: ff.h
+.\game.o: ffconf.h
+.\game.o: Display.h
+.\game.o: Timer0.h

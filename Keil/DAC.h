@@ -5,6 +5,8 @@
 #include <stdint.h>
 #include "diskio.h"
 #include "ff.h"
+#include "Display.h"
+#include "Timer0.h"
 
 #define assert(); if(file_res!=FR_OK){ferrorLCD(this->path);}
 #define SAMPLE_RT 8000
@@ -41,6 +43,9 @@ class Sound{
 	
 		// Get current sample
 		uint8_t getSample();
+	
+		//plays the sound (I referenced this in a lot of classes, so impement it as play lol)
+		void play();
 };
 
 // Takes in a Sound* and adds it to the global array of sounds

@@ -60,48 +60,40 @@
 //#include "TExaS.h"
 #include "Timer0.h"
 //#include "Timer1.h"
-#include "Game.h"
-#include "Plant.h"
-#include "Zombie.h"
-#include "Button.h"
-#include "Projectile.h"
-
-
-#include "diskio.h"
-#include "ff.h"
 #include "Display.h"
-
 #include "TestFS.h"
+#include "Game.h"
+
+
 
 extern "C" void DisableInterrupts(void);
 extern "C" void EnableInterrupts(void);
 extern "C" void SysTick_Handler(void);
 
 
-Sound* s;
-uint8_t soundBuffer[24000];
+//macros
 
-Scene currentScene;
-
-uint8_t language = 0; //0 = english, 1 = espanol
-
-void loadScene();
 
 int main(void){
 	DisableInterrupts();
   PLL_Init(Bus80MHz);       // Bus clock is 80 MHz 
   //TExaS_Init();
-  Random_Init(1);
-  Output_Init();
+  //Random_Init(1);
+  //Output_Init();
   //Timer0_Init(&background,1600000); // 50 Hz
   //Timer1_Init(&clock,80000000); // 1 Hz
-	DAC_Init();
-	EnableInterrupts();
+  EnableInterrupts();
+	//DAC_Init();
 	//for(int i=0; i<24000; i++){
 		//soundBuffer[i] = 0;
 	//}
 	//s = new Sound("music.wav", soundBuffer, 24000);
 	//Sound_Init(s);
-	FileSystemTest();
-	while(1){};
+	//FileSystemTest();
+	while(1){
+	};
+}
+
+void Systick_Handler(){
+	currentScene->tick();
 }
