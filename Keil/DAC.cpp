@@ -92,11 +92,11 @@ void Sound::increment(){
 void Sound::loadFile(){
 	// Read into buffer
 	uint16_t bs = this->currentBufferSize;
-	if(chunkPtr*bs > this->dataSize){
+	if(chunkPtr*this->defaultBufferSize >= this->dataSize){
 		this->end = 1;
 	}
 	
-	if((chunkPtr+1) * bs > this->dataSize){	// If next load of complete buffer size goes over file boundary, we want to shrink buffer to only have remaining data
+	if((chunkPtr+1) * this->defaultBufferSize >= this->dataSize){	// If next load of complete buffer size goes over file boundary, we want to shrink buffer to only have remaining data
 		//delete [] this->soundBuffer;
 		this->currentBufferSize = this->dataSize - this->chunkPtr*bs;
 		//this->soundBuffer = new uint8_t[this->dataSize - this->chunkPtr*bs];	// Buffer size is now remaining amount of data
@@ -155,11 +155,14 @@ void DAC_Out(uint32_t data){
 }
 
 void playAllSounds(){
-	uint8_t total = 0;
-	for(int i=0; i<NUM_SOUNDS && sounds[i] != 0; i++){
-		uint8_t sample = sounds[i]->getSample();
-		total += sample;
-		sounds[i]->increment();
+	//uint8_t total = 0;
+	//for(int i=0; i<NUM_SOUNDS && sounds[i] != 0; i++){
+	uint8_t sample;
+	if(sounds[0] != 0){
+		sample = sounds[0]->getSample();
+		//total += sample;
+		sounds[0]->increment();
 	}
-	DAC_Out(total);
+	//}
+	DAC_Out(sample);
 }

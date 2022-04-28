@@ -143,25 +143,13 @@ void SDC_CS_Init(void){
 }
 #endif
 
-uint8_t xchg_spi(unsigned char c, uint8_t periph, uint8_t dc){
+uint8_t xchg_spi(unsigned char c, uint8_t dc){
 	volatile uint8_t response;
                                         // wait until SSI0 not busy/transmit FIFO empty
   while((SSI0_SR_R&SSI_SR_BSY)==SSI_SR_BSY){};
-	if(periph == TO_SD){
-		SwitchToSD();
-	}
-	else{
-		SwitchToDisplay();
-	}
 	D_C(dc);
 	SSI0_DR_R = c;                        // data out
   while((SSI0_SR_R&SSI_SR_RNE)==0){};   // wait until response
-	if(periph == TO_SD){
-		TurnSD(OFF);
-	}
-	else{
-		TurnDisplay(OFF);
-	}
 	
 	response = SSI0_DR_R;
 	return response;
@@ -187,17 +175,17 @@ void Delay1ms(uint32_t n){
 
 // Companion code to the above tables.  Reads and issues
 // a series of LCD commands stored in ROM byte array.
-void commandList(const cmdList* c, uint8_t periph) {
+void commandList(const cmdList* c) {
   //uint8_t numCommands, numArgs;
   //uint16_t ms;
 	uint8_t i;
 	uint8_t numCmds = c->numCmds;
 	
   while(i<numCmds) {                 // For each command...
-    xchg_spi(c->cmds[i].id, periph, DC_COMMAND);             //   Read, issue command
+    xchg_spi(c->cmds[i].id, DC_COMMAND);             //   Read, issue command
     uint8_t j = 0;
 		while(j<c->cmds[i].numArgs) {                   //   For each argument...
-			xchg_spi(c->cmds[i].args[j++], periph, DC_DATA);              //     Read, issue argument
+			xchg_spi(c->cmds[i].args[j++], DC_DATA);              //     Read, issue argument
     }
 		
 		uint16_t ms = c->cmds[i].delay;
@@ -262,6 +250,13 @@ void SSI0_Init(uint32_t CPSDVSR){
                                         // DSS = 8-bit data
   SSI0_CR0_R = (SSI0_CR0_R&~SSI_CR0_DSS_M)+SSI_CR0_DSS_8;
   SSI0_CR1_R |= SSI_CR1_SSE;            // enable SSI
+	
+	SSI0_DMACTL_R |= 0x01;
+}
+
+void SSI0_Handler(){
+
+
 }
 
 void TurnDisplay(uint8_t state){	// ON or OFF

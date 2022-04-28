@@ -157,7 +157,8 @@ void static commonInit(const cmdList* c) {
   ColStart  = RowStart = 0; // May be overridden in init func
   
 	SSI0_Init(2);
-  if(c) commandList(c, TO_DISP);
+	SwitchToDisplay();
+  if(c) commandList(c);
 }
 
 //------------Display_InitB------------
@@ -177,21 +178,22 @@ void Display_InitB(void) {
 // Input: option one of the enumerated options depending on tabs
 // Output: none
 void ST7735_InitR(enum initRFlags option) {
-  commonInit(&Rcmd1);
+	commonInit(&Rcmd1);
+	SwitchToDisplay();
   if(option == INITR_GREENTAB) {
-    commandList(&Rcmd2green, TO_DISP);
+    commandList(&Rcmd2green);
     ColStart = 2;
     RowStart = 1;
   } else {
     // colstart, rowstart left at default '0' values
-    commandList(&Rcmd2red, TO_DISP);
+    commandList(&Rcmd2red);
   }
-  commandList(&Rcmd3, TO_DISP);
+  commandList(&Rcmd3);
 
   // if black, change MADCTL color filter
   if (option == INITR_BLACKTAB) {
-    xchg_spi(DISPLAY_MADCTL, TO_DISP, DC_COMMAND);
-    xchg_spi(0xC0, TO_DISP, DC_DATA);
+    xchg_spi(DISPLAY_MADCTL, DC_COMMAND);
+    xchg_spi(0xC0, DC_DATA);
   }
   TabColor = option;
   Display_SetCursor(0,0);
@@ -204,27 +206,28 @@ void ST7735_InitR(enum initRFlags option) {
 // (same as Font table is encoded; different from regular bitmap)
 // Requires 11 bytes of transmission
 void static setAddrWindow(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1) {
-
-  xchg_spi(DISPLAY_CASET, TO_DISP, DC_COMMAND);
-  xchg_spi(0x00, TO_DISP, DC_DATA);
-  xchg_spi(x0+ColStart, TO_DISP, DC_DATA);
-  xchg_spi(0x00, TO_DISP, DC_DATA);
-  xchg_spi(x1+ColStart, TO_DISP, DC_DATA);
+	SwitchToDisplay();
+  xchg_spi(DISPLAY_CASET, DC_COMMAND);
+  xchg_spi(0x00, DC_DATA);
+  xchg_spi(x0+ColStart, DC_DATA);
+  xchg_spi(0x00, DC_DATA);
+  xchg_spi(x1+ColStart, DC_DATA);
 	
-	xchg_spi(DISPLAY_RASET, TO_DISP, DC_COMMAND);
-  xchg_spi(0x00, TO_DISP, DC_DATA);
-  xchg_spi(y0+RowStart, TO_DISP, DC_DATA);
-  xchg_spi(0x00, TO_DISP, DC_DATA);
-  xchg_spi(y1+RowStart, TO_DISP, DC_DATA);
+	xchg_spi(DISPLAY_RASET, DC_COMMAND);
+  xchg_spi(0x00, DC_DATA);
+  xchg_spi(y0+RowStart, DC_DATA);
+  xchg_spi(0x00, DC_DATA);
+  xchg_spi(y1+RowStart, DC_DATA);
 	
-	xchg_spi(DISPLAY_RAMWR, TO_DISP, DC_COMMAND);
+	xchg_spi(DISPLAY_RAMWR, DC_COMMAND);
 }
 
 // Send two bytes of data, most significant byte first
 // Requires 2 bytes of transmission
 void static pushColor(uint16_t color) {
-  xchg_spi((uint8_t)(color >> 8), TO_DISP, DC_DATA);
-  xchg_spi((uint8_t)(color), TO_DISP, DC_DATA);
+	SwitchToDisplay();
+  xchg_spi((uint8_t)(color >> 8), DC_DATA);
+  xchg_spi((uint8_t)(color), DC_DATA);
 }
 
 //------------Display_DrawPixel------------
@@ -264,9 +267,10 @@ void Display_DrawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color) {
   if((y+h-1) >= _height) h = _height-y;
   setAddrWindow(x, y, x, y+h-1);
 
+	SwitchToDisplay();
   while (h--) {
-    xchg_spi(hi, TO_DISP, DC_DATA);
-    xchg_spi(lo, TO_DISP, DC_DATA);
+    xchg_spi(hi, DC_DATA);
+    xchg_spi(lo, DC_DATA);
   }
 }
 
@@ -286,10 +290,11 @@ void ST7735_DrawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color) {
   if((x >= _width) || (y >= _height)) return;
   if((x+w-1) >= _width)  w = _width-x;
   setAddrWindow(x, y, x+w-1, y);
-
+	
+	SwitchToDisplay();
   while (w--) {
-    xchg_spi(hi, TO_DISP, DC_DATA);
-    xchg_spi(lo, TO_DISP, DC_DATA);
+    xchg_spi(hi, DC_DATA);
+    xchg_spi(lo, DC_DATA);
   }
 }
 
@@ -321,11 +326,12 @@ void Display_FillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color
   if((y + h - 1) >= _height) h = _height - y;
 
   setAddrWindow(x, y, x+w-1, y+h-1);
-
+	
+	SwitchToDisplay();
   for(y=h; y>0; y--) {
     for(x=w; x>0; x--) {
-      xchg_spi(hi, TO_DISP, DC_DATA);
-			xchg_spi(lo, TO_DISP, DC_DATA);
+      xchg_spi(hi, DC_DATA);
+			xchg_spi(lo, DC_DATA);
     }
   }
 }
@@ -350,12 +356,13 @@ void Display_DrawSmallCircle(int16_t x, int16_t y, uint16_t color) {
   uint8_t hi = color >> 8, lo = color;
   // rudimentary clipping 
   if((x>_width-5)||(y>_height-5)) return; // doesn't fit
-  for(i=0; i<6; i++){
+  SwitchToDisplay();
+	for(i=0; i<6; i++){
     setAddrWindow(x+smallCircle[i][0], y+i, x+smallCircle[i][1], y+i);
     w = smallCircle[i][2];
     while (w--) {
-      xchg_spi(hi, TO_DISP, DC_DATA);
-			xchg_spi(lo, TO_DISP, DC_DATA);
+      xchg_spi(hi, DC_DATA);
+			xchg_spi(lo, DC_DATA);
     }
   }
 }
@@ -384,12 +391,13 @@ void Display_DrawCircle(int16_t x, int16_t y, uint16_t color) {
   uint8_t hi = color >> 8, lo = color;
   // rudimentary clipping 
   if((x>_width-9)||(y>_height-9)) return; // doesn't fit
-  for(i=0; i<10; i++){
+  SwitchToDisplay();
+	for(i=0; i<10; i++){
     setAddrWindow(x+circle[i][0], y+i, x+circle[i][1], y+i);
     w = circle[i][2];
     while (w--) {
-      xchg_spi(hi, TO_DISP, DC_DATA);
-			xchg_spi(lo, TO_DISP, DC_DATA);
+      xchg_spi(hi, DC_DATA);
+			xchg_spi(lo, DC_DATA);
     }
   }
 }
@@ -467,13 +475,14 @@ void Display_DrawBitmap(int16_t x, int16_t y, const uint16_t *image, int16_t w, 
   }
 
   setAddrWindow(x, y-h+1, x+w-1, y);
-
+	
+	SwitchToDisplay();
   for(y=0; y<h; y=y+1){
     for(x=0; x<w; x=x+1){
                                         // send the top 8 bits
-      xchg_spi((uint8_t)(image[i] >> 8), TO_DISP, DC_DATA);
+      xchg_spi((uint8_t)(image[i] >> 8), DC_DATA);
                                         // send the bottom 8 bits
-      xchg_spi((uint8_t)image[i], TO_DISP, DC_DATA);
+      xchg_spi((uint8_t)image[i], DC_DATA);
       i = i + 1;                        // go to the next pixel
     }
     i = i + skipC;
@@ -674,42 +683,42 @@ void Display_OutUDec(uint32_t n){
 // Input: m new rotation value (0 to 3)
 // Output: none
 void Display_SetRotation(uint8_t m) {
-
-  xchg_spi(DISPLAY_MADCTL, TO_DISP, DC_COMMAND);
+	SwitchToDisplay();
+  xchg_spi(DISPLAY_MADCTL, DC_COMMAND);
   Rotation = m % 4; // can't be higher than 3
   switch (Rotation) {
    case 0:
      if (TabColor == INITR_BLACKTAB) {
-       xchg_spi(MADCTL_MX | MADCTL_MY | MADCTL_RGB, TO_DISP, DC_DATA);
+       xchg_spi(MADCTL_MX | MADCTL_MY | MADCTL_RGB, DC_DATA);
      } else {
-       xchg_spi(MADCTL_MX | MADCTL_MY | MADCTL_BGR, TO_DISP, DC_DATA);
+       xchg_spi(MADCTL_MX | MADCTL_MY | MADCTL_BGR, DC_DATA);
      }
      _width  = DISPLAY_TFTWIDTH;
      _height = DISPLAY_TFTHEIGHT;
      break;
    case 1:
      if (TabColor == INITR_BLACKTAB) {
-       xchg_spi(MADCTL_MY | MADCTL_MV | MADCTL_RGB, TO_DISP, DC_DATA);
+       xchg_spi(MADCTL_MY | MADCTL_MV | MADCTL_RGB, DC_DATA);
      } else {
-       xchg_spi(MADCTL_MY | MADCTL_MV | MADCTL_BGR, TO_DISP, DC_DATA);
+       xchg_spi(MADCTL_MY | MADCTL_MV | MADCTL_BGR, DC_DATA);
      }
      _width  = DISPLAY_TFTHEIGHT;
      _height = DISPLAY_TFTWIDTH;
      break;
   case 2:
      if (TabColor == INITR_BLACKTAB) {
-       xchg_spi(MADCTL_RGB, TO_DISP, DC_DATA);
+       xchg_spi(MADCTL_RGB, DC_DATA);
      } else {
-       xchg_spi(MADCTL_BGR, TO_DISP, DC_DATA);
+       xchg_spi(MADCTL_BGR, DC_DATA);
      }
      _width  = DISPLAY_TFTWIDTH;
      _height = DISPLAY_TFTHEIGHT;
     break;
    case 3:
      if (TabColor == INITR_BLACKTAB) {
-       xchg_spi(MADCTL_MX | MADCTL_MV | MADCTL_RGB, TO_DISP, DC_DATA);
+       xchg_spi(MADCTL_MX | MADCTL_MV | MADCTL_RGB, DC_DATA);
      } else {
-       xchg_spi(MADCTL_MX | MADCTL_MV | MADCTL_BGR, TO_DISP, DC_DATA);
+       xchg_spi(MADCTL_MX | MADCTL_MV | MADCTL_BGR, DC_DATA);
      }
      _width  = DISPLAY_TFTHEIGHT;
      _height = DISPLAY_TFTWIDTH;
@@ -724,10 +733,11 @@ void Display_SetRotation(uint8_t m) {
 // Input: i 0 to disable inversion; non-zero to enable inversion
 // Output: none
 void Display_InvertDisplay(int i) {
-  if(i){
-    xchg_spi(DISPLAY_INVON, TO_DISP, DC_COMMAND);
+  SwitchToDisplay();
+	if(i){
+    xchg_spi(DISPLAY_INVON, DC_COMMAND);
   } else{
-    xchg_spi(DISPLAY_INVOFF, TO_DISP, DC_COMMAND);
+    xchg_spi(DISPLAY_INVOFF, DC_COMMAND);
   }
 }
 // graphics routines

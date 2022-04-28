@@ -159,9 +159,6 @@ enum initRFlags{
 #define OFF 0x00
 #define ON 0x01
 
-#define TO_SD 0x00
-#define TO_DISP 0x01
-
 typedef struct {
 	uint8_t id;
 	uint8_t numArgs;
@@ -192,9 +189,9 @@ void D_C(uint8_t b);
 
 void Reset(uint8_t b);
 
-uint8_t xchg_spi(unsigned char c, uint8_t periph, uint8_t dc);
+uint8_t xchg_spi(unsigned char c, uint8_t dc);
 
-void commandList(const cmdList* c, uint8_t periph);
+void commandList(const cmdList* c);
 
 void Delay(uint32_t u1Count);
 

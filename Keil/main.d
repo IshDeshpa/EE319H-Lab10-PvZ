@@ -13,5 +13,7 @@
 .\main.o: Game.h
 .\main.o: Plant.h
 .\main.o: Zombie.h
+.\main.o: Button.h
+.\main.o: Projectile.h
 .\main.o: Display.h
 .\main.o: TestFS.h
