@@ -10,6 +10,7 @@ static FATFS g_sFatFs;
 uint8_t br;
 
 Sound* sounds[NUM_SOUNDS] = {0};
+uint8_t dacInitialized = 0;
 
 extern "C" void DisableInterrupts(void);
 extern "C" void EnableInterrupts(void);
@@ -22,6 +23,10 @@ Sound::Sound(char* path, uint8_t* soundBuffer, uint16_t bufferSize){
 	this->currentBufferSize = bufferSize;
 	this->path = path;
 	this->bufferPtr = 0;
+	
+	if(!dacInitialized){
+		DAC_Init();
+	}
 	
 	Timer0_Arm(0);
 	
@@ -52,6 +57,14 @@ Sound::Sound(char* path, uint8_t* soundBuffer, uint16_t bufferSize){
 	// Close file
 	//file_res = f_close(&(this->soundFile));
 	//assert();
+}
+
+Sound::Sound(){
+	this->soundBuffer = 0;
+	this->defaultBufferSize = 0;
+	this->currentBufferSize = 0;
+	this->path = 0;
+	this->bufferPtr = 0;
 }
 
 Sound::~Sound(){
@@ -140,7 +153,8 @@ void DAC_Init(void){
 		sounds[i] = 0;	// Initialize sounds array to 0
 	}
 	
-	Timer0_Init(&playAllSounds, 80000000/SAMPLE_RT);
+	//Timer0_Init(&playAllSounds, 80000000/SAMPLE_RT);
+	dacInitialized = 1;
 }
 
 // **************DAC_Out*********************

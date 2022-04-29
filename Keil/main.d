@@ -12,4 +12,3 @@
 .\main.o: Timer0.h
 .\main.o: Random.h
 .\main.o: TestFS.h
-.\main.o: Game.h

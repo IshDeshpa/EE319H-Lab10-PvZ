@@ -678,6 +678,12 @@ void Output_Color(uint32_t newColor);
 
 void ferrorLCD(char* name);
 
+uint8_t convX(uint8_t x);
+uint8_t convY(uint8_t y);
+
+//#define convX(x) ((DISPLAY_TFTWIDTH - 1 - x < 0)?(-(DISPLAY_TFTWIDTH - 1 - x)):(DISPLAY_TFTWIDTH - 1 - x));
+//#define convY(y) ((DISPLAY_TFTHEIGHT - 1 - y < 0)?(-(DISPLAY_TFTHEIGHT - 1 - y)):(DISPLAY_TFTHEIGHT - 1 - y));
+
 #define ST7735_InitB() Display_InitB()
 #define ST7735_InitR(o) Display_InitR(o)
 #define ST7735_DrawPixel(x, y, color) Display_DrawPixel(x, y, color)

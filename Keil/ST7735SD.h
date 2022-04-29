@@ -87,8 +87,8 @@ enum initRFlags{
   INITR_BLACKTAB
 };
 
-#define DISPLAY_TFTWIDTH  128
-#define DISPLAY_TFTHEIGHT 160
+#define DISPLAY_TFTWIDTH  160
+#define DISPLAY_TFTHEIGHT 128
 
 // Color definitions
 #define DISPLAY_BLACK   0x0000
@@ -159,9 +159,6 @@ enum initRFlags{
 #define OFF 0x00
 #define ON 0x01
 
-#define TO_SD 0x00
-#define TO_DISP 0x01
-
 typedef struct {
 	uint8_t id;
 	uint8_t numArgs;
@@ -192,9 +189,9 @@ extern void D_C(uint8_t b);
 
 extern void Reset(uint8_t b);
 
-extern uint8_t xchg_spi(unsigned char c, uint8_t periph, uint8_t dc);
+extern uint8_t xchg_spi(unsigned char c, uint8_t dc);
 
-extern void commandList(const cmdList* c, uint8_t periph);
+extern void commandList(const cmdList* c);
 
 extern void Delay(uint32_t u1Count);
 

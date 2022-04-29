@@ -189,7 +189,8 @@ static int wait_ready(UINT wt){
 	Timer1_Arm(1);
 	Timer2 = wt;
   do {
-    d = xchg_spi(0xFF, TO_SD, DC_COMMAND);
+		SwitchToSD();
+    d = xchg_spi(0xFF, DC_COMMAND);
     /* This loop takes a time. Insert rot_rdq() here for multitask environment. */
   } while (d != 0xFF && Timer2);  /* Wait for card goes ready or timeout */
   Timer1_Arm(0);
@@ -208,9 +209,9 @@ void dummy_clock()
 	TurnSD(OFF);
 	//Disables SSI on TX/MOSI pin to send a 1
 	tx_high();
-	for ( i = 0; i < 10; i++)
+	for (i = 0; i < 10; i++)
 	{
-		xchg_spi(0xFF,TO_SD, DC_DATA);
+		xchg_spi(0xFF, DC_DATA);
 	}
 	tx_SSI();
 }
@@ -221,7 +222,7 @@ void dummy_clock()
 /*-----------------------------------------------------------------------*/
 static void deselect(void){
   TurnSD(OFF);
-  xchg_spi(0xFF, TO_SD, DC_DATA);  /* Dummy clock (force DO hi-z for multiple slave SPI) */
+  xchg_spi(0xFF, DC_DATA);  /* Dummy clock (force DO hi-z for multiple slave SPI) */
 }
 
 
@@ -233,7 +234,7 @@ static void deselect(void){
 // Output: 1:OK, 0:Timeout in 500ms
 static int select(void){
   SwitchToSD();
-  xchg_spi(0xFF, TO_SD, DC_DATA);  /* Dummy clock (force DO enabled) */
+  xchg_spi(0xFF, DC_DATA);  /* Dummy clock (force DO enabled) */
   if(wait_ready(500)) return 1;  /* OK */
   deselect();
   return 0;  /* Timeout */
@@ -251,14 +252,15 @@ static int rcvr_datablock(BYTE *buff, UINT btr){
   BYTE token;
 	Timer1_Arm(1);
   Timer1 = 200;
+	SwitchToSD();
   do {              /* Wait for DataStart token in timeout of 200ms */
-    token = xchg_spi(0xFF, TO_SD, DC_DATA);
+    token = xchg_spi(0xFF, DC_DATA);
     /* This loop will take a time. Insert rot_rdq() here for multitask envilonment. */
   } while ((token == 0xFF) && Timer1);
   if(token != 0xFE) return 0;    /* Function fails if invalid DataStart token or timeout */
 
   rcvr_spi_multi(buff, btr);    /* Store trailing data to the buffer */
-  xchg_spi(0xFF, TO_SD, DC_DATA); xchg_spi(0xFF, TO_SD, DC_DATA);      /* Discard CRC */
+  xchg_spi(0xFF, DC_DATA); xchg_spi(0xFF, DC_DATA);      /* Discard CRC */
   Timer1_Arm(0);
 	return 1;            /* Function succeeded */
 }
@@ -276,13 +278,14 @@ static int rcvr_datablock(BYTE *buff, UINT btr){
 static int xmit_datablock(const BYTE *buff, BYTE token){
   BYTE resp;
   if (!wait_ready(500)) return 0;    /* Wait for card ready */
-
-  xchg_spi(token, TO_SD, DC_DATA);                   /* Send token */
+	
+	SwitchToSD();
+  xchg_spi(token, DC_DATA);                   /* Send token */
   if (token != 0xFD) {               /* Send data if token is other than StopTran */
     xmit_spi_multi(buff, 512);       /* Data */
-    xchg_spi(0xFF, TO_SD, DC_DATA); xchg_spi(0xFF, TO_SD, DC_DATA);      /* Discard CRC */
+    xchg_spi(0xFF, DC_DATA); xchg_spi(0xFF, DC_DATA);      /* Discard CRC */
 
-    resp = xchg_spi(0xFF, TO_SD, DC_DATA);        /* Receive data resp */
+    resp = xchg_spi(0xFF, DC_DATA);        /* Receive data resp */
     if ((resp & 0x1F) != 0x05)    /* Function fails if the data packet was not accepted */
       return 0;
   }
@@ -299,35 +302,37 @@ static int xmit_datablock(const BYTE *buff, BYTE token){
 // Outputs: R1 resp (bit7==1:Failed to send)
 static BYTE send_cmd(BYTE cmd, DWORD arg){
   BYTE n, res;
-  if (cmd & 0x80) {  /* Send a CMD55 prior to ACMD<n> */
-    cmd &= 0x7F;
-    res = send_cmd(CMD55, 0);
-    if (res > 1) return res;
-  }
+  do{	// If CMD0 returns 0xFF or a garbled response, we send it again until it works
+		if (cmd & 0x80) {  /* Send a CMD55 prior to ACMD<n> */
+			cmd &= 0x7F;
+			res = send_cmd(CMD55, 0);
+			if (res > 1) return res;
+		}
 
-  /* Select the card and wait for ready except to stop multiple block read */
-  if (cmd != CMD12) {
-    deselect();
-    if (!select()) return 0xFF;
-  }
+		/* Select the card and wait for ready except to stop multiple block read */
+		if (cmd != CMD12) {
+			deselect();
+			if (!select()) return 0xFF;
+		}
+		
+		/* Send command packet */
+		xchg_spi(0x40 | cmd, DC_COMMAND);        /* Start + command index */
+		xchg_spi((BYTE)(arg >> 24), DC_DATA);    /* Argument[31..24] */
+		xchg_spi((BYTE)(arg >> 16), DC_DATA);    /* Argument[23..16] */
+		xchg_spi((BYTE)(arg >> 8), DC_DATA);      /* Argument[15..8] */
+		xchg_spi((BYTE)arg, DC_DATA);        /* Argument[7..0] */
+		n = 0x01;              /* Dummy CRC + Stop */
+		if (cmd == CMD0) n = 0x95;      /* Valid CRC for CMD0(0) */
+		if (cmd == CMD8) n = 0x87;      /* Valid CRC for CMD8(0x1AA) */
+		xchg_spi(n, DC_DATA);
 
-  /* Send command packet */
-  xchg_spi(0x40 | cmd, TO_SD, DC_COMMAND);        /* Start + command index */
-  xchg_spi((BYTE)(arg >> 24), TO_SD, DC_DATA);    /* Argument[31..24] */
-  xchg_spi((BYTE)(arg >> 16), TO_SD, DC_DATA);    /* Argument[23..16] */
-  xchg_spi((BYTE)(arg >> 8), TO_SD, DC_DATA);      /* Argument[15..8] */
-  xchg_spi((BYTE)arg, TO_SD, DC_DATA);        /* Argument[7..0] */
-  n = 0x01;              /* Dummy CRC + Stop */
-  if (cmd == CMD0) n = 0x95;      /* Valid CRC for CMD0(0) */
-  if (cmd == CMD8) n = 0x87;      /* Valid CRC for CMD8(0x1AA) */
-  xchg_spi(n, TO_SD, DC_DATA);
-
-  /* Receive command resp */
-  if (cmd == CMD12) xchg_spi(0xFF, TO_SD, DC_DATA);  /* Diacard following one byte when CMD12 */
-  n = 10;                /* Wait for response (10 bytes max) */
-  do
-    res = xchg_spi(0xFF, TO_SD, DC_DATA);
-  while ((res & 0x80) && --n);
+		/* Receive command resp */
+		if (cmd == CMD12) xchg_spi(0xFF, DC_DATA);  /* Discard following one byte when CMD12 */
+		n = 10;                /* Wait for response (10 bytes max) */
+		do
+			res = xchg_spi(0xFF, DC_DATA);
+		while ((res & 0x80) && --n);
+	}while(res != 0x01 && cmd == CMD0);
 
   return res;              /* Return received response */
 }
@@ -363,11 +368,11 @@ DSTATUS disk_initialize(BYTE drv){
   if (send_cmd(CMD0, 0) == 1) {      /* Put the card SPI/Idle state */
     Timer1 = 1000;            /* Initialization timeout = 1 sec */
     if (send_cmd(CMD8, 0x1AA) == 1) {  /* SDv2? */
-      for (n = 0; n < 4; n++) ocr[n] = xchg_spi(0xFF, TO_SD, DC_DATA);  /* Get 32 bit return value of R7 resp */
+      for (n = 0; n < 4; n++) ocr[n] = xchg_spi(0xFF, DC_DATA);  /* Get 32 bit return value of R7 resp */
       if (ocr[2] == 0x01 && ocr[3] == 0xAA) {        /* Is the card supports vcc of 2.7-3.6V? */
         while (Timer1 && send_cmd(ACMD41, 1UL << 30)) ;  /* Wait for end of initialization with ACMD41(HCS) */
         if (Timer1 && send_cmd(CMD58, 0) == 0) {    /* Check CCS bit in the OCR */
-          for (n = 0; n < 4; n++) ocr[n] = xchg_spi(0xFF, TO_SD, DC_DATA);
+          for (n = 0; n < 4; n++) ocr[n] = xchg_spi(0xFF, DC_DATA);
           ty = (ocr[0] & 0x40) ? CT_SD2 | CT_BLOCK : CT_SD2;  /* Card id SDv2 */
         }
       }
@@ -498,17 +503,18 @@ DRESULT disk_ioctl(BYTE drv, BYTE cmd, void *buff){
   BYTE n, csd[16];
   DWORD *dp, st, ed, csize;
 
-
+	
   if (drv) return RES_PARERR;          /* Check parameter */
   if (Stat & STA_NOINIT) return RES_NOTRDY;  /* Check if drive is ready */
 
   res = RES_ERROR;
-
+	
+	SwitchToSD();
   switch (cmd) {
   case CTRL_SYNC :    /* Wait for end of internal write process of the drive */
     if (select()) res = RES_OK;
     break;
-
+	
   case GET_SECTOR_COUNT :  /* Get drive capacity in unit of sector (DWORD) */
     if ((send_cmd(CMD9, 0) == 0) && rcvr_datablock(csd, 16)) {
       if ((csd[0] >> 6) == 1) {  /* SDC ver 2.00 */
@@ -522,13 +528,13 @@ DRESULT disk_ioctl(BYTE drv, BYTE cmd, void *buff){
       res = RES_OK;
     }
     break;
-
+	
   case GET_BLOCK_SIZE :  /* Get erase block size in unit of sector (DWORD) */
     if (CardType & CT_SD2) {  /* SDC ver 2.00 */
       if (send_cmd(ACMD13, 0) == 0) {  /* Read SD status */
-        xchg_spi(0xFF, TO_SD, DC_DATA);
+        xchg_spi(0xFF, DC_DATA);
         if (rcvr_datablock(csd, 16)) {        /* Read partial block */
-          for (n = 64 - 16; n; n--) xchg_spi(0xFF, TO_SD, DC_DATA);  /* Purge trailing data */
+          for (n = 64 - 16; n; n--) xchg_spi(0xFF, DC_DATA);  /* Purge trailing data */
           *(DWORD*)buff = 16UL << (csd[10] >> 4);
           res = RES_OK;
         }
