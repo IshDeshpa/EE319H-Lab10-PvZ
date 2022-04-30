@@ -1,0 +1,11 @@
+.\plant.o: Plant.cpp
+.\plant.o: Game.h
+.\plant.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\plant.o: DAC.h
+.\plant.o: diskio.h
+.\plant.o: integer.h
+.\plant.o: ST7735SD.h
+.\plant.o: ff.h
+.\plant.o: ffconf.h
+.\plant.o: Display.h
+.\plant.o: Timer0.h

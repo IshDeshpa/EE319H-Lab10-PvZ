@@ -19,12 +19,11 @@
 #define animationRatio 1//general animation speed ratio
 
 #define speedMultiplier 0.1 * gameMovementSpeed
-#define peaSpeed 10*speedMultiplier
-#define snowPeaSpeed peaSpeed
+#define peaSpeed 3*speedMultiplier
 #define sunSpeed 1*speedMultiplier
 #define zombieSpeed 1*speedMultiplier
 #define poleVaultSpeed zombieSpeed*2
-#define lawnmowerSpeed 5
+#define lawnmowerSpeed 3
 
 #define peaDamage 1*damageRatio
 #define ohkoDamage 50*damageRatio
@@ -48,17 +47,20 @@
 #define repeaterRepeatTicks 0.2*gameTickRate
 #define ZombieAttackRate 0.4*gameTickRate
 #define sunProductionRate 10*gameTickRate
-
+#define potatoMineSurfaceTime 255
+#define chomperChewTime 255
 
 #define defaultAnimationTime gameTickRate*animationRatio
 #define DefaultPlantAnimationRate 0.5*defaultAnimationTime
 #define CherryBombAnimationRate 0.2*defaultAnimationTime
-#define ExplosionAnimationRate 0.2*defaultAnimationTime
+#define ExplosionTime 0.2*defaultAnimationTime
 #define ChompAnimationRate 0.2*defaultAnimationTime
 #define DefaultZombieAnimationRate 0.3*defaultAnimationTime
 #define FootballAnimationRate 0.1*defaultAnimationTime
 #define PoleVaultAnimationRate 0.1*defaultAnimationTime
 #define EatingZombieAnimationRate 0.1*defaultAnimationTime
+
+
 
 #define cmpButtonXSize
 #define cmpButtonYSize
@@ -74,11 +76,11 @@
 #define LangButtonXpos 80
 #define LangButtonYpos 10
 
-#define SpXSize 10 //TO-DO
+#define SpXSize 10 //size of all seed packet sprites
 #define SpYSize 10 
-#define SpOffset SpXSize+1
-#define SpYpos 115
-#define FspXpos 1
+#define SpOffset SpXSize+2
+#define SpYpos 115	//y position of all seed packets
+#define FspXpos 1		//x position of left most packet
 #define SspXpos FspXpos + SpOffset * 1
 #define TspXpos FspXpos + SpOffset * 2
 #define	FospXpos FspXpos + SpOffset * 3
@@ -87,13 +89,33 @@
 #define SespXpos FspXpos + SpOffset * 6
 #define EspXpos FspXpos + SpOffset * 7
 
-#define LaneYOffset 20 //change later
-#define Lane1Ypos 10
-#define Lane2Ypos Lane1Ypos + LaneYOffset * 1
-#define Lane3Ypos Lane1Ypos + LaneYOffset * 2
-#define Lane4Ypos Lane1Ypos + LaneYOffset * 3
-#define Lane5Ypos Lane1Ypos + LaneYOffset * 4
+#define peashooterCost 100
+#define sunflowerCost 50
+#define snowPeaCost 175
+#define	repeaterCost 200
+#define chomperCost 150
+#define potatoMineCost 25
+#define cherryBombCost 150
+#define wallNutCost 50
 
+
+#define LaneYOffset gridY //change later
+#define Lane1Ypos gridX
+#define Lane2Ypos Lane1Ypos + gridY * 1
+#define Lane3Ypos Lane1Ypos + gridY * 2
+#define Lane4Ypos Lane1Ypos + gridY * 3
+#define Lane5Ypos Lane1Ypos + gridY * 4
+
+#define ZombieStartXpos
+#define collectTolerance 30
+//change later:
+#define transparentColor 0x6969
+#define ZeroX 10
+#define ZeroY	5
+#define gridX 15
+#define gridY 20
+#define shootOffsetX 15
+#define shootOffsetY 15
 	//packet load times;
 #define LoadTime 100
 
@@ -113,7 +135,7 @@ class SpriteType{
 // Any object on the screen that needs to be rendered/unrendered and does something
 class GameObject{
 	protected:
-		//SpriteType* previousSprite; //when we advance, set the previousSprite to the sprite if we change sprites
+		SpriteType* previousSprite; //when we advance, set the previousSprite to the sprite if we change sprites
 		SpriteType* sprite;	// Sprite pointer
 		uint8_t redraw; //1 or 0, initialize to 1, only render if 0
 		Sound* soundFX;	// Sound effect
@@ -122,6 +144,7 @@ class GameObject{
 		uint8_t lane;
 		uint8_t oldx;
 		uint8_t oldy;
+	
 		// Clear the current pixels of the game object, replacing them with the background
 		void unrender();
 		
@@ -159,13 +182,17 @@ class GameObject{
 		void tick();
 		//game object collide will not do anything
 		void collided();
+		uint8_t getX();
+		uint8_t getY();
+		uint8_t getLane();
 };
 
 // GameObject with health (plants and zombies)
 class Entity: public GameObject{
 	protected:
-		uint8_t health;	// Health
+		int16_t health;	// Health
 		uint8_t animationTime;	// time to switch animation sprites
+		uint8_t animationTimer;
 		uint8_t hostile; //0 or 1
 		
 		// Advance to the next state of the entity and call attack?
@@ -177,6 +204,7 @@ class Entity: public GameObject{
 		Entity(SpriteType* sp, Sound* sfx, uint8_t xpos, uint8_t ypos, uint8_t hp, uint8_t anim, uint8_t hostl, uint8_t lane);
 		//entity tick will decrement animationTime
 		void tick();
+		void hurt(uint8_t damage);
 };
 
 // Projectile
@@ -214,24 +242,22 @@ class LawnMower: public Projectile{
 class Pea : public Projectile{
 	public:
 		//set projectile variables to defined pea damage, speed, sprite, sfx, collision = 1
-		Pea(uint8_t x, uint8_t y);
+		Pea(uint8_t x, uint8_t y, uint8_t lane);
 };
 
 class FrozenPea : public Projectile{
 	public:
 		//set projectile variables to defined Snowpea damage, sprite, pea sfx, and pea speed, collision = 1
-		FrozenPea(uint8_t x, uint8_t y);
-		//Change collision so it slows the zombie when hit
-		void collided();
+		FrozenPea(uint8_t x, uint8_t y, uint8_t lane);
 };
 
 // One hit KO (e.g. Cherry Bomb, Potato Mine, Chomper)
 class Ohko: public Projectile{
 	public:
 		//set projectile variable to defined OHKO damage, OHKO (transparent) sprite, sfx, speed = 0, collision = 1
-		Ohko(uint8_t x, uint8_t y);
+		Ohko(uint8_t x, uint8_t y, uint8_t lane);
 		//Special constructor does same as other constructor, but sets sprite to argument
-		Ohko(uint8_t x, uint8_t y, SpriteType sprite);	
+		Ohko(uint8_t x, uint8_t y, uint8_t lane, SpriteType* sprite, Sound* sound);	
 };
 
 class Explosion : public Ohko{
@@ -243,9 +269,9 @@ class Explosion : public Ohko{
 	public:
 		//call Ohko constructor in the 8 surrounding squares as well as this one. In this square, use big explosion sprite.
 		//initialize
-	  Explosion(uint8_t x, uint8_t y);
+	  Explosion(uint8_t x, uint8_t y, uint8_t lane);
 		//change collided so the projectile does not go away when collision happens
-		void collided();
+		int collided();
 		//tick decrements explosionTimer;
 		void tick();
 		
@@ -254,21 +280,26 @@ class Explosion : public Ohko{
 class SmallExplosion : public Ohko{
 	protected:	
 		void advance();
+		uint8_t explosionTimer;
 	public:
 		//call Ohko constructor in this square, use small explosion sprite
-		SmallExplosion(uint8_t x, uint8_t y);
+		SmallExplosion(uint8_t x, uint8_t y, uint8_t lane);
 		//change collided so the projectile does not go away when collision happens
-		void collided();
-		
+		int collided();
+		void tick();
 };
 
 class Chomp : public Ohko{
 	//I don't know if it needs to be different than Ohko or not
+	public:
+		Chomp(uint8_t x, uint8_t y, uint8_t lane);
 };
 
 class Sun : public Projectile{
 	protected:
-                uint8_t distance;
+  uint8_t upTimer;
+	int8_t distance;
+	uint8_t isMoving;
 		//change advance so if collision with cursor, collect sun
 		void advance();
 	public:
@@ -390,7 +421,7 @@ class Plant : public Entity{
 	protected:
 		uint8_t attackRate;
 		uint8_t attackTimer;
-		Projectile projectile;
+		uint8_t projID;
 		//create projectile
 		void attack();
 		//idk why I put this here
@@ -398,10 +429,9 @@ class Plant : public Entity{
 	public:
 		//call entity constructor with all but attackRate and projectile
 		Plant(SpriteType* sp, Sound* sfx, uint8_t xpos, uint8_t ypos, uint8_t hp, 
-					uint8_t anim, uint8_t hostile, uint8_t atkRt, Projectile proj);
+					uint8_t hostile, uint8_t atkRt, uint8_t projID, uint8_t lane);
 		
-		void takeDamage(uint8_t damage);
-		//
+		
 		void tick();
 		
 };
@@ -409,34 +439,33 @@ class Plant : public Entity{
 class Peashooter : public Plant{
 		
 	protected: 
-		//check if time>attackRate, then create pea if it is
-		void advance();
 	
 	public:
 		//constructor calls Plant constructor with defined peashooter sprite, 
 		//defined peashooter sound, x and y arguments, defined generic plant health,
 		//generic plant animation time, hostile = 1, atkRt as generic plant attack rate
 		//and pea projectile
-		Peashooter(uint8_t x, uint8_t y);
+		Peashooter(uint8_t x, uint8_t y, uint8_t lane);
 		//special constructor calls Plant constructor with Sprite argument rather than defined peashooter
-		Peashooter(uint8_t x, uint8_t y, SpriteType* sp);
+		Peashooter(uint8_t x, uint8_t y, uint8_t lane, SpriteType* sp);
 		//special constructer calls Plant constructor with Sprite argument and pea argument
-		Peashooter(uint8_t x, uint8_t y, SpriteType* sp, Projectile p);
+		Peashooter(uint8_t x, uint8_t y, uint8_t lane, SpriteType* sp, uint8_t projID);
 };
 		
 class Repeater : public Peashooter{
 	protected:
 		//time in between 1st and 2nd pea
-		uint8_t repeatTime;
+		uint8_t repeatTimer;
+		void advance();
 	public:
 		//constructor calls peashooter constructor with x and y argument and defined repeater sprite, and sets repeatTime to defined repeater time
-		Repeater(uint8_t x, uint8_t y);
-
+		Repeater(uint8_t x, uint8_t y, uint8_t lane);
+		void tick();
 };
 class Snowpea : public Peashooter{
 	public:
 		//constructor calls peashooter constructor with x and y arguements, Snowpea sprite and snow pea projectile
-		Snowpea(uint8_t x, uint8_t y);
+		Snowpea(uint8_t x, uint8_t y, uint8_t lane);
 };
 
 class Wallnut : public Plant{
@@ -451,29 +480,31 @@ class Wallnut : public Plant{
 		//null sount, x and y arguments, defined walnut health,
 		//generic plant animation time (still need to render when it gets hurt), hostile = 0, atkRt as generic plant attack rate (doesn't matter)
 		//and null projectile. Set damagedWallnut to the defined damagedWallnut sprite
-		Wallnut(uint8_t x, uint8_t y);
+		Wallnut(uint8_t x, uint8_t y, uint8_t lane);
+		//change to do nothing
+		void tick();
 };
 
 class CherryBomb : public Plant{
 	protected:
 		//after attacking, destroy the cherry bomb. also, no range detection
-		void advance();
+		void attack();
 	
 	public:
 			//constructor calls Plant constructor with defined cherry bomb sprite, explosion sound, x and y arguments, 
 		  //defined generic plant health, generic plant animation time, hostile = 1, atkRt as generic plant attack rate maybe, 
 			//explosion projectile
-			CherryBomb(uint8_t x, uint8_t y);
+			CherryBomb(uint8_t x, uint8_t y, uint8_t lane);
 };
 
 class PotatoMine : public Plant{
 	protected:
-		SpriteType* growing; //this might not be implemented
+		//SpriteType* growing; //this might not be implemented
 		SpriteType* aboveGround;
 		//can only attack if it's grown
 		uint8_t grown; //1 or 0
 		//after attacking, destroy the PotatoMine. cannot attack if underground (or transitioning). also, different range detection
-		void advance();
+		void attack();
 	
 	public:
 			//constructor calls Plant constructor with defined potato mine sprite, explosion sound, x and y arguments,
@@ -481,31 +512,29 @@ class PotatoMine : public Plant{
 			//small explosion projectile
 			//set growing and aboveGround to sprites
 			//set grown to 0
-			PotatoMine(uint8_t x, uint8_t y);
+			PotatoMine(uint8_t x, uint8_t y, uint8_t lane);
+		void hurt(uint8_t dam);
 };
-
 class Sunflower : public Plant{
 		//to me, it makes sense for the sun to be a projectile, maybe just have sun incorporate different behavior
 	protected:
-		//no range detection
-		void advance();
 	public:
 		//constructor calls Plant constructor with defined sunflower sprite, null or sun sound, x and y arguments
 		//defined generic plant health, generic plant animation time, hostile = 1, atkRt as more slow
 		//sun projectile (we can change it from a projectile if we want and just change up the attack function)
-		Sunflower(uint8_t x, uint8_t y);
+		Sunflower(uint8_t x, uint8_t y, uint8_t lane);
 			
 };
 
 class Chomper : public Plant{
 	protected:	
-		SpriteType* full;	//for when zombie in mouth
+		
 		SpriteType* empty;	//for when no zombie in mouth
+		SpriteType* bite;	//while attacking, bite sprite should point to chewing sprites
 		uint8_t mouthFull; //1 or 0
 		//change range detection to one tile
 		void advance();
 		//if no invisible hitbox projectile, we need to make attack do the collision
-		void attack();
 		
 	public:
 			//constructor calls Plant constructor with defined chomper empty sprite, defined chomp sound, x and y arguments
@@ -513,7 +542,7 @@ class Chomper : public Plant{
 			//null projectile or invisible hitbox?
 			//set full sprite to defined full chomper sprite, and empty to empty sprite
 			//mouthFull = 0
-		Chomper(uint8_t x, uint8_t y);
+		Chomper(uint8_t x, uint8_t y, uint8_t lane);
 };
 
 
@@ -578,6 +607,7 @@ class SeedPacket : public Button{
 		SpriteType* gray;
 		uint8_t loadTime;
 		uint8_t loadTimer;
+		uint8_t sunCost;
 		uint8_t plantID; //0 for peashooter, 1 for repeater, 2 for snowpea, 3 for wallnut, 4 for cherry bomb, 5 for mine, 6 for chomper, 7 for sunflower
 		//change buttonFunction to call global spawn plant with plantID
 		void buttonFunction();
@@ -585,7 +615,7 @@ class SeedPacket : public Button{
 		void advance();
 	public:
 		//calls Button constructor with parameters, but use planting sound,  and defined seed packet sprite/plantname from scene model
-		SeedPacket(uint8_t x, uint8_t y, uint8_t plantID, uint8_t loadTime);	
+		SeedPacket(uint8_t x, uint8_t y, uint8_t plantID, uint8_t loadTime, uint8_t sunCost);	
 		void buttonHit();
 		//tick decrements the load timer
 		void tick();
@@ -608,38 +638,88 @@ class GameObjectList{
 		GameObject* operator[](uint8_t i);
 		//Remove Object at index
 		void GORmv(uint8_t i);
+		void tryRmv(GameObject* go);
 		void refresh();
 		uint8_t getLength();
 		//will tick every existing member of objects
 		void tick();
 };
+
+//Still need to do globals and definitions for this crap
+
+class SelectCursor{
+	private:
+		uint8_t x;
+		uint8_t y;
+		uint8_t buttonIndex;
+		uint8_t redraw;
+		GameObjectList* targetButtons;
+		void inputCheck();
+		void updatePos();
+	public:
+		SelectCursor(GameObjectList* gos);
+		void refresh();
+};
+
+class GridCursor{
+	private:
+		uint8_t calcX();
+		uint8_t calcY();
+	public:
+		uint8_t x;	//for rendering
+		uint8_t y;
+		uint8_t gridXpos;	//for spawning plants
+		uint8_t gridYpos;	//unused for select
+		uint8_t grid[9][5];
+		uint8_t redraw;
+		void inputCheck();
+		void updatePos();
+	public:
+		GridCursor();
+		void refresh();
+		uint8_t gridOpen(); //returns 1 if no plant, returns 0 if plant
+		void fillGrid();
+		
+};
 // Collection of all game objects, background, music, etc. pertinent to the current area of the game
 class Scene{
 	private:
+		const uint16_t* backgroundBMP;	// Background of the scene as a bitmap
+		uint8_t sunRate;
+		uint8_t sunTimer;
+		int16_t sunAmount;
+		Sound* music;
+	
+		GridCursor* planter; //locked to the grid hopefully
+		SelectCursor* select; //menuing and seed packets
+	public:
 		GameObjectList* Zombies;	// List of all objects on the scene these are arrays of pointers
 		GameObjectList* Plants;
 		GameObjectList* Buttons;
 		GameObjectList* Lawnmowers;
 		GameObjectList* Projectiles;
-		const uint16_t* backgroundBMP;	// Background of the scene as a bitmap
-		uint8_t sunRate;
-		uint8_t sunTimer;
-		Sound* music;
-	public:
 		// Constructor
 		Scene(GameObjectList* but, GameObjectList* lwm, const uint16_t* bg, Sound* msc);
 		// Destructor
 		//~Scene();
 	
 		// Copy Constructor
-		Scene(const Scene& other);
+		//Scene(const Scene& other);
 	
 		// Assignment Operator
-		Scene operator=(Scene& other);
+		//Scene operator=(Scene& other);
 		const uint16_t* retBG();
 	  void refresh();
 		void collisions();
 		void tick();
+		void spawnProjectile(uint8_t projID, uint8_t x, uint8_t y, uint8_t lane);
+		void spawnPlant(uint8_t plantID);
+		void spawnZombie();
+		//return 1 if sun can change
+		uint8_t changeSun(int16_t amount);
+		void renderSun();
+		int cursorHit(uint8_t x, uint8_t y);
+		uint8_t gridCheck();
 };
 
 // Basic zombie.
@@ -650,7 +730,33 @@ class Scene{
 extern uint16_t menuBackground[1];
 extern uint16_t lawnBackground[1];
 	
+//projectile sprites
+extern SpriteType* frozenPeaSprite;
+extern SpriteType* peaSprite;
+extern SpriteType* smallExplosionSprite;
+extern SpriteType* largeExplosionSprite;
+extern SpriteType* sunSprite;
+extern SpriteType* transparentSprite;
 
+enum projIDS{
+	peaID, frozenPeaID, chompID, ohkoID, smallExplosionID, explosionID, sunID};
+
+enum plantIDS{
+	peashooterID, sunflowerID, snowPeaID, repeaterID, chomperID, potatoMineID, cherryBombID, wallNutID
+};
+//TO-DO make 3 of each of these except for a couple
+//plant sprites
+extern SpriteType* peashooterSprite;
+extern SpriteType* snowPeaSprite;
+extern SpriteType* repeaterSprite;
+extern SpriteType* sunflowerSprite;
+extern SpriteType* cherryBombSprite;
+extern SpriteType* potatoMineSprite;
+extern SpriteType* potatoMineReadySprite;
+extern SpriteType* chomperSprite;
+extern SpriteType* chomperChewSprite;
+extern SpriteType* chomperAttackSprite;
+extern SpriteType* wallNutSprite;
 
 //button sprites
 extern SpriteType* vsEnglish;
@@ -677,6 +783,11 @@ extern SpriteType* seedPacketGraySprites[8];
 //button sounds
 extern Sound* menuSound;
 extern Sound* plantingSound;
+
+extern Sound* peaSound;
+extern Sound* chompSound;
+extern Sound* explosionSound;
+extern Sound* sunSound;
 
 //language
 extern uint8_t lang; //0 = eng, 1 = esp	
@@ -728,6 +839,7 @@ extern GameObjectList* singlePlayerButtons;
 //GameObjectList* multiPlayerButtons = new GameObjectList(btnArr3);
 
 extern GameObjectList* lawnMowers;
+
 
 //scenes
 extern Scene* menu;
