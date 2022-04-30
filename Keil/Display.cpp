@@ -466,9 +466,8 @@ uint16_t Display_SwapColor(uint16_t x) {
 // Output: none
 // Must be less than or equal to 128 pixels wide by 160 pixels high
 void Display_DrawBitmap(int16_t x, int16_t y, const uint16_t *image, int16_t w, int16_t h){
-	int16_t skipC = 0;	// skip value
 	int16_t originalWidth = w;
-	int i = w-1;	// We start at the bottom right corner
+	int i = w-1;	// We start at the top right corner
 	if(x >= _width || y >= _height || (x+w-1) <= 0 || (y+h-1)<= 0){
 		return;	// Out of bounds
 	}
@@ -479,7 +478,6 @@ void Display_DrawBitmap(int16_t x, int16_t y, const uint16_t *image, int16_t w, 
 	
 	// Image goes off-screen
 	if((x + w - 1) >= _width){
-		skipC = (x + w) - _width;           // skip cut off columns
     w = _width - x;
 		i = w - 1;
 	}
@@ -491,13 +489,10 @@ void Display_DrawBitmap(int16_t x, int16_t y, const uint16_t *image, int16_t w, 
 	
 	if(x < 0){                            // image exceeds left of screen
     w = w + x;
-    i = i-x;
-		skipC = -1*x;                       // skip cut off columns
     x = 0;
   }
 	if(y < 0){                     // image exceeds bottom of screen
     h = h + y;
-		i = i-y;
     y = 0;
   }
 	
@@ -512,10 +507,7 @@ void Display_DrawBitmap(int16_t x, int16_t y, const uint16_t *image, int16_t w, 
       i += originalWidth;                        // go to the next pixel
 		}
 		i--;
-		i-=h*w;
-		//i+=skipC;	// skip whatever columns that are cut off
-		//i-=2*originalWidth;	// since we just skipped a column but we wanted to go back a column, we need to go back two
-		
+		i-=h*originalWidth;
 	}
 	
 	
@@ -575,11 +567,115 @@ void Display_DrawBitmap(int16_t x, int16_t y, const uint16_t *image, int16_t w, 
 	
 }
 
-void Display_RenderSprite(int16_t x, int16_t y, const uint16_t *image, int16_t w, int16_t h, uint16_t greenScreen, const uint16_t* bg){
+void Display_RenderSprite(int16_t x, int16_t y, const uint16_t *image, int16_t w, int16_t h, uint16_t greenScreen, const uint16_t* background){
+	int16_t originalWidth = w;
+	int i = w-1;	// We start at the top right corner
+	if(x >= _width || y >= _height || (x+w-1) <= 0 || (y+h-1)<= 0){
+		return;	// Out of bounds
+	}
+	
+	if((w > _width) || (h > _height)){
+		return;	// image bigger than screen
+	}
+	
+	// Image goes off-screen
+	if((x + w - 1) >= _width){
+    w = _width - x;
+		i = w - 1;
+	}
+	
+	if((y + h - 1) >= _height){                  // image exceeds top of screen
+		i = (y + h -_height) * originalWidth + w - 1;
+		h = _height - y;
+  }
+	
+	if(x < 0){                            // image exceeds left of screen
+    w = w + x;
+    x = 0;
+  }
+	if(y < 0){                     // image exceeds bottom of screen
+    h = h + y;
+    y = 0;
+  }
+	
+	int16_t originalX = x;
+	int16_t originalY = y;
+	
+	setAddrWindow(x+w-1, y+h-1, x, y);	// x y is the bottom left corner, so we need top left and bottom right
+	
+	SwitchToDisplay();
+	for(x=w; x>0; x--){
+		for(y=h; y>0; y--){
+			if(image[i] != greenScreen){
+				xchg_spi((uint8_t)(image[i] >> 8), DC_DATA);
+																					// send the bottom 8 bits
+				xchg_spi((uint8_t)image[i], DC_DATA);
+			}
+			else{
+				uint16_t screenInd = originalX+(_width)*convY(originalY+h-1) + (x-1) + (h-y-1)*_width;
+				uint16_t fillColor = background[screenInd];
+				//background[screenInd] = image[i];
+				xchg_spi((uint8_t)(fillColor >> 8), DC_DATA);
+																					// send the bottom 8 bits
+				xchg_spi((uint8_t)fillColor, DC_DATA);
+			}
+			i += originalWidth;                        // go to the next pixel
+		}
+		i--;
+		i-=h*originalWidth;
+	}
+}
+void Display_UnrenderSprite(int16_t x, int16_t y, int16_t w, int16_t h, const uint16_t* bg){
+		int16_t originalWidth = w;
+	int i = w-1;	// We start at the top right corner
+	if(x >= _width || y >= _height || (x+w-1) <= 0 || (y+h-1)<= 0){
+		return;	// Out of bounds
+	}
+	
+	if((w > _width) || (h > _height)){
+		return;	// image bigger than screen
+	}
+	
+	// Image goes off-screen
+	if((x + w - 1) >= _width){
+    w = _width - x;
+		i = w - 1;
+	}
+	
+	if((y + h - 1) >= _height){                  // image exceeds top of screen
+		i = (y + h -_height) * originalWidth + w - 1;
+		h = _height - y;
+  }
+	
+	if(x < 0){                            // image exceeds left of screen
+    w = w + x;
+    x = 0;
+  }
+	if(y < 0){                     // image exceeds bottom of screen
+    h = h + y;
+    y = 0;
+  }
+	
+	int16_t originalX = x;
+	int16_t originalY = y;
+	
+	setAddrWindow(x+w-1, y+h-1, x, y);	// x y is the bottom left corner, so we need top left and bottom right
+	for(x=w; x>0; x--){
+		for(y=h; y>0; y--){
+			uint16_t screenInd = originalX+(_width)*convY(originalY+h-1) + (x-1) + (h-y-1)*_width;
+			uint16_t fillColor = bg[screenInd];
+			//background[screenInd] = image[i];
+			xchg_spi((uint8_t)(fillColor >> 8), DC_DATA);
+																				// send the bottom 8 bits
+			xchg_spi((uint8_t)fillColor, DC_DATA);
+			i += originalWidth;                        // go to the next pixel
+		}
+		i--;
+		i-=h*originalWidth;
+	}
 	
 
 }
-void Display_UnrenderSprite(int16_t x, int16_t y, int16_t w, int16_t h, const uint16_t* bg){}
 void Display_RenderCursor(int16_t x, int16_t y, int16_t w, int16_t h, const uint16_t* bg){}
 void Display_UnrenderCursor(int16_t x, int16_t y, int16_t w, int16_t h, const uint16_t* bg){}
 

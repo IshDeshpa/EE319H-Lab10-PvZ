@@ -436,7 +436,7 @@ uint16_t Display_SwapColor(uint16_t x) ;
 // Must be less than or equal to 128 pixels wide by 160 pixels high
 void Display_DrawBitmap(int16_t x, int16_t y, const uint16_t *image, int16_t w, int16_t h);
 
-void Display_RenderSprite(int16_t x, int16_t y, const uint16_t *image, int16_t w, int16_t h, uint16_t greenScreen, const uint16_t* bg);
+void Display_RenderSprite(int16_t x, int16_t y, const uint16_t *image, int16_t w, int16_t h, uint16_t greenScreen, const uint16_t* background);
 void Display_UnrenderSprite(int16_t x, int16_t y, int16_t w, int16_t h, const uint16_t* bg);
 void Display_RenderCursor(int16_t x, int16_t y, int16_t w, int16_t h, const uint16_t* bg);
 void Display_UnrenderCursor(int16_t x, int16_t y, int16_t w, int16_t h, const uint16_t* bg);
