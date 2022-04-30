@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "DAC.h"
 #include "Display.h"
+#include "random.h"
 
 
 
@@ -23,6 +24,8 @@
 #define sunSpeed 1*speedMultiplier
 #define zombieSpeed 1*speedMultiplier
 #define poleVaultSpeed zombieSpeed*2
+#define footballSpeed poleVaultSpeed
+#define newspaperAngrySpeed polevaultSpeed //maybe unused
 #define lawnmowerSpeed 3
 
 #define peaDamage 1*damageRatio
@@ -62,12 +65,12 @@
 
 
 
-#define cmpButtonXSize
-#define cmpButtonYSize
-#define	vsButtonXSize
-#define vsButtonYSize
-#define langButtonXSize
-#define langButtonYSize
+#define cmpButtonXSize 50
+#define cmpButtonYSize 30
+#define	vsButtonXSize 50
+#define vsButtonYSize 30
+#define langButtonXSize 50
+#define langButtonYSize 30
 
 #define CmpButtonXpos 10
 #define CmpButtonYpos 50
@@ -309,113 +312,7 @@ class Sun : public Projectile{
 		void tick();
 };
 
-class Zombie: public Entity{
-	protected:
-		SpriteType* walkFSM;	// Walk animation pointer
-		SpriteType* eatFSM; // Eat animation pointer
-		uint8_t speed;  // Speed of zombie
-		uint8_t isEating;   // Is the zombie eating?
-		
-		// Advance to the next state of the entity
-		void advance();
-		
-		// do attacking sequence if hostile
-		void attack();
-	public:
-		// Constructor
-		Zombie();
 
-		// Constructor
-		Zombie(SpriteType* sp, Sound* sfx, uint8_t xpos, uint8_t ypos, uint8_t hp, 
-			uint8_t anim, uint8_t speed, uint8_t isEating);
-};
-
-// Regular zombie with a flag. Has random zombies in a wave formation following.
-// Scene should have a generate function that generates wave
-class FlagZombie: public Zombie{
-	public:
-		FlagZombie(uint8_t x, uint8_t y);
-};
-
-// Any zombie with extra health and headwear
-class ArmorZombie: public Zombie{
-	protected:
-		SpriteType* fullWalkFSM;    // Headwear on, undamaged
-		SpriteType* fullEatFSM;
-		SpriteType* damagedWalkFSM; // Headwear on, damaged
-		SpriteType* damagedEatFSM;
-		// Redefine advance to change sprite at certain health
-		void advance();
-	public:
-		// Constructor
-		ArmorZombie(uint8_t x, uint8_t y);
-};
-
-// Conehead zombie. Only thing different is that it has a different sprite and different health.
-class ConeZombie: public ArmorZombie{
-	public:
-		// Constructor
-		ConeZombie(uint8_t x, uint8_t y);
-};
-
-// Buckethead zombie. Only thing different is that it has a different sprite and different health.
-class BucketZombie: public ArmorZombie{
-	public:
-		// Constructor
-		BucketZombie(uint8_t x, uint8_t y);
-};
-
-// Football zombie. Only thing different is that it has a different sprite, different health, and different speed.
-class FootballZombie: public ArmorZombie{
-	public:
-		// Constructor
-		FootballZombie(uint8_t x, uint8_t y);
-};
-
-// Newspaper zombie. Only thing different is that it has a different sprite, different health, and conditional speed.
-class NewsZombie: public ArmorZombie{
-	private:
-		void advance();
-	public:
-		// Constructor
-		NewsZombie(uint8_t x, uint8_t y);
-};
-
-// Jack in the box zombie. Blows up after certain amount of time.
-class JackZombie: public Zombie{
-	private:
-		uint8_t delay;	// Delay for blowing up
-		void advance();	// Make it blow up
-	public:
-		// Constructor
-		JackZombie(uint8_t x, uint8_t y);
-};
-
-// Polevault zombie. Jumps over plants.
-class PoleZombie: public Zombie{
-	private:
-		uint8_t hasPole;    // Does the zombie  have its pole?
-		
-		// Redefine advance with jumping logic
-		void advance();
-
-		// Redefine attack to jump over first plant
-		void attack();
-	public:
-		// Constructor
-		PoleZombie(uint8_t x, uint8_t y);
-};
-
-
-
-//Peashooter
-//Repeater
-//Snow pea
-//Wall-nut
-//Potato Mine
-//Cherry Bomb
-//Chomper
-//Sunflower
 
 class Plant : public Entity{
 	protected:
@@ -428,10 +325,10 @@ class Plant : public Entity{
 		void advance();
 	public:
 		//call entity constructor with all but attackRate and projectile
-		Plant(SpriteType* sp, Sound* sfx, uint8_t xpos, uint8_t ypos, uint8_t hp, 
+		Plant(SpriteType* sp, uint8_t xpos, uint8_t ypos, uint8_t hp, 
 					uint8_t hostile, uint8_t atkRt, uint8_t projID, uint8_t lane);
 		
-		
+		void hurt(uint8_t damage);
 		void tick();
 		
 };
@@ -621,7 +518,126 @@ class SeedPacket : public Button{
 		void tick();
 };
 
+class Zombie: public Entity{
+	protected:
+		SpriteType* walkFSM;	// Walk animation pointer
+		SpriteType* eatFSM; // Eat animation pointer
+		uint8_t speed;  // Speed of zombie
+		uint8_t isEating;   // Is the zombie eating?
+		uint8_t wasEating; //was the zombie eating last frame?
+		uint8_t damageTimer;
+		uint8_t damageTime;
+		uint8_t distanceDiff;
+		
+		// Advance to the next state of the entity
+		void advance();
+		
+		
+	public:
+		// Constructor
+		Zombie(uint8_t xpos, uint8_t ypos, uint8_t lane);
 
+		// Constructor
+		Zombie(SpriteType* sp, uint8_t xpos, uint8_t ypos, uint8_t hp, 
+			uint8_t anim, uint8_t speed, uint8_t lane);
+		Zombie(SpriteType* sp, uint8_t xpos, uint8_t ypos, uint8_t hp, 
+			 uint8_t speed, uint8_t lane);
+		void tick();
+		// do attacking sequence if hostile
+		void attack(Plant* plt);
+		void stopEating();
+};
+
+// Regular zombie with a flag. Has random zombies in a wave formation following.
+// Scene should have a generate function that generates wave
+class FlagZombie: public Zombie{
+	private:
+		uint8_t spawnDelay;
+		uint8_t spawnTimer;
+		uint8_t numSpawn;
+	public:
+		FlagZombie(uint8_t x, uint8_t y, uint8_t lane);
+};
+
+// Any zombie with extra health and headwear
+class ArmorZombie: public Zombie{
+	protected:
+		SpriteType* fullWalkFSM;    // Headwear on, undamaged
+		SpriteType* fullEatFSM;
+		SpriteType* damagedWalkFSM; // Headwear on, damaged
+		SpriteType* damagedEatFSM;
+		// Redefine advance to change sprite at certain health
+		void advance();
+	public:
+		// Constructor
+		ArmorZombie(uint8_t x, uint8_t y, uint8_t lane);
+};
+
+// Conehead zombie. Only thing different is that it has a different sprite and different health.
+class ConeZombie: public ArmorZombie{
+	public:
+		// Constructor
+		ConeZombie(uint8_t x, uint8_t y, uint8_t lane);
+};
+
+// Buckethead zombie. Only thing different is that it has a different sprite and different health.
+class BucketZombie: public ArmorZombie{
+	public:
+		// Constructor
+		BucketZombie(uint8_t x, uint8_t y, uint8_t lane);
+};
+
+// Football zombie. Only thing different is that it has a different sprite, different health, and different speed.
+class FootballZombie: public ArmorZombie{
+	public:
+		// Constructor
+		FootballZombie(uint8_t x, uint8_t y, uint8_t lane);
+};
+
+// Newspaper zombie. Only thing different is that it has a different sprite, different health, and conditional speed.
+class NewsZombie: public ArmorZombie{
+	private:
+		void advance();
+	public:
+		// Constructor
+		NewsZombie(uint8_t x, uint8_t y, uint8_t lane);
+};
+
+// Jack in the box zombie. Blows up after certain amount of time.
+class JackZombie: public Zombie{
+	private:
+		uint8_t delay;	// Delay for blowing up
+		void advance();	// Make it blow up
+	public:
+		// Constructor
+		JackZombie(uint8_t x, uint8_t y, uint8_t lane);
+};
+
+// Polevault zombie. Jumps over plants.
+class PoleZombie: public Zombie{
+	private:
+		uint8_t hasPole;    // Does the zombie  have its pole?
+		
+		// Redefine advance with jumping logic
+		void advance();
+
+		// Redefine attack to jump over first plant
+		void attack();
+	public:
+		// Constructor
+		PoleZombie(uint8_t x, uint8_t y, uint8_t lane);
+};
+
+
+
+//Peashooter
+//Repeater
+//Snow pea
+//Wall-nut
+//Potato Mine
+//Cherry Bomb
+//Chomper
+//Sunflower
 
 class GameObjectList{
 	private:
@@ -714,7 +730,7 @@ class Scene{
 		void tick();
 		void spawnProjectile(uint8_t projID, uint8_t x, uint8_t y, uint8_t lane);
 		void spawnPlant(uint8_t plantID);
-		void spawnZombie();
+		void spawnZombie(uint8_t zombieID, uint8_t lane);
 		//return 1 if sun can change
 		uint8_t changeSun(int16_t amount);
 		void renderSun();
@@ -738,8 +754,14 @@ extern SpriteType* largeExplosionSprite;
 extern SpriteType* sunSprite;
 extern SpriteType* transparentSprite;
 
+enum zombieIDS{
+	regularZombieID, coneZombieID, bucketZombieID, footballZombieID, 
+	newspaperZombieID, poleVaultZombieID, jackZombieID, flagZombieID
+};
+
 enum projIDS{
-	peaID, frozenPeaID, chompID, ohkoID, smallExplosionID, explosionID, sunID};
+	peaID, frozenPeaID, chompID, ohkoID, 
+smallExplosionID, explosionID, sunID};
 
 enum plantIDS{
 	peashooterID, sunflowerID, snowPeaID, repeaterID, chomperID, potatoMineID, cherryBombID, wallNutID
@@ -757,6 +779,28 @@ extern SpriteType* chomperSprite;
 extern SpriteType* chomperChewSprite;
 extern SpriteType* chomperAttackSprite;
 extern SpriteType* wallNutSprite;
+
+//Zombie sprites
+extern SpriteType* regularZombieSprite;
+extern SpriteType* regularZombieEatSprite;
+extern SpriteType* bucketZombieSprite;
+extern SpriteType* bucketZombieEatSprite;
+extern SpriteType* newspaperZombieSprite;
+extern SpriteType* newspaperZombieEatSprite;
+extern SpriteType* polevaultZombieRunSprite;
+extern SpriteType* polevaultZombieJumpSprite;
+extern SpriteType* polevaultZombieWalkSprite;
+extern SpriteType* polevaultZombieEatSprite;
+extern SpriteType* jackZombieEatSprite;
+extern SpriteType* jackZombieSprite;
+extern SpriteType* footballZombieSprite;
+extern SpriteType* footballZombieEatSprite;
+extern SpriteType* flagZombieSprite;
+extern SpriteType* flagZombieEatSprite;
+extern SpriteType* coneZombieSprite;
+extern SpriteType* coneZombieEatSprite;
+
+
 
 //button sprites
 extern SpriteType* vsEnglish;
@@ -785,9 +829,11 @@ extern Sound* menuSound;
 extern Sound* plantingSound;
 
 extern Sound* peaSound;
-extern Sound* chompSound;
+extern Sound* chompSound;	//for when chomper bites zombie
 extern Sound* explosionSound;
 extern Sound* sunSound;
+extern Sound* biteSound; //for when zombie bites plant
+extern Sound* brainsSound;
 
 //language
 extern uint8_t lang; //0 = eng, 1 = esp	

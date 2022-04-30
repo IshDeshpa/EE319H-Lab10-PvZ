@@ -13,3 +13,4 @@
 .\main.o: Random.h
 .\main.o: TestFS.h
 .\main.o: Game.h
+.\main.o: random.h

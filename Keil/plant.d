@@ -9,3 +9,4 @@
 .\plant.o: ffconf.h
 .\plant.o: Display.h
 .\plant.o: Timer0.h
+.\plant.o: random.h

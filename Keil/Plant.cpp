@@ -1,7 +1,7 @@
 #include "Game.h"
 
-Plant::Plant(SpriteType* sp, Sound* sfx, uint8_t xpos, uint8_t ypos, uint8_t hp, 
-uint8_t hostile, uint8_t atkRt, uint8_t projID, uint8_t lane) : Entity(sp, 0, xpos, ypos, hp, DefaultPlantAnimationRate, hostile, lane){
+Plant::Plant(SpriteType* sp, uint8_t xpos, uint8_t ypos, uint8_t hp, 
+uint8_t hostile, uint8_t atkRt, uint8_t projID, uint8_t lane) : Entity(sp, biteSound, xpos, ypos, hp, DefaultPlantAnimationRate, hostile, lane){
 	this->attackRate = atkRt;
 	this->attackTimer = atkRt;
 	this->projID = projID;
@@ -24,18 +24,23 @@ void Plant::attack(){
 	currentScene->spawnProjectile(this->projID, this->x + shootOffsetX, this->y + shootOffsetY, this->lane);
 }
 
+void Plant::hurt(uint8_t damage){
+	Entity::hurt(damage);
+	this->soundFX->play();
+}
+
 Peashooter::Peashooter(uint8_t x, uint8_t y, uint8_t lane)
-: Plant(peashooterSprite, 0, x, y, defaultPlantHealth, 1, PlantAttackRate, peaID, lane)
+: Plant(peashooterSprite, x, y, defaultPlantHealth, 1, PlantAttackRate, peaID, lane)
 {
 	
 }
 Peashooter::Peashooter(uint8_t x, uint8_t y, uint8_t lane, SpriteType* sp)
-: Plant(sp, 0, x, y, defaultPlantHealth, 1, PlantAttackRate, peaID, lane)
+: Plant(sp, x, y, defaultPlantHealth, 1, PlantAttackRate, peaID, lane)
 {
 	
 }
 Peashooter::Peashooter(uint8_t x, uint8_t y, uint8_t lane, SpriteType* sp, uint8_t projID)
-: Plant(sp, 0, x, y, defaultPlantHealth, 1, PlantAttackRate, projID, lane)
+: Plant(sp, x, y, defaultPlantHealth, 1, PlantAttackRate, projID, lane)
 {
 	
 }
@@ -63,7 +68,7 @@ Snowpea::Snowpea(uint8_t x, uint8_t y, uint8_t lane) : Peashooter(x, y, lane, sn
 }
 
 Wallnut::Wallnut(uint8_t x, uint8_t y, uint8_t lane)
-:	Plant(wallNutSprite, 0, x, y, wallNutHealth, 0, 0, 0, lane){
+:	Plant(wallNutSprite, x, y, wallNutHealth, 0, 0, 0, lane){
 	
 }
 void Wallnut::advance(){
@@ -77,7 +82,7 @@ void Wallnut::tick(){
 //do nothing
 }
 CherryBomb::CherryBomb(uint8_t x, uint8_t y, uint8_t lane)
-: Plant(cherryBombSprite, explosionSound, x, y, defaultPlantHealth,
+: Plant(cherryBombSprite, x, y, defaultPlantHealth,
 	1, DefaultPlantAnimationRate*3, explosionID, lane)
 {
 	
@@ -91,7 +96,7 @@ void CherryBomb::attack(){
 }
 
 PotatoMine::PotatoMine(uint8_t x, uint8_t y, uint8_t lane)
-: Plant(potatoMineSprite, explosionSound, x, y, defaultPlantHealth,
+: Plant(potatoMineSprite, x, y, defaultPlantHealth,
 1, potatoMineSurfaceTime, smallExplosionID, lane)
 {
 	this->aboveGround = potatoMineReadySprite;
@@ -115,14 +120,14 @@ void PotatoMine::hurt(uint8_t dam){
 }
 
 Sunflower::Sunflower(uint8_t x, uint8_t y, uint8_t lane)
-: Plant (sunflowerSprite, 0, x, y, defaultPlantHealth, 1, 
+: Plant (sunflowerSprite, x, y, defaultPlantHealth, 1, 
 sunProductionRate, sunID, lane)
 {
 	
 }
 
 Chomper::Chomper(uint8_t x, uint8_t y, uint8_t lane)
-: Plant (chomperSprite, 0, x, y, defaultPlantHealth, 1, 
+: Plant (chomperSprite, x, y, defaultPlantHealth, 1, 
 chomperChewTime, sunID, lane){
 	this->empty = chomperSprite;
 	this->bite = chomperAttackSprite;

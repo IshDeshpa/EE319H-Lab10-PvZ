@@ -9,3 +9,4 @@
 .\projectile.o: ffconf.h
 .\projectile.o: Display.h
 .\projectile.o: Timer0.h
+.\projectile.o: random.h

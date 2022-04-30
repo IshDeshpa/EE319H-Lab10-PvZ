@@ -9,3 +9,4 @@
 .\button.o: ffconf.h
 .\button.o: Display.h
 .\button.o: Timer0.h
+.\button.o: random.h

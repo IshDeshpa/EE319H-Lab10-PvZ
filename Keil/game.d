@@ -9,3 +9,4 @@
 .\game.o: ffconf.h
 .\game.o: Display.h
 .\game.o: Timer0.h
+.\game.o: random.h

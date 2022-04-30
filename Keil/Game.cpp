@@ -433,7 +433,30 @@ void Scene::spawnPlant(uint8_t plantID){
 		this->planter->fillGrid();
 	}
 }
-void Scene::spawnZombie(){}
+
+
+void Scene::spawnZombie(uint8_t zombieID, uint8_t lane){
+	switch(zombieID){
+		case regularZombieID:
+			this->Zombies->GOAdd(new Zombie(170, Lane1Ypos + (lane-1)*LaneYOffset, lane));
+		case coneZombieID:
+			this->Zombies->GOAdd(new ConeZombie(170, Lane1Ypos + (lane-1)*LaneYOffset, lane));
+		case bucketZombieID:
+			this->Zombies->GOAdd(new BucketZombie(170, Lane1Ypos + (lane-1)*LaneYOffset, lane));
+		case footballZombieID:
+			this->Zombies->GOAdd(new FootballZombie(170, Lane1Ypos + (lane-1)*LaneYOffset, lane));
+		case newspaperZombieID:
+			this->Zombies->GOAdd(new NewsZombie(170, Lane1Ypos + (lane-1)*LaneYOffset, lane));
+		case flagZombieID:
+			this->Zombies->GOAdd(new FlagZombie(170, Lane1Ypos + (lane-1)*LaneYOffset, lane));
+		case poleVaultZombieID:
+			this->Zombies->GOAdd(new PoleZombie(170, Lane1Ypos + (lane-1)*LaneYOffset, lane));
+		case jackZombieID:
+			this->Zombies->GOAdd(new JackZombie(170, Lane1Ypos + (lane-1)*LaneYOffset, lane));
+		default:
+				break;
+	}
+}
 
 int Scene::cursorHit(uint8_t x, uint8_t y){
 	if(this->planter->x - x < collectTolerance && this->planter->x - x > -collectTolerance
