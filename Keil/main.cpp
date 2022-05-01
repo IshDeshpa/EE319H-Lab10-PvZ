@@ -76,7 +76,8 @@ extern "C" void SysTick_Handler(void);
 
 
 //macros
-
+Sound* s;
+uint8_t soundBuffer[24000];
 
 int main(void){
 	DisableInterrupts();
@@ -98,5 +99,5 @@ int main(void){
 }
 
 void Systick_Handler(){
-	currentScene->tick();
+	//currentScene->tick();
 }

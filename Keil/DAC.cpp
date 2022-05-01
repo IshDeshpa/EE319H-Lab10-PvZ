@@ -73,7 +73,7 @@ void Sound::increment(){
 	}
 	else{
 		// Free buffer
-		if(this->soundBuffer != 0){
+		/*if(this->soundBuffer != 0){
 			// Close file
 			file_res = f_close(&(this->soundFile));
 			assert();
@@ -81,7 +81,7 @@ void Sound::increment(){
 			for(int i=0; i<this->defaultBufferSize; i++){
 				soundBuffer[i] = 0;
 			}
-		}
+		}*/
 		
 		return;
 	}
@@ -114,6 +114,7 @@ uint8_t Sound::getSample(){
 
 // Takes in a Sound* and adds it to the global array of sounds
 void Sound_Init(Sound* s){
+	Timer0_Arm(0);
 	int i=0;
 	while(sounds[i]!=0 && i < NUM_SOUNDS){
 		i++;	// Loop to next empty position of array
@@ -121,6 +122,7 @@ void Sound_Init(Sound* s){
 	if(i < NUM_SOUNDS){
 		sounds[i] = s;	// Add to array
 	}
+	Timer0_Arm(1);
 }
 
 // **************DAC_Init*********************
@@ -160,7 +162,7 @@ void playAllSounds(){
 		sample = sounds[0]->getSample();
 		//total += sample;
 		sounds[0]->increment();
+		DAC_Out(sample);
 	}
 	//}
-	DAC_Out(sample);
 }
