@@ -1481,7 +1481,8 @@ int main(void){
 	Display_DrawBitmap(0, 0, background, 160, 128);
 	int i=0;
 	const uint16_t* sp = sp1;
-	while(1){
+	Display_RenderSprite(0, 0, sp, 17, 29, 0xFB56, background);
+	/*while(1){
 		if(sp == sp1)
 			sp = sp2;
 		else if(sp == sp2)
@@ -1496,7 +1497,7 @@ int main(void){
 		if(143-i < 0){
 			i=0;
 		}
-	}
+	}*/
 }
 
 void Systick_Handler(){
