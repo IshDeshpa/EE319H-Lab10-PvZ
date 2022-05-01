@@ -20,9 +20,10 @@ void Projectile::tick(){
 }
 int Projectile::collided(){
 	this->unrender();
+	currentScene->Projectiles->tryRmv(this);
+	this->soundFX->play();
 	return 1;
 }
-
 LawnMower::LawnMower(uint8_t x, uint8_t y, uint8_t lane) : Projectile(lmSprite, lmSound, x, y, lawnmowerSpeed, lawnmowerDamage, lane) {
 	this->isMoving  = 0;
 }
@@ -75,6 +76,7 @@ Explosion::Explosion(uint8_t x, uint8_t y, uint8_t lane) : Ohko(x, y, lane, larg
 	currentScene->spawnProjectile(ohkoID, x - gridX, y + gridY, lane + 1);
 	currentScene->spawnProjectile(ohkoID, x, y + gridY, lane + 1);
 	this->explosionTimer = ExplosionTime;
+	this->soundFX->play();
 }
 
 void Explosion::advance(){
@@ -93,6 +95,7 @@ void Explosion::tick(){
 
 SmallExplosion::SmallExplosion(uint8_t x, uint8_t y, uint8_t lane) : Ohko(x, y, lane, smallExplosionSprite, explosionSound){
 	this->explosionTimer = ExplosionTime;
+	this->soundFX->play();
 }
 int SmallExplosion::collided(){
 	return 0;
@@ -109,7 +112,7 @@ void SmallExplosion::tick(){
 }
 
 Chomp::Chomp(uint8_t x, uint8_t y, uint8_t lane): Ohko(x, y, lane, transparentSprite, chompSound){
-
+this->soundFX->play();
 }
 
 Sun::Sun(uint8_t x, uint8_t y, uint8_t isMoving) : Projectile(sunSprite, sunSound, x, y, sunSpeed, 0, 6){
@@ -122,6 +125,7 @@ void Sun::advance(){
 	if(currentScene->cursorHit(this->x, this->y)){
 		currentScene->changeSun(25);
 		this->unrender();
+		this->soundFX->play();
 		currentScene->Projectiles->tryRmv(this);
 		return;
 	}

@@ -23,9 +23,10 @@
 #define peaSpeed 3*speedMultiplier
 #define sunSpeed 1*speedMultiplier
 #define zombieSpeed 1*speedMultiplier
-#define poleVaultSpeed zombieSpeed*2
+#define poleVaultSpeed zombieSpeed*3
+#define jackZombieSpeed zombieSpeed*2
 #define footballSpeed poleVaultSpeed
-#define newspaperAngrySpeed polevaultSpeed //maybe unused
+#define newspaperAngrySpeed jackZombieSpeed
 #define lawnmowerSpeed 3
 
 #define peaDamage 1*damageRatio
@@ -121,6 +122,7 @@
 #define shootOffsetY 15
 	//packet load times;
 #define LoadTime 100
+#define bigWaveSize 10 //number of zombies in a big wave
 
 // Sprite contains a pointer to a bitmap, and has a length and width in pixels.
 class SpriteType{
@@ -137,7 +139,7 @@ class SpriteType{
 
 // Any object on the screen that needs to be rendered/unrendered and does something
 class GameObject{
-	protected:
+	public:
 		SpriteType* previousSprite; //when we advance, set the previousSprite to the sprite if we change sprites
 		SpriteType* sprite;	// Sprite pointer
 		uint8_t redraw; //1 or 0, initialize to 1, only render if 0
@@ -192,7 +194,7 @@ class GameObject{
 
 // GameObject with health (plants and zombies)
 class Entity: public GameObject{
-	protected:
+	public:
 		int16_t health;	// Health
 		uint8_t animationTime;	// time to switch animation sprites
 		uint8_t animationTimer;
@@ -213,12 +215,13 @@ class Entity: public GameObject{
 // Projectile
 class Projectile: public GameObject{
 	protected:
-		uint8_t damage;	// Damage
+		
 		uint8_t speed;	// Speed
 		uint8_t distanceDiff; //increments by speed every tick, advance adds it to xpos and sets redraw to 1;
 		uint8_t collision; //1 or 0
 		void advance();
 	public:
+		uint8_t damage;	// Damage
 		//constructor with all new parameters, calls parent constructor for first 4
 		Projectile(SpriteType* sp, Sound* sfx, uint8_t xpos, uint8_t ypos, uint8_t spd, uint8_t dam, uint8_t lane);
 		int collided();
@@ -546,6 +549,7 @@ class Zombie: public Entity{
 		// do attacking sequence if hostile
 		void attack(Plant* plt);
 		void stopEating();
+		void takeDamage(uint8_t dam);
 };
 
 // Regular zombie with a flag. Has random zombies in a wave formation following.
@@ -555,8 +559,10 @@ class FlagZombie: public Zombie{
 		uint8_t spawnDelay;
 		uint8_t spawnTimer;
 		uint8_t numSpawn;
+		void advance();
 	public:
 		FlagZombie(uint8_t x, uint8_t y, uint8_t lane);
+		void tick();
 };
 
 // Any zombie with extra health and headwear
@@ -564,13 +570,11 @@ class ArmorZombie: public Zombie{
 	protected:
 		SpriteType* fullWalkFSM;    // Headwear on, undamaged
 		SpriteType* fullEatFSM;
-		SpriteType* damagedWalkFSM; // Headwear on, damaged
-		SpriteType* damagedEatFSM;
 		// Redefine advance to change sprite at certain health
 		void advance();
 	public:
 		// Constructor
-		ArmorZombie(uint8_t x, uint8_t y, uint8_t lane);
+		ArmorZombie(uint8_t x, uint8_t y, uint8_t lane, SpriteType* fullWalk, SpriteType* fullEat);
 };
 
 // Conehead zombie. Only thing different is that it has a different sprite and different health.
@@ -606,23 +610,21 @@ class NewsZombie: public ArmorZombie{
 // Jack in the box zombie. Blows up after certain amount of time.
 class JackZombie: public Zombie{
 	private:
-		uint8_t delay;	// Delay for blowing up
-		void advance();	// Make it blow up
 	public:
 		// Constructor
 		JackZombie(uint8_t x, uint8_t y, uint8_t lane);
+		void attack();
 };
 
 // Polevault zombie. Jumps over plants.
 class PoleZombie: public Zombie{
 	private:
-		uint8_t hasPole;    // Does the zombie  have its pole?
-		
-		// Redefine advance with jumping logic
-		void advance();
+		uint8_t hasPole;	// Does the zombie  have its pole?
+		uint8_t hadPole; //did the zombie have the pole on the last frame
+		SpriteType* jumpSprite; //points to walking sprites
 
 		// Redefine attack to jump over first plant
-		void attack();
+		void attack(Plant* plt);
 	public:
 		// Constructor
 		PoleZombie(uint8_t x, uint8_t y, uint8_t lane);
@@ -640,7 +642,7 @@ class PoleZombie: public Zombie{
 //Sunflower
 
 class GameObjectList{
-	private:
+	public:
 		GameObject* objects[256];
 		uint8_t indexPtr;
 	public:
@@ -780,6 +782,23 @@ extern SpriteType* chomperChewSprite;
 extern SpriteType* chomperAttackSprite;
 extern SpriteType* wallNutSprite;
 
+extern SpriteType* peashooterSprite2;
+extern SpriteType* snowPeaSprite2;
+extern SpriteType* repeaterSprite2;
+extern SpriteType* sunflowerSprite2;
+extern SpriteType* cherryBombSprite2;
+extern SpriteType* potatoMineReadySprite2;
+extern SpriteType* chomperSprite2;
+extern SpriteType* chomperChewSprite2;
+extern SpriteType* wallNutDamagedSprite;
+
+extern SpriteType* peashooterSprite3;
+extern SpriteType* snowPeaSprite3;
+extern SpriteType* repeaterSprite3;
+extern SpriteType* sunflowerSprite3;
+extern SpriteType* cherryBombSprite3;
+extern SpriteType* chomperSprite3;
+extern SpriteType* chomperChewSprite3;
 //Zombie sprites
 extern SpriteType* regularZombieSprite;
 extern SpriteType* regularZombieEatSprite;
@@ -791,7 +810,6 @@ extern SpriteType* polevaultZombieRunSprite;
 extern SpriteType* polevaultZombieJumpSprite;
 extern SpriteType* polevaultZombieWalkSprite;
 extern SpriteType* polevaultZombieEatSprite;
-extern SpriteType* jackZombieEatSprite;
 extern SpriteType* jackZombieSprite;
 extern SpriteType* footballZombieSprite;
 extern SpriteType* footballZombieEatSprite;
@@ -799,6 +817,44 @@ extern SpriteType* flagZombieSprite;
 extern SpriteType* flagZombieEatSprite;
 extern SpriteType* coneZombieSprite;
 extern SpriteType* coneZombieEatSprite;
+
+extern SpriteType* regularZombieSprite2;
+extern SpriteType* regularZombieEatSprite2;
+extern SpriteType* bucketZombieSprite2;
+extern SpriteType* bucketZombieEatSprite2;
+extern SpriteType* newspaperZombieSprite2;
+extern SpriteType* newspaperZombieEatSprite2;
+extern SpriteType* polevaultZombieRunSprite2;
+extern SpriteType* polevaultZombieWalkSprite2;
+extern SpriteType* polevaultZombieEatSprite2;
+extern SpriteType* jackZombieSprite2;
+extern SpriteType* footballZombieSprite2;
+extern SpriteType* footballZombieEatSprite2;
+extern SpriteType* flagZombieSprite2;
+extern SpriteType* flagZombieEatSprite2;
+extern SpriteType* coneZombieSprite2;
+extern SpriteType* coneZombieEatSprite2;
+
+extern SpriteType* regularZombieSprite3;
+extern SpriteType* regularZombieEatSprite3;
+extern SpriteType* bucketZombieSprite3;
+extern SpriteType* bucketZombieEatSprite3;
+extern SpriteType* newspaperZombieSprite3;
+extern SpriteType* newspaperZombieEatSprite3;
+extern SpriteType* polevaultZombieRunSprite3;
+extern SpriteType* polevaultZombieWalkSprite3;
+extern SpriteType* polevaultZombieEatSprite3;
+extern SpriteType* jackZombieSprite3;
+extern SpriteType* footballZombieSprite3;
+extern SpriteType* footballZombieEatSprite3;
+extern SpriteType* flagZombieSprite3;
+extern SpriteType* flagZombieEatSprite3;
+extern SpriteType* coneZombieSprite3;
+extern SpriteType* coneZombieEatSprite3;
+
+
+
+
 
 
 
@@ -810,6 +866,7 @@ extern SpriteType* campaignSpanish;
 extern SpriteType* languageEnglish;
 extern SpriteType* languageSpanish;
 
+//seed packet sprites
 extern SpriteType* p0; extern SpriteType* p0g;
 extern SpriteType* p1; extern SpriteType* p1g;
 extern SpriteType* p2; extern SpriteType* p2g;

@@ -91,6 +91,8 @@ int main(void){
 	//Sound_Init(s);
 	//FileSystemTest();
 	while(1){
+		currentScene->refresh();
+		currentScene->collisions();
 	};
 }
 

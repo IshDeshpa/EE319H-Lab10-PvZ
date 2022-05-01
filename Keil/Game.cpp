@@ -240,14 +240,14 @@ void GameObjectList::refresh(){
 	uint8_t i = this->indexPtr-1; 
 	while(i>=0){
 		this->objects[i]->refresh();
-		i++;
+		i--;
 	} 
 }
 void GameObjectList::tick(){
 	uint8_t i = this->indexPtr-1;
 	while(i>=0){
 		this->objects[i]->tick();
-		i++;
+		i--;
 	}
 }
 uint8_t GameObjectList::getLength(){
@@ -463,4 +463,52 @@ int Scene::cursorHit(uint8_t x, uint8_t y){
 		&& this->planter->y - y < collectTolerance && this->planter->y - y > collectTolerance)
 		return 1;
 	return 0;
+}
+
+void Scene::collisions(){
+	GameObject** zmList = this->Zombies->objects;
+	GameObject** ptList = this->Plants->objects;
+	GameObject** prList = this->Projectiles->objects;
+	for(int i = this->Zombies->indexPtr - 1; i >=0; i--) {
+		for(int j = this->Plants->indexPtr - 1; j >= 0; j--){
+			Zombie* zm = (Zombie*)zmList[i];
+			Plant* pt = (Plant*)ptList[i];
+			if(zm->getLane() == pt->getLane()
+				&& zm->getX() > pt->getX() 
+				&& zm->getX() < pt->getX() + pt->sprite->width)
+			{
+				zm->attack(pt);
+				if(pt->health <=0){
+					pt->unrender();
+					this->Plants->tryRmv(pt);
+				}
+				if(zm->health<=0){
+					zm->unrender();
+					this->Zombies->tryRmv(zm);
+					break;
+				}
+			}
+			else{
+				zm->stopEating();
+			}
+		}
+	}
+	for(int i = this->Zombies->indexPtr - 1; i >=0; i--) {
+		for(int j = this->Projectiles->indexPtr - 1; j >= 0; j--){
+			Zombie* zm = (Zombie*)zmList[i];
+			Projectile* pr = (Projectile*)prList[i];
+			if(pr->getLane() == zm->getLane()
+				&& pr->getX() > zm->getX() 
+				&& pr->getX() < zm->getX() + zm->sprite->width)
+			{
+				zm->takeDamage(pr->damage);
+				pr->collided();
+				if(zm->health<=0){
+					zm->unrender();
+					this->Zombies->tryRmv(zm);
+					break;
+				}
+			}
+		}
+	}
 }
