@@ -78,7 +78,7 @@ int main(void){
 	DisableInterrupts();
   PLL_Init(Bus80MHz);       // Bus clock is 80 MHz 
   //TExaS_Init();
-  //Random_Init(1);
+  Random_Init(1);
   //Output_Init();
   //Timer0_Init(&background,1600000); // 50 Hz
   //Timer1_Init(&clock,80000000); // 1 Hz
@@ -92,7 +92,9 @@ int main(void){
 	//FileSystemTest();
 	Display_DrawBitmap(100, 100, 0, 50, 50);
 	while(1){
-	}
+		currentScene->refresh();
+		currentScene->collisions();
+	};
 }
 
 void Systick_Handler(){

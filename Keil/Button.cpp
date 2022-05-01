@@ -43,24 +43,29 @@ void LanguageButton::buttonFunction(){
 	lang ^= lang;
 }
 
-SeedPacket::SeedPacket(uint8_t x, uint8_t y, uint8_t plantID, uint8_t loadTime) : Button(x, y, seedPacketSprites[plantID], plantingSound){
+SeedPacket::SeedPacket(uint8_t x, uint8_t y, uint8_t plantID, uint8_t loadTime, uint8_t sunCost) : Button(x, y, seedPacketSprites[plantID], plantingSound){
 	this->ready = seedPacketSprites[plantID];
 	this->gray = seedPacketGraySprites[plantID];
 	this->loadTime = loadTime;
 	this->loadTimer = 0;
 	this->isReady = 1;
+	this->plantID = plantID;
+	this->sunCost = sunCost;
 }
-//TO-DO: find a way to spawn a plant from here
+
 void SeedPacket::buttonFunction(){
-	this->loadTimer = loadTime;
-	this->sprite = gray;	
-	//SpawnPlant(plantID);
+	
+		this->loadTimer = loadTime;
+		this->sprite = gray;
+		this->isReady = 0;
+		currentScene->spawnPlant(plantID);
 }
 void SeedPacket::buttonHit(){
-	if(this->isReady == 1){
-	buttonFunction();
-	this->soundFX->play();
-	this->isReady = 0;
+	if(this->isReady == 1 && currentScene->gridCheck() == 0 
+		&& currentScene->changeSun(this->sunCost)){
+		buttonFunction();
+		this->soundFX->play();
+		this->isReady = 0;
 	}
 }
 void SeedPacket::tick(){
