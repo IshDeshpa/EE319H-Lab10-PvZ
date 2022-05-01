@@ -62,8 +62,8 @@
 //#include "Timer1.h"
 #include "Display.h"
 #include "TestFS.h"
-#include "Game.h"
 #include "Inputs.h"
+//#include "Game.h"
 
 extern "C" void DisableInterrupts(void);
 extern "C" void EnableInterrupts(void);
@@ -1481,6 +1481,7 @@ int main(void){
 	//Display_FillScreen(0xFFFF);
 	//Display_FillRect(50, 50, 30, 30, 0xFAFF);            // set screen to white
 	Display_DrawBitmap(0, 0, background, 160, 128);
+
 	//Display_RenderSprite(10, 10, sp1, 17, 29, 0xFB56, background);
 	//Display_RenderCursor(10, 10, 40, 40, 0xF7E7);
 	//Display_UnrenderCursor(10, 10, 40, 40, background);
@@ -1505,6 +1506,7 @@ int main(void){
 		}
 	}*/
 	//Display_DrawBitmap(100, 100, 0, 50, 50);
+
 	Display_DrawBitmap(0, 0, background, 160, 128);
 	while(1){
 		Display_FillRect(0, 0, 20, 20, 0xFFFF);
