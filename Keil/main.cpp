@@ -90,6 +90,7 @@ int main(void){
 	//s = new Sound("music.wav", soundBuffer, 24000);
 	//Sound_Init(s);
 	//FileSystemTest();
+	Display_DrawBitmap(100, 100, 0, 50, 50);
 	while(1){
 		currentScene->refresh();
 		currentScene->collisions();
