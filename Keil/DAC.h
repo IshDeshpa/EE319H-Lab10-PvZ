@@ -34,6 +34,9 @@ class Sound{
 	public:
 		// Constructor
 		Sound(char* path, uint8_t* soundBuffer, uint16_t bufferSize);
+	
+		// Constructor
+		Sound();
 		
 		// Destructor
 		~Sound();

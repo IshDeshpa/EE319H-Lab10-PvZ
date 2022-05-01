@@ -436,7 +436,7 @@ uint16_t Display_SwapColor(uint16_t x) ;
 // Must be less than or equal to 128 pixels wide by 160 pixels high
 void Display_DrawBitmap(int16_t x, int16_t y, const uint16_t *image, int16_t w, int16_t h);
 
-void Display_RenderSprite(int16_t x, int16_t y, const uint16_t *image, int16_t w, int16_t h, uint16_t greenScreen, const uint16_t* bg);
+void Display_RenderSprite(int16_t x, int16_t y, const uint16_t *image, int16_t w, int16_t h, uint16_t greenScreen, const uint16_t* background);
 void Display_UnrenderSprite(int16_t x, int16_t y, int16_t w, int16_t h, const uint16_t* bg);
 void Display_RenderCursor(int16_t x, int16_t y, int16_t w, int16_t h, const uint16_t* bg);
 void Display_UnrenderCursor(int16_t x, int16_t y, int16_t w, int16_t h, const uint16_t* bg);
@@ -677,6 +677,12 @@ void Output_On(void);
 void Output_Color(uint32_t newColor);
 
 void ferrorLCD(char* name);
+
+uint8_t convX(uint8_t x);
+uint8_t convY(uint8_t y);
+
+//#define convX(x) ((DISPLAY_TFTWIDTH - 1 - x < 0)?(-(DISPLAY_TFTWIDTH - 1 - x)):(DISPLAY_TFTWIDTH - 1 - x));
+//#define convY(y) ((DISPLAY_TFTHEIGHT - 1 - y < 0)?(-(DISPLAY_TFTHEIGHT - 1 - y)):(DISPLAY_TFTHEIGHT - 1 - y));
 
 #define ST7735_InitB() Display_InitB()
 #define ST7735_InitR(o) Display_InitR(o)

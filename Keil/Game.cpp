@@ -45,8 +45,8 @@ SpriteType* seedPacketSprites[8] = {p0, p1, p2, p3, p4, p5, p6, p7};
 SpriteType* seedPacketGraySprites[8] = {p0g, p1g, p2g, p3g, p4g, p5g, p6g, p7g};
 
 //button sounds
-Sound* menuSound = new Sound(0, 0, 0);
-Sound* plantingSound = new Sound(0, 0, 0);
+Sound* menuSound = new Sound();
+Sound* plantingSound = new Sound();
 
 //language
 uint8_t lang = 0; //0 = eng, 1 = esp	
@@ -80,8 +80,8 @@ LawnMower* LM5 = new LawnMower(0, Lane5Ypos, 5);
 
 
 //Music classes
-Sound* menuMusic = new Sound(0, 0, 0);
-Sound* levelMusic = new Sound(0, 0, 0);
+Sound* menuMusic = new Sound();
+Sound* levelMusic = new Sound();
 //TO-DO
 
 //Game Object lists
