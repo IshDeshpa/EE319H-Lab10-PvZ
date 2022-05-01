@@ -6,8 +6,6 @@
 #include "Display.h"
 #include "random.h"
 
-
-
 #define MUSIC_BUFFER_SIZE 16
 #define FX_BUFFER_SIZE 16
 
