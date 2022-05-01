@@ -63,6 +63,7 @@
 #include "Display.h"
 #include "TestFS.h"
 #include "Game.h"
+#include "Inputs.h"
 
 extern "C" void DisableInterrupts(void);
 extern "C" void EnableInterrupts(void);
@@ -1460,6 +1461,7 @@ int main(void){
   //TExaS_Init();
   //Random_Init(1);
   Output_Init();
+	Inputs_Init();
   //Timer0_Init(&background,1600000); // 50 Hz
   //Timer1_Init(&clock,80000000); // 1 Hz
   EnableInterrupts();
@@ -1479,9 +1481,9 @@ int main(void){
 	//Display_FillScreen(0xFFFF);
 	//Display_FillRect(50, 50, 30, 30, 0xFAFF);            // set screen to white
 	Display_DrawBitmap(0, 0, background, 160, 128);
-	Display_RenderSprite(10, 10, sp1, 17, 29, 0xFB56, background);
-	Display_RenderCursor(10, 10, 40, 40, 0xF7E7);
-	Display_UnrenderCursor(10, 10, 40, 40, background);
+	//Display_RenderSprite(10, 10, sp1, 17, 29, 0xFB56, background);
+	//Display_RenderCursor(10, 10, 40, 40, 0xF7E7);
+	//Display_UnrenderCursor(10, 10, 40, 40, background);
 	
 	//int i=0;
 	//const uint16_t* sp = sp1;
@@ -1502,8 +1504,15 @@ int main(void){
 			i=0;
 		}
 	}*/
-	Display_DrawBitmap(100, 100, 0, 50, 50);
+	//Display_DrawBitmap(100, 100, 0, 50, 50);
+	Display_DrawBitmap(0, 0, background, 160, 128);
 	while(1){
+		Display_FillRect(0, 0, 20, 20, 0xFFFF);
+		uint32_t ADCvalue[2];
+		getJoyXY(ADCvalue);
+		Display_SetCursor(0, 0);
+		Display_OutUDec(ADCvalue[0], 0x0000);
+		Delay1ms(300);
 		//currentScene->refresh();
 		//currentScene->collisions();
 	};

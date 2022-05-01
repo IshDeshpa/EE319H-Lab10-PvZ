@@ -717,7 +717,7 @@ void Display_RenderCursor(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t c
 	for(x=w; x>0; x--){
 		for(y=h; y>0; y--){
 			if(!(x-1 < w-2 && x-1 >= 2 && y-1 < h-2 && y-1 >= 2)){
-				Display_DrawPixel(originalX+x-1, originalY+y-1, color);
+				Display_DrawPixel(originalX+x-1, originalY+y-1, ~color);
 			}
 			i += originalWidth;                        // go to the next pixel
 		}
@@ -810,20 +810,21 @@ void Display_DrawCharS(int16_t x, int16_t y, char c, int16_t textColor, int16_t 
     else
       line = Font[(c*5)+i];
     for (j = 0; j<8; j++) {
-      if (line & 0x1) {
+      if ((line & 0x80) >> 7) {
         if (size == 1) // default size
           Display_DrawPixel(x+i, y+j, textColor);
         else {  // big size
           Display_FillRect(x+(i*size), y+(j*size), size, size, textColor);
         }
       } else if (bgColor != textColor) {
-        if (size == 1) // default size
-          Display_DrawPixel(x+i, y+j, bgColor);
+        if (size == 1){ // default size
+          //Display_DrawPixel(x+i, y+j, bgColor);
+				}
         else {  // big size
-          Display_FillRect(x+i*size, y+j*size, size, size, bgColor);
+          //Display_FillRect(x+i*size, y+j*size, size, size, bgColor);
         }
       }
-      line >>= 1;
+      line <<= 1;
     }
   }
 }
@@ -942,11 +943,11 @@ void Display_SetCursor(uint32_t newX, uint32_t newY){
 // Input: 32-bit number to be transferred
 // Output: none
 // Variable format 1-10 digits with no space before or after
-void Display_OutUDec(uint32_t n){
+void Display_OutUDec(uint32_t n, uint16_t color){
   Messageindex = 0;
   fillmessage(n);
   Message[Messageindex] = 0; // terminate
-  Display_DrawString(StX,StY,Message,StTextColor);
+  Display_DrawString(StX,StY,Message,color);
   StX = StX+Messageindex;
   if(StX>20){
     StX = 20;

@@ -505,7 +505,7 @@ void Display_SetCursor(uint32_t newX, uint32_t newY);
 // Input: 32-bit number to be transferred
 // Output: none
 // Variable format 1-10 digits with no space before or after
-void Display_OutUDec(uint32_t n);
+void Display_OutUDec(uint32_t n, uint16_t color);
 
 
 //------------Display_SetRotation------------
@@ -702,7 +702,7 @@ uint8_t convY(uint8_t y);
 #define ST7735_DrawChar(x, y, c, textColor, bgColor, size) Display_DrawChar(x, y, c, textColor, bgColor, size)
 #define ST7735_DrawString(x, y, pt, textColor) Display_DrawString(x, y, pt, textColor)
 #define ST7735_SetCursor(newX, newY) Display_SetCursor(newX, newY)
-#define ST7735_OutUDec(n) Display_OutUDec(n)
+#define ST7735_OutUDec(n) Display_OutUDec(n, 0xFFFF)
 #define ST7735_SetRotation(m) Display_SetRotation(m)
 #define ST7735_InvertDisplay(i) Display_InvertDisplay(i)
 #define ST7735_PlotClear(ymin, ymax) Display_PlotClear(ymin, ymax)
