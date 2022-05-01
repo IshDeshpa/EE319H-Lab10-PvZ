@@ -49,6 +49,8 @@
 #define DISPLAY_GMCTRP1 0xE0
 #define DISPLAY_GMCTRN1 0xE1
 
+#define CURSOR_COLOR 0xE6C0
+
 // standard ascii 5x7 font
 // originally from glcdfont.c from Adafruit project
 static const uint8_t Font[] = {
@@ -438,7 +440,7 @@ void Display_DrawBitmap(int16_t x, int16_t y, const uint16_t *image, int16_t w, 
 
 void Display_RenderSprite(int16_t x, int16_t y, const uint16_t *image, int16_t w, int16_t h, uint16_t greenScreen, const uint16_t* background);
 void Display_UnrenderSprite(int16_t x, int16_t y, int16_t w, int16_t h, const uint16_t* bg);
-void Display_RenderCursor(int16_t x, int16_t y, int16_t w, int16_t h, const uint16_t* bg);
+void Display_RenderCursor(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
 void Display_UnrenderCursor(int16_t x, int16_t y, int16_t w, int16_t h, const uint16_t* bg);
 
 //------------Display_DrawCharS------------
