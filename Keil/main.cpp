@@ -1478,10 +1478,10 @@ int main(void){
 	
 	//Display_FillScreen(0xFFFF);
 	//Display_FillRect(50, 50, 30, 30, 0xFAFF);            // set screen to white
-	Display_DrawBitmap(0, 0, background, 160, 128);
-	int i=0;
-	const uint16_t* sp = sp1;
-	Display_RenderSprite(0, 0, sp, 17, 29, 0xFB56, background);
+	//Display_DrawBitmap(0, 0, background, 160, 128);
+	//int i=0;
+	//const uint16_t* sp = sp1;
+	//Display_RenderSprite(0, 0, sp, 17, 29, 0xFB56, background);
 	/*while(1){
 		if(sp == sp1)
 			sp = sp2;
@@ -1498,6 +1498,11 @@ int main(void){
 			i=0;
 		}
 	}*/
+	Display_DrawBitmap(100, 100, 0, 50, 50);
+	while(1){
+		currentScene->refresh();
+		currentScene->collisions();
+	};
 }
 
 void Systick_Handler(){
