@@ -1,4 +1,4 @@
 Keil/Lab10_C++*.*
-Keil/*.o
-Keil/*.crf
-Keil/*.d
+*.o
+*.crf
+*.d
