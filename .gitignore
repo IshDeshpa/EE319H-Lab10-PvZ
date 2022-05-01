@@ -1,4 +1,6 @@
 *.o
 *.crf
 *.d
-
+Keil/Lab10_C++.*
+!Keil/Lab10_C++.uvprojx
+Keil/Lab10_C++_Lab 10.dep

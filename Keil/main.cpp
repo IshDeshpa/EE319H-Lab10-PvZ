@@ -62,6 +62,7 @@
 //#include "Timer1.h"
 #include "Display.h"
 #include "TestFS.h"
+#include "Inputs.h"
 //#include "Game.h"
 
 extern "C" void DisableInterrupts(void);
@@ -1460,6 +1461,7 @@ int main(void){
   //TExaS_Init();
   //Random_Init(1);
   Output_Init();
+	Inputs_Init();
   //Timer0_Init(&background,1600000); // 50 Hz
   //Timer1_Init(&clock,80000000); // 1 Hz
   EnableInterrupts();
@@ -1479,9 +1481,14 @@ int main(void){
 	//Display_FillScreen(0xFFFF);
 	//Display_FillRect(50, 50, 30, 30, 0xFAFF);            // set screen to white
 	Display_DrawBitmap(0, 0, background, 160, 128);
-	int i=0;
-	const uint16_t* sp = sp1;
-	Display_RenderSprite(0, 0, sp, 17, 29, 0xFB56, background);
+
+	//Display_RenderSprite(10, 10, sp1, 17, 29, 0xFB56, background);
+	//Display_RenderCursor(10, 10, 40, 40, 0xF7E7);
+	//Display_UnrenderCursor(10, 10, 40, 40, background);
+	
+	//int i=0;
+	//const uint16_t* sp = sp1;
+	//Display_RenderSprite(50, 30, sp, 17, 29, 0xFB56, background);
 	/*while(1){
 		if(sp == sp1)
 			sp = sp2;
@@ -1489,20 +1496,28 @@ int main(void){
 			sp = sp3;
 		else if(sp == sp3)
 			sp = sp1;
-		Display_RenderSprite(143-i, 99, sp, 17, 29, 0xFB56, background);
+		Display_RenderSprite(143-i, 70, sp, 17, 29, 0xFB56, background);
 			
 		Delay1ms(100);
-		Display_UnrenderSprite(143-i, 99, 17, 29, background);
+		Display_UnrenderSprite(143-i, 70, 17, 29, background);
 		i++;
 		if(143-i < 0){
 			i=0;
 		}
 	}*/
 	//Display_DrawBitmap(100, 100, 0, 50, 50);
-	/*while(1){
+
+	Display_DrawBitmap(0, 0, background, 160, 128);
+	while(1){
+		Display_FillRect(0, 0, 20, 20, 0xFFFF);
+		uint32_t ADCvalue[2];
+		getJoyXY(ADCvalue);
+		Display_SetCursor(0, 0);
+		Display_OutUDec(ADCvalue[0], 0x0000);
+		Delay1ms(300);
 		//currentScene->refresh();
 		//currentScene->collisions();
-	};*/
+	};
 }
 
 void Systick_Handler(){

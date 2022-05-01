@@ -478,6 +478,16 @@
               <FileType>5</FileType>
               <FilePath>.\TestFS.h</FilePath>
             </File>
+            <File>
+              <FileName>Inputs.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Inputs.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>Inputs.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Inputs.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
