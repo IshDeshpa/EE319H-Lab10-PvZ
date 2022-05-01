@@ -237,14 +237,14 @@ void GameObjectList::tryRmv(GameObject* go){
 	}
 }
 void GameObjectList::refresh(){
-	uint8_t i = this->indexPtr-1; 
+	int16_t i = this->indexPtr-1; 
 	while(i>=0){
 		this->objects[i]->refresh();
 		i--;
 	} 
 }
 void GameObjectList::tick(){
-	uint8_t i = this->indexPtr-1;
+	int16_t i = this->indexPtr-1;
 	while(i>=0){
 		this->objects[i]->tick();
 		i--;
@@ -306,6 +306,9 @@ uint8_t GridCursor::gridOpen(){
 }
 void GridCursor::fillGrid(){
 	this->grid[this->gridXpos-1][this->gridYpos-1] = 1;
+}
+void GridCursor::emptyGrid(uint8_t col, uint8_t row){
+	this->grid[col-1][row-1] = 0;	
 }
 Scene::Scene(GameObjectList* but, GameObjectList* lwm, const uint16_t* bg, Sound* msc){
 		this->Buttons = but;
@@ -382,18 +385,25 @@ void Scene::spawnProjectile(uint8_t projID, uint8_t x, uint8_t y, uint8_t lane){
 	switch (projID){
 		case peaID:
 			this->Projectiles->GOAdd(new Pea(x, y, lane));
+			break;
 		case frozenPeaID:
 			this->Projectiles->GOAdd(new FrozenPea(x, y, lane));
+			break;
 		case chompID:
 			this->Projectiles->GOAdd(new Chomp(x, y, lane));
+			break;
 		case ohkoID:
 			this->Projectiles->GOAdd(new Ohko(x, y, lane));
+			break;
 		case smallExplosionID:
 			this->Projectiles->GOAdd(new SmallExplosion(x, y, lane));
+			break;
 		case explosionID:
 			this->Projectiles->GOAdd(new Explosion(x, y, lane));
+			break;
 		case sunID:
 			this->Projectiles->GOAdd(new Sun(x, y, lane));
+			break;
 		default:
 			break;
 			
@@ -407,31 +417,66 @@ uint8_t Scene::gridCheck(){
 void Scene::spawnPlant(uint8_t plantID){
 	switch (plantID) {
 		case peashooterID:
-			this->Plants->GOAdd(new Peashooter(this->planter->x, this->planter->y, this->planter->gridYpos));
-
+		{
+			Plant* pt = new Peashooter(this->planter->x, this->planter->y, this->planter->gridYpos);
+			this->Plants->GOAdd(pt);
+			pt->setCol(planter->gridXpos);
+			break;
+		}
 		case snowPeaID:
-			this->Plants->GOAdd(new Snowpea(this->planter->x, this->planter->y, this->planter->gridYpos));
-	
+		{
+			Plant* pt = new Snowpea(this->planter->x, this->planter->y, this->planter->gridYpos);
+			this->Plants->GOAdd(pt);
+			pt->setCol(planter->gridXpos);
+			break;
+		}
 		case repeaterID:
-			this->Plants->GOAdd(new Repeater(this->planter->x, this->planter->y, this->planter->gridYpos));
-
+		{
+			Plant* pt = new Repeater(this->planter->x, this->planter->y, this->planter->gridYpos);
+			this->Plants->GOAdd(pt);
+			pt->setCol(planter->gridXpos);
+			break;
+		}
 		case sunflowerID:
-			this->Plants->GOAdd(new Sunflower(this->planter->x, this->planter->y, this->planter->gridYpos));
-	
+		{
+			Plant* pt = new Sunflower(this->planter->x, this->planter->y, this->planter->gridYpos);
+			this->Plants->GOAdd(pt);
+			pt->setCol(planter->gridXpos);
+			break;
+		}
 		case chomperID:
-			this->Plants->GOAdd(new Chomper(this->planter->x, this->planter->y, this->planter->gridYpos));
-
+		{
+			Plant* pt =new Chomper(this->planter->x, this->planter->y, this->planter->gridYpos);
+			this->Plants->GOAdd(pt);
+			pt->setCol(planter->gridXpos);
+			break;
+		}
 		case potatoMineID:
-			this->Plants->GOAdd(new PotatoMine(this->planter->x, this->planter->y, this->planter->gridYpos));
-
+		{
+			Plant* pt =new PotatoMine(this->planter->x, this->planter->y, this->planter->gridYpos);
+			this->Plants->GOAdd(pt);
+			pt->setCol(planter->gridXpos);
+			break;
+		}
 		case cherryBombID:
-			this->Plants->GOAdd(new CherryBomb(this->planter->x, this->planter->y, this->planter->gridYpos));
+		{
+			Plant* pt = new CherryBomb(this->planter->x, this->planter->y, this->planter->gridYpos);
+			this->Plants->GOAdd(pt);
+			pt->setCol(planter->gridXpos);
+			break;
+		}
 		case wallNutID:
-			this->Plants->GOAdd(new Wallnut(this->planter->x, this->planter->y, this->planter->gridYpos));
+		{
+			Plant* pt = new Wallnut(this->planter->x, this->planter->y, this->planter->gridYpos);
+			this->Plants->GOAdd(pt);
+			pt->setCol(planter->gridXpos);
+			break;
+		}
 		default:
 			break;
-		this->planter->fillGrid();
+		
 	}
+	this->planter->fillGrid();
 }
 
 
@@ -439,27 +484,35 @@ void Scene::spawnZombie(uint8_t zombieID, uint8_t lane){
 	switch(zombieID){
 		case regularZombieID:
 			this->Zombies->GOAdd(new Zombie(170, Lane1Ypos + (lane-1)*LaneYOffset, lane));
+			break;
 		case coneZombieID:
 			this->Zombies->GOAdd(new ConeZombie(170, Lane1Ypos + (lane-1)*LaneYOffset, lane));
+			break;
 		case bucketZombieID:
 			this->Zombies->GOAdd(new BucketZombie(170, Lane1Ypos + (lane-1)*LaneYOffset, lane));
+			break;
 		case footballZombieID:
 			this->Zombies->GOAdd(new FootballZombie(170, Lane1Ypos + (lane-1)*LaneYOffset, lane));
+			break;
 		case newspaperZombieID:
 			this->Zombies->GOAdd(new NewsZombie(170, Lane1Ypos + (lane-1)*LaneYOffset, lane));
+			break;
 		case flagZombieID:
 			this->Zombies->GOAdd(new FlagZombie(170, Lane1Ypos + (lane-1)*LaneYOffset, lane));
+			break;
 		case poleVaultZombieID:
 			this->Zombies->GOAdd(new PoleZombie(170, Lane1Ypos + (lane-1)*LaneYOffset, lane));
+			break;
 		case jackZombieID:
 			this->Zombies->GOAdd(new JackZombie(170, Lane1Ypos + (lane-1)*LaneYOffset, lane));
+			break;
 		default:
 				break;
 	}
 }
 
-int Scene::cursorHit(uint8_t x, uint8_t y){
-	if(this->planter->x - x < collectTolerance && this->planter->x - x > -collectTolerance
+int Scene::cursorHit(int16_t x, int16_t y){
+	if((int16_t)this->planter->x - x < collectTolerance && this->planter->x - x > -collectTolerance
 		&& this->planter->y - y < collectTolerance && this->planter->y - y > collectTolerance)
 		return 1;
 	return 0;
@@ -480,6 +533,7 @@ void Scene::collisions(){
 				zm->attack(pt);
 				if(pt->health <=0){
 					pt->unrender();
+					this->planter->emptyGrid(pt->getCol(), pt->getLane());
 					this->Plants->tryRmv(pt);
 				}
 				if(zm->health<=0){

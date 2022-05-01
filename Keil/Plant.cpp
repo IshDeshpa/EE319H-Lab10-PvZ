@@ -20,6 +20,13 @@ void Plant::advance(){
 	}
 }
 
+void Plant::setCol(uint8_t col){
+	this->col = col;
+}
+uint8_t Plant::getCol(){
+	return this->col;
+}
+
 void Plant::attack(){
 	currentScene->spawnProjectile(this->projID, this->x + shootOffsetX, this->y + shootOffsetY, this->lane);
 }
@@ -90,6 +97,7 @@ CherryBomb::CherryBomb(uint8_t x, uint8_t y, uint8_t lane)
 void CherryBomb::attack(){
 	Plant::attack();
 	this->unrender();
+	currentScene->planter->emptyGrid(this->col, this->lane);
 	currentScene->Plants->tryRmv(this);
 	//TO-DO: have the grid set this plant's spot to 0
 	//currentScene->planter->g
@@ -113,6 +121,9 @@ void PotatoMine::attack(){
 void PotatoMine::hurt(uint8_t dam){
 	if(this->grown == 1){
 		Plant::attack();
+		this->unrender();
+		currentScene->planter->emptyGrid(this->col, this->lane);
+		currentScene->Plants->tryRmv(this);
 	}
 	else{
 		Plant::hurt(dam);

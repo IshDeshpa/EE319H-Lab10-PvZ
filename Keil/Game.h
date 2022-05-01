@@ -320,6 +320,7 @@ class Plant : public Entity{
 		uint8_t attackRate;
 		uint8_t attackTimer;
 		uint8_t projID;
+		uint8_t col;
 		//create projectile
 		void attack();
 		//idk why I put this here
@@ -331,6 +332,8 @@ class Plant : public Entity{
 		
 		void hurt(uint8_t damage);
 		void tick();
+		void setCol(uint8_t col);
+		uint8_t getCol();
 		
 };
 
@@ -695,6 +698,7 @@ class GridCursor{
 		void refresh();
 		uint8_t gridOpen(); //returns 1 if no plant, returns 0 if plant
 		void fillGrid();
+		void emptyGrid(uint8_t col, uint8_t row);
 		
 };
 // Collection of all game objects, background, music, etc. pertinent to the current area of the game
@@ -706,7 +710,7 @@ class Scene{
 		int16_t sunAmount;
 		Sound* music;
 	
-		GridCursor* planter; //locked to the grid hopefully
+		
 		SelectCursor* select; //menuing and seed packets
 	public:
 		GameObjectList* Zombies;	// List of all objects on the scene these are arrays of pointers
@@ -714,6 +718,7 @@ class Scene{
 		GameObjectList* Buttons;
 		GameObjectList* Lawnmowers;
 		GameObjectList* Projectiles;
+		GridCursor* planter; //locked to the grid hopefully
 		// Constructor
 		Scene(GameObjectList* but, GameObjectList* lwm, const uint16_t* bg, Sound* msc);
 		// Destructor
@@ -734,7 +739,7 @@ class Scene{
 		//return 1 if sun can change
 		uint8_t changeSun(int16_t amount);
 		void renderSun();
-		int cursorHit(uint8_t x, uint8_t y);
+		int cursorHit(int16_t x, int16_t y);
 		uint8_t gridCheck();
 };
 

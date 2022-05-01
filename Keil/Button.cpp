@@ -33,9 +33,8 @@ void VsButton::buttonFunction(){
 
 CampaignButton::CampaignButton(uint8_t x, uint8_t y) : MenuButton(x, y, campaignEnglish, campaignSpanish){}
 	
-	//TO-DO: find a way to load the scene from here	w/o including main
 void CampaignButton::buttonFunction(){
-	//loadScene(campaign);
+	loadScene(campaign);
 }
 
 LanguageButton::LanguageButton(uint8_t x, uint8_t y) : MenuButton(x, y, languageEnglish, languageSpanish){}
