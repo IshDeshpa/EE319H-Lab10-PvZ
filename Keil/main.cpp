@@ -62,7 +62,7 @@
 //#include "Timer1.h"
 #include "Display.h"
 #include "TestFS.h"
-#include "Game.h"
+//#include "Game.h"
 
 extern "C" void DisableInterrupts(void);
 extern "C" void EnableInterrupts(void);
@@ -70,7 +70,7 @@ extern "C" void SysTick_Handler(void);
 
 
 //macros
-/*const uint16_t sp1[493] = {
+const uint16_t sp1[493] = {
 // 'test1', 17x29px
 0xfb56, 0xfb56, 0xfb56, 0xfb56, 0xfb56, 0xfb56, 0xfb56, 0xfb56, 0xfb56, 0xfb56, 0xfb56, 0xfb56, 0xfb56, 0xfb56, 0xfb56, 0xfb56, 
 0xfb56, 0xfb56, 0xfb56, 0xfb56, 0xfb56, 0xfb56, 0xfb56, 0xd2b2, 0x89cc, 0xfb56, 0xfb56, 0xfb56, 0xfb56, 0xfb56, 0xfb56, 0xfb56, 
@@ -1453,7 +1453,7 @@ const uint16_t background[20480] = {// 'lawn', 128x160px
 0x43e6, 0x4406, 0x43e6, 0x0c63, 0x14a3, 0x14e4, 0x1564, 0x0c83, 0x0ce4, 0x1ca3, 0x14a3, 0x14c3, 0x0c63, 0x0c63, 0x0c63, 0x0c63, 
 0x0c63, 0x2587, 0x0d25, 0x0c63, 0x0c63, 0x0c63, 0x0c63, 0x0c23, 0x0ca4, 0x1e29, 0x0d05, 0x0c63, 0x2567, 0x1d26, 0x2587, 0x1544, 
 0x1523, 0x2587, 0x0d23, 0x0d23, 0x0d23, 0x0d43, 0x1564, 0x0d83, 0x3584, 0x0d64, 0x15a7, 0x1628, 0x14e3, 0x8d2d, 0xf738, 0xf738};
-*/
+
 int main(void){
 	DisableInterrupts();
   PLL_Init(Bus80MHz);       // Bus clock is 80 MHz 
@@ -1478,10 +1478,10 @@ int main(void){
 	
 	//Display_FillScreen(0xFFFF);
 	//Display_FillRect(50, 50, 30, 30, 0xFAFF);            // set screen to white
-	//Display_DrawBitmap(0, 0, background, 160, 128);
-	//int i=0;
-	//const uint16_t* sp = sp1;
-	//Display_RenderSprite(0, 0, sp, 17, 29, 0xFB56, background);
+	Display_DrawBitmap(0, 0, background, 160, 128);
+	int i=0;
+	const uint16_t* sp = sp1;
+	Display_RenderSprite(0, 0, sp, 17, 29, 0xFB56, background);
 	/*while(1){
 		if(sp == sp1)
 			sp = sp2;
@@ -1498,13 +1498,13 @@ int main(void){
 			i=0;
 		}
 	}*/
-	Display_DrawBitmap(100, 100, 0, 50, 50);
-	while(1){
-		currentScene->refresh();
-		currentScene->collisions();
-	};
+	//Display_DrawBitmap(100, 100, 0, 50, 50);
+	/*while(1){
+		//currentScene->refresh();
+		//currentScene->collisions();
+	};*/
 }
 
 void Systick_Handler(){
-	currentScene->tick();
+	//currentScene->tick();
 }
