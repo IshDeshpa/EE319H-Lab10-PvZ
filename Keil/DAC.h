@@ -3,37 +3,26 @@
 #ifndef __DAC_H__ // do not include more than once
 #define __DAC_H__
 #include <stdint.h>
-#include "diskio.h"
-#include "ff.h"
 #include "Display.h"
 #include "Timer0.h"
 
-#define assert(); if(file_res!=FR_OK){ferrorLCD(this->path);}
-#define SAMPLE_RT 8000
+#define SAMPLE_RT 4000
 #define BIT_DEPTH 8
-#define NUM_SOUNDS 3
+#define NUM_SOUNDS 7
 
 // Sound stored on SD Card
 class Sound{
 	protected:
-		FIL soundFile;	// Sound file
-		char* path;	// Path to file
-		uint32_t chunkPtr;	// Number of buffers read so far
-		uint32_t dataSize;	// Size of data section
-		
-		uint8_t* soundBuffer;	// Sound buffer
-		uint16_t bufferPtr;	// Current location in buffer (offset from soundBuffer)
-		uint16_t defaultBufferSize;	// Size of a default buffer; number of bytes
-		uint16_t currentBufferSize;	// Size of current buffer; number of bytes
-		
-		uint8_t end;	// Reached end of file
-		uint8_t loop;	// True if we need to loop, false otherwise (if it's music, we loop)
+		const uint8_t* soundBuffer;	// Sound buffer
+		uint16_t bufferPtr;	// Current location in buffer
+		uint16_t bufferSize;	// Size of buffer
+		int8_t ind;	// index in global sound array
 	
 		// Load sound effect into local memory
 		void loadFile();
 	public:
 		// Constructor
-		Sound(char* path, uint8_t* soundBuffer, uint16_t bufferSize);
+		Sound(const uint8_t* soundBuffer, uint16_t bufferSize);
 	
 		// Constructor
 		Sound();
@@ -47,7 +36,7 @@ class Sound{
 		// Get current sample
 		uint8_t getSample();
 	
-		//plays the sound (I referenced this in a lot of classes, so impement it as play lol)
+		//plays the sound (I referenced this in a lot of classes, so implement it as play lol)
 		void play();
 };
 
