@@ -107,6 +107,7 @@ Scene* currentScene = menu;
 
 void loadScene(Scene* s){
 	currentScene = s;
+	Display_DrawBitmap(0, 0, s->backgroundBMP, 160, 128);
 }
 	
 SpriteType::SpriteType(uint16_t* bmp, uint8_t length, uint8_t width, SpriteType* nextSprite){
@@ -353,6 +354,7 @@ void GridCursor::updatePos(){
 		if(gridOpen()){
 			this->grid[this->gridXpos - 1][this->gridYpos - 1] = 0;
 			currentScene->Plants->tryRmv(this->gridXpos, this->gridYpos);
+			plantingSound->play();
 		}
 	}
 }
