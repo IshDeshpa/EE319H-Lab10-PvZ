@@ -26,7 +26,7 @@
 #include <stdint.h>
 
 #include "FIFO.h"
-#include "ST7735.h"
+#include "Display.h"
 
 
 // A class named Queue that defines a FIFO

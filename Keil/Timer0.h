@@ -32,4 +32,7 @@
 // Outputs: none
 void Timer0_Init(void(*task)(void), uint32_t period);
 
+// Arm/disarm timer
+void Timer0_Arm(uint8_t isArmed);
+
 #endif // __TIMER2INTS_H__
