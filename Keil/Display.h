@@ -49,6 +49,8 @@
 #define DISPLAY_GMCTRP1 0xE0
 #define DISPLAY_GMCTRN1 0xE1
 
+#define CURSOR_COLOR 0xE6C0
+
 // standard ascii 5x7 font
 // originally from glcdfont.c from Adafruit project
 static const uint8_t Font[] = {
@@ -438,7 +440,7 @@ void Display_DrawBitmap(int16_t x, int16_t y, const uint16_t *image, int16_t w, 
 
 void Display_RenderSprite(int16_t x, int16_t y, const uint16_t *image, int16_t w, int16_t h, uint16_t greenScreen, const uint16_t* background);
 void Display_UnrenderSprite(int16_t x, int16_t y, int16_t w, int16_t h, const uint16_t* bg);
-void Display_RenderCursor(int16_t x, int16_t y, int16_t w, int16_t h, const uint16_t* bg);
+void Display_RenderCursor(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
 void Display_UnrenderCursor(int16_t x, int16_t y, int16_t w, int16_t h, const uint16_t* bg);
 
 //------------Display_DrawCharS------------
@@ -503,7 +505,7 @@ void Display_SetCursor(uint32_t newX, uint32_t newY);
 // Input: 32-bit number to be transferred
 // Output: none
 // Variable format 1-10 digits with no space before or after
-void Display_OutUDec(uint32_t n);
+void Display_OutUDec(uint32_t n, uint16_t color);
 
 
 //------------Display_SetRotation------------
@@ -700,7 +702,7 @@ uint8_t convY(uint8_t y);
 #define ST7735_DrawChar(x, y, c, textColor, bgColor, size) Display_DrawChar(x, y, c, textColor, bgColor, size)
 #define ST7735_DrawString(x, y, pt, textColor) Display_DrawString(x, y, pt, textColor)
 #define ST7735_SetCursor(newX, newY) Display_SetCursor(newX, newY)
-#define ST7735_OutUDec(n) Display_OutUDec(n)
+#define ST7735_OutUDec(n) Display_OutUDec(n, 0xFFFF)
 #define ST7735_SetRotation(m) Display_SetRotation(m)
 #define ST7735_InvertDisplay(i) Display_InvertDisplay(i)
 #define ST7735_PlotClear(ymin, ymax) Display_PlotClear(ymin, ymax)
