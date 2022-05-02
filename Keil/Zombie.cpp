@@ -194,8 +194,8 @@ JackZombie::JackZombie(uint8_t x, uint8_t y, uint8_t lane)
 }
 
 void JackZombie::attack(){
-	this->unrender();
+	this->unrender(); 
 	currentScene->spawnProjectile(explosionID, this->x, this->y, this->lane);
-	currentScene->Zombies->tryRmv(this);
+	this->health = 0;
 	
 }

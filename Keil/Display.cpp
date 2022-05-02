@@ -716,7 +716,7 @@ void Display_RenderCursor(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t c
 	
 	for(x=w; x>0; x--){
 		for(y=h; y>0; y--){
-			if(!(x-1 < w-2 && x-1 >= 2 && y-1 < h-2 && y-1 >= 2)){
+			if(!(x-1 < w-borderWidth && x-1 >= borderWidth && y-1 < h-borderWidth && y-1 >= borderWidth)){
 				Display_DrawPixel(originalX+x-1, originalY+y-1, ~color);
 			}
 			i += originalWidth;                        // go to the next pixel
@@ -768,7 +768,7 @@ void Display_UnrenderCursor(int16_t x, int16_t y, int16_t w, int16_t h, const ui
 	for(x=w; x>0; x--){
 		for(y=h; y>0; y--){
 			uint16_t screenInd = originalX+(_width)*convY(originalY+h-1) + (x-1) + (h-y-1)*_width;
-			if(!(x-1 < w-2 && x-1 >= 2 && y-1 < h-2 && y-1 >= 2)){
+			if(!(x-1 < w-borderWidth && x-1 >= borderWidth && y-1 < h-borderWidth && y-1 >= borderWidth)){
 				Display_DrawPixel(originalX+x-1, originalY+y-1, bg[screenInd]);
 			}
 			i += originalWidth;                        // go to the next pixel

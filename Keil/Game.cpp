@@ -1,6 +1,7 @@
 #include "Game.h"
 
 //GLOBALS SECTION
+int screenWipe = 0;
 //lawnmower sprite and sound
 SpriteType* lmSprite;
 Sound* lmSound;
@@ -257,32 +258,65 @@ uint8_t GameObjectList::getLength(){
 SelectCursor::SelectCursor(GameObjectList* gos){
 	this->buttonIndex = 0;
 	this->targetButtons = gos;
-	this->redraw = 1;
-	this->x = (*this->targetButtons)[buttonIndex]->getX();
-	this->y = (*this->targetButtons)[buttonIndex]->getY();
+	this->redraw = 0;
+	this->button = this->targetButtons->objects[this->buttonIndex];
+	this->render();
+	this->oldButton = this->button;
 }
 //TO-DO //on refresh, the cursor will check for button inputs. if
 //shoulder buttons, unrender (using seedpacket x, y, w, h, might 
 //have to make accessor functions), change buttonIndex,
 //then change x and/or y to new button location then rerender
 //idk if you need all 3 of these functions
-void SelectCursor::refresh(){}
-void SelectCursor::updatePos(){}
-void SelectCursor::inputCheck(){}
+void SelectCursor::refresh(){
+	this->updatePos();
+	this->render();
+		
+}
+void SelectCursor::updatePos(){
+	if(getLB()){
+		this->oldButton = this->button;
+		this->buttonIndex -= 1;
+		if(this->buttonIndex >= this->targetButtons->indexPtr){
+			this->buttonIndex = this->targetButtons->indexPtr - 1;
+		}
+		this->button = this->targetButtons->objects[this->buttonIndex];
+		this->redraw = 1;
+	}
+	else if(getRB()){
+		this->oldButton = this->button;
+		this->buttonIndex += 1;
+		if(this->buttonIndex >= this->targetButtons->indexPtr){
+			this->buttonIndex = 0;
+		}
+		this->button = this->targetButtons->objects[this->buttonIndex];
+		this->redraw = 1;
+	}
+	if(getA()){
+		((Button*)this->button)->buttonHit();
+	}
+}
+void SelectCursor::render(){
+	if(this->redraw){
+		this->redraw = 0;
+		Display_UnrenderCursor(this->oldButton->getX() - borderWidth, this->oldButton->getY() - borderWidth, oldButton->sprite->width + 2*borderWidth, oldButton->sprite->length + 2*borderWidth, currentScene->backgroundBMP);
+		Display_RenderCursor(this->button->getX() - borderWidth, this->button->getY() - borderWidth, button->sprite->width + 2*borderWidth, button->sprite->length + 2*borderWidth, CURSOR_COLOR);
+	}
+}
 	
 	
 //gridXpos	and gridYpos start at 1
 GridCursor::GridCursor(){
 	this->gridXpos = 1;
 	this->gridYpos = 1;
+	this->oldGridX = 1;
+	this->oldGridY = 1;
 	this->redraw = 1;
 	for(int i = 0; i<5; i++){
 		for(int j = 0; j<9; j++){
 			this->grid[i][j] = 0;
 		}
 	}
-	this->x = this->calcX();
-	this->y = this->calcY();
 }
 //TO-DO //on refresh, the cursor will check for stick inputs. if 
 //stick has changed, unrender, change gridxpos, gridypos 
@@ -290,15 +324,68 @@ GridCursor::GridCursor(){
 //idk if you need all 3 of these functions
 //also, check for b button. if b button and gridOpen = 0, somehow
 //remove the plant and change grid at position gridXpos - 1, gridYpos - 1 to 1
-void GridCursor::refresh(){}
-void GridCursor::updatePos(){}
-void GridCursor::inputCheck(){}
+void GridCursor::refresh(){
+	this->updatePos();
+	this->render();
+}
+void GridCursor::updatePos(){
+	uint32_t stickPos[2] = {0, 0};
+	getJoyXY(stickPos);
+	if(stickPos[0] < stickLeftTolerance && this->gridXpos > 1){
+		this->oldGridX = this->gridXpos;
+		this->gridXpos--;
+		this->redraw = 1;
+	}
+	else if(stickPos[0] < stickRightTolerance && this->gridXpos < 9){
+		this->oldGridX = this->gridXpos;
+		this->gridXpos++;
+		this->redraw = 1;
+	}
+	if(stickPos[1] < stickDownTolerance && this->gridYpos > 1){
+		this->oldGridY = this->gridYpos;
+		this->gridYpos--;
+		this->redraw = 1;
+	}
+	else if(stickPos[1] > stickRightTolerance && this->gridYpos < 5){
+		this->oldGridY = this->gridYpos;
+		this->gridYpos++;
+		this->redraw = 1;
+	}
+	if(getB()){
+		if(gridOpen()){
+			this->grid[this->gridXpos - 1][this->gridYpos - 1] = 0;
+			currentScene->Plants->tryRmv(this->gridXpos, this->gridYpos);
+		}
+	}
+}
+//specifically called by shovel mechanic
+
+void GameObjectList::tryRmv(uint8_t col, uint8_t row){
+	uint8_t i = 0;
+	uint8_t end = this->indexPtr;
+	while(i<end){
+		if(((Plant*)objects[i])->getCol() == col && objects[i]->getLane() == row){
+			GameObject* go = this->objects[i];
+			this->GORmv(i);
+			go->unrender();
+			delete(go);
+			return;
+		}
+	}
+}
+void GridCursor::render(){
+	if(this->redraw){
+		this->redraw = 0;
+		Display_UnrenderCursor(this->calcX() - borderWidth, this->calcY() - borderWidth, transparentSprite->width + 2*borderWidth, transparentSprite->length + 2*borderWidth, currentScene->backgroundBMP);
+		Display_RenderCursor(this->calcX() - borderWidth, this->calcY() - borderWidth, transparentSprite->width + 2*borderWidth, transparentSprite->length + 2*borderWidth, CURSOR_COLOR);
+	}
+}
 
 uint8_t GridCursor::calcX(){
-	return ZeroX + (gridXpos-1)*gridX;
+	return ZeroX + (this->gridXpos-1)*gridX;
 }
 uint8_t GridCursor::calcY(){
-	return ZeroY + (gridYpos-1)*gridY;
+	return ZeroY + (this->gridYpos-1)*gridY;
 }
 
 uint8_t GridCursor::gridOpen(){
@@ -366,6 +453,9 @@ uint8_t Scene::changeSun(int16_t amount){
 void Scene::renderSun(){
 	if(this->sunAmount>=0){	//>= 0 because it's signed, don't wanna do negatives ig
 		//TO-DO
+				Display_RenderSprite(2, 110, sunSprite->bmp, sunSprite->width, sunSprite->length, transparentColor, currentScene->backgroundBMP);
+				Display_SetCursor(4, 114);
+				Display_OutUDec(sunAmount, 0x0000);
 	}
 }
 
@@ -418,56 +508,56 @@ void Scene::spawnPlant(uint8_t plantID){
 	switch (plantID) {
 		case peashooterID:
 		{
-			Plant* pt = new Peashooter(this->planter->x, this->planter->y, this->planter->gridYpos);
+			Plant* pt = new Peashooter(this->planter->calcX(), this->planter->calcY(), this->planter->gridYpos);
 			this->Plants->GOAdd(pt);
 			pt->setCol(planter->gridXpos);
 			break;
 		}
 		case snowPeaID:
 		{
-			Plant* pt = new Snowpea(this->planter->x, this->planter->y, this->planter->gridYpos);
+			Plant* pt = new Snowpea(this->planter->calcX(), this->planter->calcY(), this->planter->gridYpos);
 			this->Plants->GOAdd(pt);
 			pt->setCol(planter->gridXpos);
 			break;
 		}
 		case repeaterID:
 		{
-			Plant* pt = new Repeater(this->planter->x, this->planter->y, this->planter->gridYpos);
+			Plant* pt = new Repeater(this->planter->calcX(), this->planter->calcY(), this->planter->gridYpos);
 			this->Plants->GOAdd(pt);
 			pt->setCol(planter->gridXpos);
 			break;
 		}
 		case sunflowerID:
 		{
-			Plant* pt = new Sunflower(this->planter->x, this->planter->y, this->planter->gridYpos);
+			Plant* pt = new Sunflower(this->planter->calcX(), this->planter->calcY(), this->planter->gridYpos);
 			this->Plants->GOAdd(pt);
 			pt->setCol(planter->gridXpos);
 			break;
 		}
 		case chomperID:
 		{
-			Plant* pt =new Chomper(this->planter->x, this->planter->y, this->planter->gridYpos);
+			Plant* pt =new Chomper(this->planter->calcX(), this->planter->calcY(), this->planter->gridYpos);
 			this->Plants->GOAdd(pt);
 			pt->setCol(planter->gridXpos);
 			break;
 		}
 		case potatoMineID:
 		{
-			Plant* pt =new PotatoMine(this->planter->x, this->planter->y, this->planter->gridYpos);
+			Plant* pt =new PotatoMine(this->planter->calcX(), this->planter->calcY(), this->planter->gridYpos);
 			this->Plants->GOAdd(pt);
 			pt->setCol(planter->gridXpos);
 			break;
 		}
 		case cherryBombID:
 		{
-			Plant* pt = new CherryBomb(this->planter->x, this->planter->y, this->planter->gridYpos);
+			Plant* pt = new CherryBomb(this->planter->calcX(), this->planter->calcY(), this->planter->gridYpos);
 			this->Plants->GOAdd(pt);
 			pt->setCol(planter->gridXpos);
 			break;
 		}
 		case wallNutID:
 		{
-			Plant* pt = new Wallnut(this->planter->x, this->planter->y, this->planter->gridYpos);
+			Plant* pt = new Wallnut(this->planter->calcX(), this->planter->calcY(), this->planter->gridYpos);
 			this->Plants->GOAdd(pt);
 			pt->setCol(planter->gridXpos);
 			break;
@@ -512,10 +602,22 @@ void Scene::spawnZombie(uint8_t zombieID, uint8_t lane){
 }
 
 int Scene::cursorHit(int16_t x, int16_t y){
-	if((int16_t)this->planter->x - x < collectTolerance && this->planter->x - x > -collectTolerance
-		&& this->planter->y - y < collectTolerance && this->planter->y - y > collectTolerance)
+	if((int16_t)this->planter->calcX() - x < collectTolerance && this->planter->calcX() - x > -collectTolerance
+		&& this->planter->calcY()- y < collectTolerance && this->planter->calcY() - y > collectTolerance)
 		return 1;
 	return 0;
+}
+
+void Scene::wipe(){
+	for(int i = this->Zombies->indexPtr; i>=0; i--){
+		Zombies->objects[i]->unrender();
+		Zombies->GORmv(i);
+	}
+	for(int i = this->Plants->indexPtr; i>=0; i--){
+		Zombies->objects[i]->unrender();
+		Zombies->GORmv(i);
+	}
+	screenWipe = 1;
 }
 
 void Scene::collisions(){
@@ -523,14 +625,19 @@ void Scene::collisions(){
 	GameObject** ptList = this->Plants->objects;
 	GameObject** prList = this->Projectiles->objects;
 	for(int i = this->Zombies->indexPtr - 1; i >=0; i--) {
+		Zombie* zm = (Zombie*)zmList[i];
+		uint8_t eatingFlag = 0;
 		for(int j = this->Plants->indexPtr - 1; j >= 0; j--){
-			Zombie* zm = (Zombie*)zmList[i];
 			Plant* pt = (Plant*)ptList[i];
 			if(zm->getLane() == pt->getLane()
 				&& zm->getX() > pt->getX() 
 				&& zm->getX() < pt->getX() + pt->sprite->width)
 			{
+				eatingFlag = 1;
 				zm->attack(pt);
+				if(screenWipe){
+					break;
+				}
 				if(pt->health <=0){
 					pt->unrender();
 					this->planter->emptyGrid(pt->getCol(), pt->getLane());
@@ -539,10 +646,17 @@ void Scene::collisions(){
 				if(zm->health<=0){
 					zm->unrender();
 					this->Zombies->tryRmv(zm);
+					zm = 0;
 					break;
 				}
 			}
-			else{
+		}
+		if(screenWipe){
+			screenWipe = 0;
+			break;
+		}
+		if(zm != 0){
+			if(eatingFlag == 0){
 				zm->stopEating();
 			}
 		}

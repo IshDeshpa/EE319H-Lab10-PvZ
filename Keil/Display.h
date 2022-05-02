@@ -51,6 +51,8 @@
 
 #define CURSOR_COLOR 0xE6C0
 
+#define borderWidth 2
+
 // standard ascii 5x7 font
 // originally from glcdfont.c from Adafruit project
 static const uint8_t Font[] = {

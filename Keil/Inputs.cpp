@@ -36,11 +36,26 @@ void Inputs_Init(){
 		ADC0_ACTSS_R |= 0x0001;
 
 }
-
 void getJoyXY(uint32_t data[2]){
 	ADC0_PSSI_R = 0x0001;
 	while((ADC0_RIS_R&0x01) == 0){};
 	data[1] = ADC0_SSFIFO0_R&0xFFF;
 	data[0] = ADC0_SSFIFO0_R&0xFFF;
 	ADC0_ISC_R = 0x0004;
+}
+
+uint8_t getA(){
+		return (GPIO_PORTC_DATA_R & 0x02) >> 1;
+}
+
+uint8_t getB(){
+		return (GPIO_PORTC_DATA_R & 0x04) >> 2;
+}
+
+uint8_t getRB(){
+		return (GPIO_PORTC_DATA_R & 0x80) >> 7;
+}
+
+uint8_t getLB(){
+		return (GPIO_PORTC_DATA_R & 0x40) >> 6;
 }

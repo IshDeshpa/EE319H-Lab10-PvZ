@@ -63,7 +63,7 @@
 #include "Display.h"
 #include "TestFS.h"
 #include "Inputs.h"
-//#include "Game.h"
+#include "Game.h"
 
 extern "C" void DisableInterrupts(void);
 extern "C" void EnableInterrupts(void);

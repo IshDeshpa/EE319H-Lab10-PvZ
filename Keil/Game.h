@@ -5,6 +5,7 @@
 #include "DAC.h"
 #include "Display.h"
 #include "random.h"
+#include "Inputs.h"
 
 #define MUSIC_BUFFER_SIZE 16
 #define FX_BUFFER_SIZE 16
@@ -121,6 +122,12 @@
 	//packet load times;
 #define LoadTime 100
 #define bigWaveSize 10 //number of zombies in a big wave
+#define stickLeftTolerance 1000
+#define stickRightTolerance 3000
+#define stickUpTolerance 3000
+#define stickDownTolerance 1000
+
+
 
 // Sprite contains a pointer to a bitmap, and has a length and width in pixels.
 class SpriteType{
@@ -658,6 +665,7 @@ class GameObjectList{
 		//Remove Object at index
 		void GORmv(uint8_t i);
 		void tryRmv(GameObject* go);
+		void tryRmv(uint8_t col, uint8_t row);
 		void refresh();
 		uint8_t getLength();
 		//will tick every existing member of objects
@@ -668,12 +676,12 @@ class GameObjectList{
 
 class SelectCursor{
 	private:
-		uint8_t x;
-		uint8_t y;
 		uint8_t buttonIndex;
+		GameObject* button;
+		GameObject* oldButton;
 		uint8_t redraw;
 		GameObjectList* targetButtons;
-		void inputCheck();
+		void render();
 		void updatePos();
 	public:
 		SelectCursor(GameObjectList* gos);
@@ -681,17 +689,17 @@ class SelectCursor{
 };
 
 class GridCursor{
-	private:
+	public:
 		uint8_t calcX();
 		uint8_t calcY();
 	public:
-		uint8_t x;	//for rendering
-		uint8_t y;
 		uint8_t gridXpos;	//for spawning plants
 		uint8_t gridYpos;	//unused for select
+		uint8_t oldGridX;
+		uint8_t oldGridY;
 		uint8_t grid[9][5];
 		uint8_t redraw;
-		void inputCheck();
+		void render();
 		void updatePos();
 	public:
 		GridCursor();
@@ -704,7 +712,7 @@ class GridCursor{
 // Collection of all game objects, background, music, etc. pertinent to the current area of the game
 class Scene{
 	private:
-		const uint16_t* backgroundBMP;	// Background of the scene as a bitmap
+		
 		uint8_t sunRate;
 		uint8_t sunTimer;
 		int16_t sunAmount;
@@ -713,6 +721,7 @@ class Scene{
 		
 		SelectCursor* select; //menuing and seed packets
 	public:
+		const uint16_t* backgroundBMP;	// Background of the scene as a bitmap
 		GameObjectList* Zombies;	// List of all objects on the scene these are arrays of pointers
 		GameObjectList* Plants;
 		GameObjectList* Buttons;
@@ -741,6 +750,8 @@ class Scene{
 		void renderSun();
 		int cursorHit(int16_t x, int16_t y);
 		uint8_t gridCheck();
+		//called by jack zombie
+		void wipe();
 };
 
 // Basic zombie.
@@ -956,8 +967,12 @@ extern Sound* s;
 extern uint8_t soundBuffer[24000];
 extern Scene* currentScene;
 
+//for if jack zombie explodes
+extern int screenWipe;
+
 //global functions
 void loadScene(Scene* s);
+
 
 #endif
 
