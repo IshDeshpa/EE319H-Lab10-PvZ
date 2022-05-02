@@ -4,135 +4,54 @@
 #include "inc/tm4c123gh6pm.h"
 #include "DAC.h"
 
-
-FRESULT file_res;
-static FATFS g_sFatFs;
-uint8_t br;
-
 Sound* sounds[NUM_SOUNDS] = {0};
-uint8_t dacInitialized = 0;
 
 extern "C" void DisableInterrupts(void);
 extern "C" void EnableInterrupts(void);
-void Sound::play(){
-	//TO-DO
-}
-Sound::Sound(char* path, uint8_t* soundBuffer, uint16_t bufferSize){
+Sound::Sound(const uint8_t* soundBuffer, uint16_t bufferSize){
 	this->soundBuffer = soundBuffer;
-	this->defaultBufferSize = bufferSize;
-	this->currentBufferSize = bufferSize;
-	this->path = path;
 	this->bufferPtr = 0;
-	
-	if(!dacInitialized){
-		DAC_Init();
-	}
-	
-	Timer0_Arm(0);
-	
-	// For getting data size
-	uint8_t buffSize = 4;	
-	uint8_t buff[4];
-	
-	// Mount filesystem
-	file_res = f_mount(&g_sFatFs, "", 1);
-	assert();
-	
-	// Open file
-	file_res = f_open(&(this->soundFile), (const TCHAR*)this->path, FA_READ);
-	assert();
-	
-	// Seek to & get data size
-	file_res = f_lseek(&(this->soundFile), 0x28);
-	assert();
-	br = 0;
-	file_res = f_read(&(this->soundFile), buff, buffSize, (UINT*)&br);
-	assert();
-	this->dataSize = (buff[3]<<24) | (buff[2]<<16) | (buff[1]<<8) | (buff[0]);
-	
-	this->loadFile();
-	
-	Timer0_Arm(1);
-	
-	// Close file
-	//file_res = f_close(&(this->soundFile));
-	//assert();
+	this->bufferSize = bufferSize;
+	this->ind = -1;
 }
 
 Sound::Sound(){
 	this->soundBuffer = 0;
-	this->defaultBufferSize = 0;
-	this->currentBufferSize = 0;
-	this->path = 0;
 	this->bufferPtr = 0;
+	this->bufferSize = 0;
+	this->ind = -1;
 }
 
-Sound::~Sound(){
-	for(int i=0; i<this->defaultBufferSize; i++){
-		soundBuffer[i] = 0;
-	}
-	delete &soundFile;
-}
+/*Sound::~Sound(){
+	this->bufferPtr = 0;
+	this->bufferSize = 0;
+}*/
 
 void Sound::increment(){
-	if(!this->end){
-		if(this->bufferPtr < this->currentBufferSize){	// If not at end of buffer, add to buffer
-			this->bufferPtr++;
-		}
-		else{	// Else, load next buffer
-			this->loadFile();
-			this->bufferPtr = 0;
-		}
+	if(this->bufferPtr >= this->bufferSize){
+		sounds[this->ind] = 0;
+		this->ind = -1;
 	}
 	else{
-		// Free buffer
-		if(this->soundBuffer != 0){
-			// Close file
-			file_res = f_close(&(this->soundFile));
-			assert();
-
-			for(int i=0; i<this->defaultBufferSize; i++){
-				soundBuffer[i] = 0;
-			}
-		}
-		
-		return;
+		this->bufferPtr++;
 	}
-}
-
-void Sound::loadFile(){
-	// Read into buffer
-	uint16_t bs = this->currentBufferSize;
-	if(chunkPtr*bs > this->dataSize){
-		this->end = 1;
-	}
-	
-	if((chunkPtr+1) * bs > this->dataSize){	// If next load of complete buffer size goes over file boundary, we want to shrink buffer to only have remaining data
-		//delete [] this->soundBuffer;
-		this->currentBufferSize = this->dataSize - this->chunkPtr*bs;
-		//this->soundBuffer = new uint8_t[this->dataSize - this->chunkPtr*bs];	// Buffer size is now remaining amount of data
-	}
-	
-	br = 0;
-	Timer0_Arm(0);
-	file_res = f_read(&(this->soundFile), this->soundBuffer, bs, (UINT*)&br);
-	assert();
-	Timer0_Arm(1);
-	this->chunkPtr++;
 }
 
 uint8_t Sound::getSample(){
 	return this->soundBuffer[this->bufferPtr];
 }
 
-// Takes in a Sound* and adds it to the global array of sounds
-void Sound_Init(Sound* s){
-	int i=0;
-	while(sounds[i]!=0 && i < NUM_SOUNDS){
-		i++;	// Loop to next empty position of array
-	}
-	if(i < NUM_SOUNDS){
-		sounds[i] = s;	// Add to array
+void Sound::play(){
+	// Adds to array
+	if(this->ind == -1){
+		for(int i=0; i<NUM_SOUNDS; i++){
+			if(sounds[i] == 0){
+				this->ind = i;
+				sounds[this->ind] = this;
+				this->bufferPtr = 0;
+				break;
+			}
+		}
 	}
 }
 
@@ -153,8 +72,7 @@ void DAC_Init(void){
 		sounds[i] = 0;	// Initialize sounds array to 0
 	}
 	
-	//Timer0_Init(&playAllSounds, 80000000/SAMPLE_RT);
-	dacInitialized = 1;
+	Timer0_Init(&playAllSounds, 80000000/SAMPLE_RT);
 }
 
 // **************DAC_Out*********************
@@ -168,10 +86,12 @@ void DAC_Out(uint32_t data){
 
 void playAllSounds(){
 	uint8_t total = 0;
-	for(int i=0; i<NUM_SOUNDS && sounds[i] != 0; i++){
-		uint8_t sample = sounds[i]->getSample();
-		total += sample;
-		sounds[i]->increment();
+	for(int i=0; i<NUM_SOUNDS; i++){
+		if(sounds[i] != 0){
+			uint8_t sample = sounds[i]->getSample();
+			total += sample;
+			sounds[i]->increment();
+		}
 	}
 	DAC_Out(total);
 }
