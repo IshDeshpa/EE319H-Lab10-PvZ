@@ -32,18 +32,16 @@ SpriteType* campaignSpanish = new SpriteType(0, 0, 0, 0);
 SpriteType* languageEnglish = new SpriteType(0, 0, 0, 0);
 SpriteType* languageSpanish = new SpriteType(0, 0, 0, 0);
 
-SpriteType* p0; SpriteType* p0g;
-SpriteType* p1; SpriteType* p1g;
-SpriteType* p2; SpriteType* p2g;
-SpriteType* p3; SpriteType* p3g;
-SpriteType* p4; SpriteType* p4g;
-SpriteType* p5; SpriteType* p5g;
-SpriteType* p6; SpriteType* p6g;
-SpriteType* p7; SpriteType* p7g;
-
-
+SpriteType* seedPacketGraySprite;
+SpriteType* p0; 
+SpriteType* p1;
+SpriteType* p2;
+SpriteType* p3; 
+SpriteType* p4; 
+SpriteType* p5; 
+SpriteType* p6;
+SpriteType* p7; 
 SpriteType* seedPacketSprites[8] = {p0, p1, p2, p3, p4, p5, p6, p7};
-SpriteType* seedPacketGraySprites[8] = {p0g, p1g, p2g, p3g, p4g, p5g, p6g, p7g};
 
 //button sounds
 Sound* menuSound = new Sound();

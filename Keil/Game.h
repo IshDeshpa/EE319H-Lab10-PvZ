@@ -881,19 +881,17 @@ extern SpriteType* languageEnglish;
 extern SpriteType* languageSpanish;
 
 //seed packet sprites
-extern SpriteType* p0; extern SpriteType* p0g;
-extern SpriteType* p1; extern SpriteType* p1g;
-extern SpriteType* p2; extern SpriteType* p2g;
-extern SpriteType* p3; extern SpriteType* p3g;
-extern SpriteType* p4; extern SpriteType* p4g;
-extern SpriteType* p5; extern SpriteType* p5g;
-extern SpriteType* p6; extern SpriteType* p6g;
-extern SpriteType* p7; extern SpriteType* p7g;
-
-
-
+extern SpriteType* p0;
+extern SpriteType* p1;
+extern SpriteType* p2; 
+extern SpriteType* p3;
+extern SpriteType* p4; 
+extern SpriteType* p5; 
+extern SpriteType* p6;
+extern SpriteType* p7;
+extern SpriteType* seedPacketGraySprite;
 extern SpriteType* seedPacketSprites[8];
-extern SpriteType* seedPacketGraySprites[8];
+
 
 //button sounds
 extern Sound* menuSound;

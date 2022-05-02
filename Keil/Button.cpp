@@ -44,7 +44,7 @@ void LanguageButton::buttonFunction(){
 
 SeedPacket::SeedPacket(uint8_t x, uint8_t y, uint8_t plantID, uint8_t loadTime, uint8_t sunCost) : Button(x, y, seedPacketSprites[plantID], plantingSound){
 	this->ready = seedPacketSprites[plantID];
-	this->gray = seedPacketGraySprites[plantID];
+	this->gray = seedPacketGraySprite;
 	this->loadTime = loadTime;
 	this->loadTimer = 0;
 	this->isReady = 1;
