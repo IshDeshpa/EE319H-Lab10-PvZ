@@ -276,7 +276,8 @@ class Explosion : public Ohko{
 		uint8_t explosionTimer;
 		//change advance so the projectile goes away after explosionTimer 
 		void advance();
-	
+		void render();
+		void unrender();
 	public:
 		//call Ohko constructor in the 8 surrounding squares as well as this one. In this square, use big explosion sprite.
 		//initialize
@@ -397,7 +398,6 @@ class CherryBomb : public Plant{
 	protected:
 		//after attacking, destroy the cherry bomb. also, no range detection
 		void attack();
-	
 	public:
 			//constructor calls Plant constructor with defined cherry bomb sprite, explosion sound, x and y arguments, 
 		  //defined generic plant health, generic plant animation time, hostile = 1, atkRt as generic plant attack rate maybe, 

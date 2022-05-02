@@ -94,6 +94,8 @@ CherryBomb::CherryBomb(uint8_t x, uint8_t y, uint8_t lane)
 {
 	
 }
+
+
 void CherryBomb::attack(){
 	Plant::attack();
 	this->unrender();

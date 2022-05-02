@@ -89,6 +89,7 @@ Section Cross References
     zombie.o(.ARM.exidx) refers to zombie.o(.text) for .text
     projectile.o(.text) refers to game.o(.text) for GameObject::GameObject(SpriteType*, Sound*, unsigned char, unsigned char, unsigned char)
     projectile.o(.text) refers to dac.o(.text) for Sound::play()
+    projectile.o(.text) refers to display.o(.text) for Display_UnrenderSprite(short, short, short, short, const unsigned short*)
     projectile.o(.text) refers to game.o(.data) for currentScene
     projectile.o(.ARM.exidx) refers to projectile.o(.text) for .text
     game.o(.text) refers to display.o(.text) for Display_UnrenderSprite(short, short, short, short, const unsigned short*)

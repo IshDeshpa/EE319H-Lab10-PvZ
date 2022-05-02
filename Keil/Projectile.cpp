@@ -79,6 +79,13 @@ Explosion::Explosion(uint8_t x, uint8_t y, uint8_t lane) : Ohko(x, y, lane, larg
 	this->soundFX->play();
 }
 
+void Explosion::render(){
+	Display_RenderSprite(this->x - 20, this->y - 20, this->sprite->bmp, this->sprite->width, this->sprite->length, transparentColor, currentScene->retBG());
+}
+void Explosion::unrender(){
+	Display_UnrenderSprite(this->oldx - 20, this->oldy - 20, this->previousSprite->width, this->previousSprite->length, currentScene->retBG());
+}
+
 void Explosion::advance(){
 	if(this->explosionTimer == 0){
 		this->unrender();
