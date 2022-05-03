@@ -6325,17 +6325,9 @@ LawnMower* LM4;
 LawnMower* LM5;
 
 //Game Object lists
-GameObject* btnArr1[4] = {singlePlayer, multiPlayer, language, 0};
-GameObject* btnArr2[8] = {peaSeed, sunSeed, snowSeed, repSeed, chompSeed, mineSeed, bombSeed, wallSeed};
-//GameObject* btnArr3[16] = {};
-
-GameObject* lmwArr[5] = {LM1, LM2, LM3, LM4, LM5};
-
-GameObjectList* menuButtons = new GameObjectList(btnArr1);	
-GameObjectList* singlePlayerButtons = new GameObjectList(btnArr2);
-//GameObjectList* multiPlayerButtons = new GameObjectList(btnArr3);
-
-GameObjectList* lawnMowers = new GameObjectList(lmwArr);
+GameObjectList* menuButtons;	
+GameObjectList* singlePlayerButtons;
+GameObjectList* lawnMowers;
 
 //scenes
 Scene* menu;
@@ -6415,6 +6407,7 @@ void GameObject::refresh(){
 		this->previousSprite = this->sprite;
 		advance();
 		if(this->redraw == 1){	
+			this->redraw = 0;
 			unrender();
 			render();
 		}
@@ -6439,7 +6432,9 @@ void GameObject::collided(){}
 
 
 GameObjectList::GameObjectList(GameObject** GOlist){
-	this->indexPtr = 0;
+	for(int i=0; GOlist[i] != 0; i++){
+		this->GOAdd(GOlist[i]); 
+	}
 }
 		//Destructor
 GameObjectList::~GameObjectList(){
@@ -7041,7 +7036,7 @@ void globalInits(){
 	vsEnglish = new SpriteType(vsEnglishBMP, 50, 30, vsEnglish);
 	vsSpanish = new SpriteType(vsSpanishBMP, 50, 30, vsSpanish);
 	campaignEnglish = new SpriteType(campaignEnglishBMP, 50, 30, campaignEnglish);
-	campaignEnglish = new SpriteType(campaignSpanishBMP, 50, 30, campaignSpanish);
+	campaignSpanish = new SpriteType(campaignSpanishBMP, 50, 30, campaignSpanish);
 	languageEnglish = new SpriteType(languageEnglishBMP, 50, 30, languageEnglish);
 	languageSpanish = new SpriteType(languageSpanishBMP, 50, 30, languageSpanish);
 
@@ -7068,6 +7063,9 @@ void globalInits(){
 	singlePlayer = new CampaignButton(CmpButtonXpos, CmpButtonYpos);
 	multiPlayer = new VsButton(VsButtonXpos, VsButtonYpos);
 	language = new LanguageButton(LangButtonXpos, LangButtonYpos);
+	
+	GameObject* btnArr1[4] = {singlePlayer, multiPlayer, language, 0};
+	menuButtons = new GameObjectList(btnArr1);
 
 	peaSeed = new SeedPacket(FspXpos, SpYpos, peashooterID, LoadTime, peashooterCost);
 	sunSeed = new SeedPacket(SspXpos, SpYpos, sunflowerID, LoadTime, sunflowerCost);
@@ -7077,12 +7075,18 @@ void globalInits(){
 	mineSeed = new SeedPacket(SispXpos, SpYpos, potatoMineID, LoadTime, potatoMineCost);
 	bombSeed = new SeedPacket(SespXpos, SpYpos, cherryBombID, LoadTime, cherryBombCost);
 	wallSeed = new SeedPacket(EspXpos, SpYpos, wallNutID, LoadTime, wallNutCost);
-
+	
+	GameObject* btnArr2[8] = {peaSeed, sunSeed, snowSeed, repSeed, chompSeed, mineSeed, bombSeed, wallSeed};
+	singlePlayerButtons = new GameObjectList(btnArr2);
+	
 	LM1 = new LawnMower(0, Lane1Ypos, 1);
 	LM2 = new LawnMower(0, Lane2Ypos, 2);
 	LM3 = new LawnMower(0, Lane3Ypos, 3);
 	LM4 = new LawnMower(0, Lane4Ypos, 4);
 	LM5 = new LawnMower(0, Lane5Ypos, 5);
+	
+	GameObject* lmwArr[5] = {LM1, LM2, LM3, LM4, LM5};
+	lawnMowers = new GameObjectList(lmwArr);
 
 	menu  = new Scene(menuButtons, 0, menuBackground);
 	campaign = new Scene(singlePlayerButtons, lawnMowers, lawnBackground);

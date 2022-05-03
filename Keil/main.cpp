@@ -70,7 +70,6 @@ extern "C" void EnableInterrupts(void);
 extern "C" void SysTick_Handler(void);
 
 int main(void){
-	globalInits();
 	DisableInterrupts();
   PLL_Init(Bus80MHz);       // Bus clock is 80 MHz 
   Random_Init(1);
@@ -78,26 +77,19 @@ int main(void){
 	Inputs_Init();
 	DAC_Init();
   EnableInterrupts();
+	globalInits();
 	
 
 	//Display_DrawBitmap(0, 0, background, 160, 128);
 	
 	//biteSound = new Sound(bite, 2099);
 	//biteSound->play();
-	
+	loadScene(menu);
 	while(1){
-		//biteSound->play();
-		//Display_FillRect(0, 0, 20, 20, 0xFFFF);
-		//uint32_t ADCvalue[2];
-		//getJoyXY(ADCvalue);
-		//Display_SetCursor(0, 0);
-		//Display_OutUDec(ADCvalue[0], 0x0000);
-		//Delay1ms(300);
-		//currentScene->refresh();
-		//currentScene->collisions();
+		currentScene->refresh();
 	};
 }
 
 void Systick_Handler(){
-	//currentScene->tick();
+	currentScene->tick();
 }
