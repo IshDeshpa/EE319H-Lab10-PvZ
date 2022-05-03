@@ -159,7 +159,7 @@ class GameObject{
 		void unrender();
 		
 		// Advance to the next state of the game object (should be overloaded)
-		void advance();
+		virtual void advance();
 	
 		// Render the current state of the game object
 		void render();
@@ -187,11 +187,11 @@ class GameObject{
 		//GameObject operator=(GameObject& other);
 		
 		// Unrender, advance to next state of the game object and render
-		void refresh();
+		virtual void refresh();
 		//game object tick will not do anything
-		void tick();
+		virtual void tick();
 		//game object collide will not do anything
-		void collided();
+		int collided();
 		uint8_t getX();
 		uint8_t getY();
 		uint8_t getLane();
@@ -680,6 +680,7 @@ class SelectCursor{
 		GameObject* button;
 		GameObject* oldButton;
 		uint8_t redraw;
+		uint8_t updated;
 		GameObjectList* targetButtons;
 		void render();
 		void updatePos();

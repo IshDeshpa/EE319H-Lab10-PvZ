@@ -2,6 +2,11 @@
 #include "inc/tm4c123gh6pm.h"
 #include "Inputs.h"
 
+uint8_t LB = 0;
+uint8_t RB = 0;
+uint8_t A = 0;
+uint8_t B = 0;
+
 void Inputs_Init(){
 		SYSCTL_RCGCGPIO_R |= 0x1C;
 		SYSCTL_RCGCADC_R |= 0x01;
@@ -37,7 +42,6 @@ void Inputs_Init(){
 		ADC0_SSCTL0_R = 0x0060;
 		ADC0_IM_R &= ~0x0001;
 		ADC0_ACTSS_R |= 0x0001;
-
 }
 void getJoyXY(uint32_t data[2]){
 	ADC0_PSSI_R = 0x0001;
@@ -48,17 +52,29 @@ void getJoyXY(uint32_t data[2]){
 }
 
 uint8_t getA(){
-		return (GPIO_PORTD_DATA_R & 0x02) >> 1;
+	if(A && !((GPIO_PORTD_DATA_R & 0x02) >> 1)){
+		A = 0;
+	}
+	return (GPIO_PORTD_DATA_R & 0x02) >> 1;
 }
 
 uint8_t getB(){
-		return (GPIO_PORTD_DATA_R & 0x04) >> 2;
+	if(B && !((GPIO_PORTD_DATA_R & 0x04) >> 2)){
+		B = 0;
+	}
+	return (GPIO_PORTD_DATA_R & 0x04) >> 2;
 }
 
 uint8_t getRB(){
-		return (GPIO_PORTC_DATA_R & 0x80) >> 7;
+	if(RB && !((GPIO_PORTC_DATA_R & 0x80) >> 7)){
+		RB = 0;
+	}
+	return (GPIO_PORTC_DATA_R & 0x80) >> 7;
 }
 
 uint8_t getLB(){
-		return (GPIO_PORTC_DATA_R & 0x40) >> 6;
+	if(LB && !((GPIO_PORTC_DATA_R & 0x40) >> 6)){
+		LB = 0;
+	}
+	return (GPIO_PORTC_DATA_R & 0x40) >> 6;
 }

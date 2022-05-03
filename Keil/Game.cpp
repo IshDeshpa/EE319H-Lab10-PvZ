@@ -6425,7 +6425,7 @@ uint8_t GameObject::getLane(){
 //does nothing
 void GameObject::tick(){}
 //does nothing
-void GameObject::collided(){}
+int GameObject::collided(){}
 
 
 //Constructor
@@ -6504,10 +6504,9 @@ SelectCursor::SelectCursor(GameObjectList* gos){
 void SelectCursor::refresh(){
 	this->updatePos();
 	this->render();
-		
 }
 void SelectCursor::updatePos(){
-	if(getLB()){
+	if(getLB() && !LB){
 		this->oldButton = this->button;
 		this->buttonIndex -= 1;
 		if(this->buttonIndex >= this->targetButtons->indexPtr){
@@ -6515,8 +6514,9 @@ void SelectCursor::updatePos(){
 		}
 		this->button = this->targetButtons->objects[this->buttonIndex];
 		this->redraw = 1;
+		LB = 1;
 	}
-	else if(getRB()){
+	else if(getRB() && !RB){
 		this->oldButton = this->button;
 		this->buttonIndex += 1;
 		if(this->buttonIndex >= this->targetButtons->indexPtr){
@@ -6524,9 +6524,11 @@ void SelectCursor::updatePos(){
 		}
 		this->button = this->targetButtons->objects[this->buttonIndex];
 		this->redraw = 1;
+		RB = 1;
 	}
-	if(getA()){
+	if(getA() && !A){
 		((Button*)this->button)->buttonHit();
+		A = 1;
 	}
 }
 void SelectCursor::render(){
@@ -6641,6 +6643,7 @@ Scene::Scene(GameObjectList* but, GameObjectList* lwm, const uint16_t* bg){
 		this->sunRate = sunProductionRate;
 		this->sunTimer = 0;
 		this->sunAmount = 0;
+		this->select = new SelectCursor(but);
 }
 void Scene::refresh(){
 	if(this->select != 0)
@@ -6652,10 +6655,10 @@ void Scene::refresh(){
 	}
 	
 	this->Buttons->refresh();
-	this->Plants->refresh();
-	this->Zombies->refresh();
-	this->Lawnmowers->refresh();
-	this->Projectiles->refresh();
+//	this->Plants->refresh();
+//	this->Zombies->refresh();
+//	this->Lawnmowers->refresh();
+//	this->Projectiles->refresh();
 	
 }
 void Scene::tick(){
@@ -7065,7 +7068,7 @@ void globalInits(){
 	language = new LanguageButton(LangButtonXpos, LangButtonYpos);
 	
 	GameObject* btnArr1[4] = {singlePlayer, multiPlayer, language, 0};
-	menuButtons = new GameObjectList(btnArr1);
+	menuButtons = new GameObjectList(btnArr1);	
 
 	peaSeed = new SeedPacket(FspXpos, SpYpos, peashooterID, LoadTime, peashooterCost);
 	sunSeed = new SeedPacket(SspXpos, SpYpos, sunflowerID, LoadTime, sunflowerCost);
@@ -7087,7 +7090,7 @@ void globalInits(){
 	
 	GameObject* lmwArr[5] = {LM1, LM2, LM3, LM4, LM5};
 	lawnMowers = new GameObjectList(lmwArr);
-
+	
 	menu  = new Scene(menuButtons, 0, menuBackground);
 	campaign = new Scene(singlePlayerButtons, lawnMowers, lawnBackground);
 }

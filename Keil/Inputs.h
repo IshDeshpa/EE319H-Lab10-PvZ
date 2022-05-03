@@ -10,4 +10,9 @@ uint8_t getB();
 uint8_t getRB();
 uint8_t getLB();
 
+extern uint8_t LB;
+extern uint8_t RB;
+extern uint8_t A;
+extern uint8_t B;
+
 #endif

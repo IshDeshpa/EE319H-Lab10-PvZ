@@ -39,7 +39,7 @@ void CampaignButton::buttonFunction(){
 
 LanguageButton::LanguageButton(uint8_t x, uint8_t y) : MenuButton(x, y, languageEnglish, languageSpanish){}
 void LanguageButton::buttonFunction(){
-	lang ^= lang;
+	lang = !lang;
 }
 
 SeedPacket::SeedPacket(uint8_t x, uint8_t y, uint8_t plantID, uint8_t loadTime, uint8_t sunCost) : Button(x, y, seedPacketSprites[plantID], plantingSound){
