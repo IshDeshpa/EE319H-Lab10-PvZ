@@ -63,21 +63,22 @@
 #include "Display.h"
 #include "TestFS.h"
 #include "Inputs.h"
-//#include "Game.h"
+#include "Game.h"
 
 extern "C" void DisableInterrupts(void);
 extern "C" void EnableInterrupts(void);
 extern "C" void SysTick_Handler(void);
 
 int main(void){
+	globalInits();
 	DisableInterrupts();
   PLL_Init(Bus80MHz);       // Bus clock is 80 MHz 
-  //TExaS_Init();
-  //Random_Init(1);
+  Random_Init(1);
   Output_Init();
 	Inputs_Init();
 	DAC_Init();
   EnableInterrupts();
+	
 
 	//Display_DrawBitmap(0, 0, background, 160, 128);
 	
