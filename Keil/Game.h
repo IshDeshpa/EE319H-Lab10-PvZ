@@ -132,12 +132,12 @@
 // Sprite contains a pointer to a bitmap, and has a length and width in pixels.
 class SpriteType{
 	public:
-		uint16_t* bmp;	// Bitmap of half words to encode RGB info
+		const uint16_t* bmp;	// Bitmap of half words to encode RGB info
 		uint8_t length;	// Length
 		uint8_t width;	// Width
 		SpriteType* nextSprite;	// Sprite pointer for animation FSM (each sprite only has one next sprite)
 	public:
-		SpriteType(uint16_t* bmp, uint8_t length, uint8_t width, SpriteType* nextSprite);
+		SpriteType(const uint16_t* bmp, uint8_t length, uint8_t width, SpriteType* nextSprite);
 };
 
 
@@ -716,7 +716,6 @@ class Scene{
 		uint8_t sunRate;
 		uint8_t sunTimer;
 		int16_t sunAmount;
-		Sound* music;
 	
 		
 		SelectCursor* select; //menuing and seed packets
@@ -729,7 +728,7 @@ class Scene{
 		GameObjectList* Projectiles;
 		GridCursor* planter; //locked to the grid hopefully
 		// Constructor
-		Scene(GameObjectList* but, GameObjectList* lwm, const uint16_t* bg, Sound* msc);
+		Scene(GameObjectList* but, GameObjectList* lwm, const uint16_t* bg);
 		// Destructor
 		//~Scene();
 	
@@ -754,22 +753,10 @@ class Scene{
 		void wipe();
 };
 
-// Basic zombie.
-
-
-
 //bitmaps
-extern uint16_t menuBackground[1];
-extern uint16_t lawnBackground[1];
+extern const uint16_t menuBackground[20480];
+extern const uint16_t lawnBackground[20480];
 	
-//projectile sprites
-extern SpriteType* frozenPeaSprite;
-extern SpriteType* peaSprite;
-extern SpriteType* smallExplosionSprite;
-extern SpriteType* largeExplosionSprite;
-extern SpriteType* sunSprite;
-extern SpriteType* transparentSprite;
-
 enum zombieIDS{
 	regularZombieID, coneZombieID, bucketZombieID, footballZombieID, 
 	newspaperZombieID, poleVaultZombieID, jackZombieID, flagZombieID
@@ -782,95 +769,119 @@ smallExplosionID, explosionID, sunID};
 enum plantIDS{
 	peashooterID, sunflowerID, snowPeaID, repeaterID, chomperID, potatoMineID, cherryBombID, wallNutID
 };
-//TO-DO make 3 of each of these except for a couple
+
 //plant sprites
 extern SpriteType* peashooterSprite;
+extern SpriteType* peashooterSprite2;
+extern SpriteType* peashooterSprite3;
+extern SpriteType* peashooterSprite4;
+
 extern SpriteType* snowPeaSprite;
+extern SpriteType* snowPeaSprite2;
+extern SpriteType* snowPeaSprite3;
+extern SpriteType* snowPeaSprite4;
+
 extern SpriteType* repeaterSprite;
+extern SpriteType* repeaterSprite2;
+
 extern SpriteType* sunflowerSprite;
+extern SpriteType* sunflowerSprite2;
+
 extern SpriteType* cherryBombSprite;
+extern SpriteType* cherryBombSprite2;
+extern SpriteType* cherryBombSprite3;
+
 extern SpriteType* potatoMineSprite;
 extern SpriteType* potatoMineReadySprite;
+extern SpriteType* potatoMineReadySprite2;
+
 extern SpriteType* chomperSprite;
+extern SpriteType* chomperSprite2;
+extern SpriteType* chomperSprite3;
+extern SpriteType* chomperSprite4;
 extern SpriteType* chomperChewSprite;
 extern SpriteType* chomperAttackSprite;
-extern SpriteType* wallNutSprite;
 
-extern SpriteType* peashooterSprite2;
-extern SpriteType* snowPeaSprite2;
-extern SpriteType* repeaterSprite2;
-extern SpriteType* sunflowerSprite2;
-extern SpriteType* cherryBombSprite2;
-extern SpriteType* potatoMineReadySprite2;
-extern SpriteType* chomperSprite2;
-extern SpriteType* chomperChewSprite2;
+extern SpriteType* wallNutSprite;
 extern SpriteType* wallNutDamagedSprite;
 
-extern SpriteType* peashooterSprite3;
-extern SpriteType* snowPeaSprite3;
-extern SpriteType* repeaterSprite3;
-extern SpriteType* sunflowerSprite3;
-extern SpriteType* cherryBombSprite3;
-extern SpriteType* chomperSprite3;
-extern SpriteType* chomperChewSprite3;
+//projectile sprites
+extern SpriteType* frozenPeaSprite;
+extern SpriteType* peaSprite;
+extern SpriteType* smallExplosionSprite;
+extern SpriteType* largeExplosionSprite;
+extern SpriteType* sunSprite;
+extern SpriteType* transparentSprite;
+
 //Zombie sprites
 extern SpriteType* regularZombieSprite;
-extern SpriteType* regularZombieEatSprite;
-extern SpriteType* bucketZombieSprite;
-extern SpriteType* bucketZombieEatSprite;
-extern SpriteType* newspaperZombieSprite;
-extern SpriteType* newspaperZombieEatSprite;
-extern SpriteType* polevaultZombieRunSprite;
-extern SpriteType* polevaultZombieJumpSprite;
-extern SpriteType* polevaultZombieWalkSprite;
-extern SpriteType* polevaultZombieEatSprite;
-extern SpriteType* jackZombieSprite;
-extern SpriteType* footballZombieSprite;
-extern SpriteType* footballZombieEatSprite;
-extern SpriteType* flagZombieSprite;
-extern SpriteType* flagZombieEatSprite;
-extern SpriteType* coneZombieSprite;
-extern SpriteType* coneZombieEatSprite;
-
 extern SpriteType* regularZombieSprite2;
-extern SpriteType* regularZombieEatSprite2;
-extern SpriteType* bucketZombieSprite2;
-extern SpriteType* bucketZombieEatSprite2;
-extern SpriteType* newspaperZombieSprite2;
-extern SpriteType* newspaperZombieEatSprite2;
-extern SpriteType* polevaultZombieRunSprite2;
-extern SpriteType* polevaultZombieWalkSprite2;
-extern SpriteType* polevaultZombieEatSprite2;
-extern SpriteType* jackZombieSprite2;
-extern SpriteType* footballZombieSprite2;
-extern SpriteType* footballZombieEatSprite2;
-extern SpriteType* flagZombieSprite2;
-extern SpriteType* flagZombieEatSprite2;
-extern SpriteType* coneZombieSprite2;
-extern SpriteType* coneZombieEatSprite2;
-
 extern SpriteType* regularZombieSprite3;
+extern SpriteType* regularZombieSprite4;
+
+extern SpriteType* regularZombieEatSprite;
+extern SpriteType* regularZombieEatSprite2;
 extern SpriteType* regularZombieEatSprite3;
+extern SpriteType* regularZombieEatSprite4;
+
+extern SpriteType* bucketZombieSprite;
+extern SpriteType* bucketZombieSprite2;
 extern SpriteType* bucketZombieSprite3;
-extern SpriteType* bucketZombieEatSprite3;
+extern SpriteType* bucketZombieSprite4;
+
+extern SpriteType* bucketZombieEatSprite;
+extern SpriteType* bucketZombieEatSprite2;
+
+extern SpriteType* newspaperZombieSprite;
+extern SpriteType* newspaperZombieSprite2;
 extern SpriteType* newspaperZombieSprite3;
-extern SpriteType* newspaperZombieEatSprite3;
+
+extern SpriteType* newspaperZombieEatSprite;
+extern SpriteType* newspaperZombieEatSprite2;
+
+extern SpriteType* polevaultZombieRunSprite;
+extern SpriteType* polevaultZombieRunSprite2;
 extern SpriteType* polevaultZombieRunSprite3;
+extern SpriteType* polevaultZombieRunSprite4;
+
+extern SpriteType* polevaultZombieEatSprite;
+extern SpriteType* polevaultZombieEatSprite2;
+
+extern SpriteType* polevaultZombieJumpSprite;
+
+extern SpriteType* polevaultZombieWalkSprite;
+extern SpriteType* polevaultZombieWalkSprite2;
 extern SpriteType* polevaultZombieWalkSprite3;
-extern SpriteType* polevaultZombieEatSprite3;
+extern SpriteType* polevaultZombieWalkSprite4;
+
+extern SpriteType* jackZombieSprite;
+extern SpriteType* jackZombieSprite2;
 extern SpriteType* jackZombieSprite3;
+extern SpriteType* jackZombieSprite4;
+
+extern SpriteType* footballZombieSprite;
+extern SpriteType* footballZombieSprite2;
 extern SpriteType* footballZombieSprite3;
-extern SpriteType* footballZombieEatSprite3;
+extern SpriteType* footballZombieSprite4;
+
+extern SpriteType* footballZombieEatSprite;
+extern SpriteType* footballZombieEatSprite2;
+
+extern SpriteType* flagZombieSprite;
+extern SpriteType* flagZombieSprite2;
 extern SpriteType* flagZombieSprite3;
-extern SpriteType* flagZombieEatSprite3;
+extern SpriteType* flagZombieSprite4;
+
+extern SpriteType* flagZombieEatSprite;
+extern SpriteType* flagZombieEatSprite2;
+
+extern SpriteType* coneZombieSprite;
+extern SpriteType* coneZombieSprite2;
 extern SpriteType* coneZombieSprite3;
-extern SpriteType* coneZombieEatSprite3;
+extern SpriteType* coneZombieSprite4;
 
-
-
-
-
-
+extern SpriteType* coneZombieEatSprite;
+extern SpriteType* coneZombieEatSprite2;
 
 //button sprites
 extern SpriteType* vsEnglish;
@@ -881,22 +892,22 @@ extern SpriteType* languageEnglish;
 extern SpriteType* languageSpanish;
 
 //seed packet sprites
-extern SpriteType* p0;
-extern SpriteType* p1;
-extern SpriteType* p2; 
-extern SpriteType* p3;
-extern SpriteType* p4; 
-extern SpriteType* p5; 
-extern SpriteType* p6;
-extern SpriteType* p7;
+extern SpriteType* peashooterPacket;
+extern SpriteType* sunflowerPacket;
+extern SpriteType* snowPeaPacket; 
+extern SpriteType* repeaterPacket;
+extern SpriteType* chomperPacket; 
+extern SpriteType* potatoMinePacket; 
+extern SpriteType* cherryBombPacket;
+extern SpriteType* wallNutPacket;
 extern SpriteType* seedPacketGraySprite;
 extern SpriteType* seedPacketSprites[8];
-
 
 //button sounds
 extern Sound* menuSound;
 extern Sound* plantingSound;
 
+// other sounds
 extern Sound* peaSound;
 extern Sound* chompSound;	//for when chomper bites zombie
 extern Sound* explosionSound;
@@ -970,6 +981,7 @@ extern int screenWipe;
 
 //global functions
 void loadScene(Scene* s);
+void globalInits(void);
 
 
 #endif
