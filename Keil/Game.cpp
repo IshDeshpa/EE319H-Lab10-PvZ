@@ -5304,7 +5304,7 @@ const uint16_t wallNutPacketBMP[80] = {// 'WallNutSeed', 10x8px
 0xffff, 0x0000, 0xd6b9, 0xffff, 0xffff, 0x0000, 0xbca5, 0x0000, 0xd567, 0xbca5, 0x9cf2, 0x0000, 0xbca5, 0xd6b9, 0xffff, 0x0000, 
 0xd567, 0x0000, 0x7b03, 0x8b83, 0xa424, 0x0000, 0x0000, 0x0000, 0x0000, 0xd567, 0xd567, 0xbca5, 0x0000, 0x0000, 0x0000, 0xa424};
 SpriteType* wallNutPacket; 
-SpriteType* seedPacketSprites[8] = {peashooterPacket, sunflowerPacket, snowPeaPacket, repeaterPacket, chomperPacket, potatoMinePacket, cherryBombPacket, wallNutPacket};
+SpriteType* seedPacketSprites[8];
 
 //button sounds
 const uint8_t menuWav[953] = {
@@ -6430,8 +6430,11 @@ int GameObject::collided(){}
 
 //Constructor
 
-
+GameObjectList::GameObjectList(){
+	this->indexPtr = 0;
+}
 GameObjectList::GameObjectList(GameObject** GOlist){
+	this->indexPtr = 0;
 	for(int i=0; GOlist[i] != 0; i++){
 		this->GOAdd(GOlist[i]); 
 	}
@@ -6491,9 +6494,8 @@ uint8_t GameObjectList::getLength(){
 SelectCursor::SelectCursor(GameObjectList* gos){
 	this->buttonIndex = 0;
 	this->targetButtons = gos;
-	this->redraw = 0;
+	this->redraw = 1;
 	this->button = this->targetButtons->objects[this->buttonIndex];
-	this->render();
 	this->oldButton = this->button;
 }
 //TO-DO //on refresh, the cursor will check for button inputs. if
@@ -6581,7 +6583,7 @@ void GridCursor::updatePos(){
 		this->gridYpos--;
 		this->redraw = 1;
 	}
-	else if(stickPos[1] > stickRightTolerance && this->gridYpos < 5){
+	else if(stickPos[1] > stickUpTolerance && this->gridYpos < 5){
 		this->oldGridY = this->gridYpos;
 		this->gridYpos++;
 		this->redraw = 1;
@@ -6635,10 +6637,10 @@ void GridCursor::emptyGrid(uint8_t col, uint8_t row){
 }
 Scene::Scene(GameObjectList* but, GameObjectList* lwm, const uint16_t* bg){
 		this->Buttons = but;
-		this->Plants = new GameObjectList(0);
-		this->Zombies = new GameObjectList(0);
-		this->Lawnmowers = new GameObjectList(0);
-		this->Projectiles = new GameObjectList(0);
+		this->Plants = new GameObjectList();
+		this->Zombies = new GameObjectList();
+		this->Lawnmowers = new GameObjectList();
+		this->Projectiles = new GameObjectList();
 		this->backgroundBMP = bg;
 		this->sunRate = sunProductionRate;
 		this->sunTimer = 0;
@@ -6649,16 +6651,19 @@ void Scene::refresh(){
 	if(this->select != 0)
 	{
 			this->select->refresh();
+		if(currentScene != this){
+			return;
+		}
 	}
 	if(this->planter != 0){
 			this->planter->refresh();
 	}
 	
 	this->Buttons->refresh();
-//	this->Plants->refresh();
-//	this->Zombies->refresh();
-//	this->Lawnmowers->refresh();
-//	this->Projectiles->refresh();
+	this->Plants->refresh();
+	this->Zombies->refresh();
+	this->Lawnmowers->refresh();
+	this->Projectiles->refresh();
 	
 }
 void Scene::tick(){
@@ -7070,16 +7075,25 @@ void globalInits(){
 	GameObject* btnArr1[4] = {singlePlayer, multiPlayer, language, 0};
 	menuButtons = new GameObjectList(btnArr1);	
 
-	peaSeed = new SeedPacket(FspXpos, SpYpos, peashooterID, LoadTime, peashooterCost);
-	sunSeed = new SeedPacket(SspXpos, SpYpos, sunflowerID, LoadTime, sunflowerCost);
-	snowSeed = new SeedPacket(TspXpos, SpYpos, snowPeaID, LoadTime, snowPeaCost);
-	repSeed = new SeedPacket(FspXpos, SpYpos, repeaterID, LoadTime, repeaterCost);
-	chompSeed = new SeedPacket(FispXpos, SpYpos, chomperID, LoadTime, chomperCost);
-	mineSeed = new SeedPacket(SispXpos, SpYpos, potatoMineID, LoadTime, potatoMineCost);
-	bombSeed = new SeedPacket(SespXpos, SpYpos, cherryBombID, LoadTime, cherryBombCost);
-	wallSeed = new SeedPacket(EspXpos, SpYpos, wallNutID, LoadTime, wallNutCost);
+	seedPacketSprites[0] = peashooterPacket;
+	seedPacketSprites[1] = sunflowerPacket;
+	seedPacketSprites[2] = snowPeaPacket;
+	seedPacketSprites[3] = repeaterPacket;
+	seedPacketSprites[4] = chomperPacket;
+	seedPacketSprites[5] = potatoMinePacket;
+	seedPacketSprites[6] = cherryBombPacket;
+	seedPacketSprites[7] = wallNutPacket;
 	
-	GameObject* btnArr2[8] = {peaSeed, sunSeed, snowSeed, repSeed, chompSeed, mineSeed, bombSeed, wallSeed};
+	peaSeed = new SeedPacket(1, SpYpos, peashooterID, LoadTime, peashooterCost);
+	sunSeed = new SeedPacket(13, SpYpos, sunflowerID, LoadTime, sunflowerCost);
+	snowSeed = new SeedPacket(25, SpYpos, snowPeaID, LoadTime, snowPeaCost);
+	repSeed = new SeedPacket(37, SpYpos, repeaterID, LoadTime, repeaterCost);
+	chompSeed = new SeedPacket(49, SpYpos, chomperID, LoadTime, chomperCost);
+	mineSeed = new SeedPacket(61, SpYpos, potatoMineID, LoadTime, potatoMineCost);
+	bombSeed = new SeedPacket(73, SpYpos, cherryBombID, LoadTime, cherryBombCost);
+	wallSeed = new SeedPacket(85, SpYpos, wallNutID, LoadTime, wallNutCost);
+	
+	GameObject* btnArr2[9] = {peaSeed, sunSeed, snowSeed, repSeed, chompSeed, mineSeed, bombSeed, wallSeed, 0};
 	singlePlayerButtons = new GameObjectList(btnArr2);
 	
 	LM1 = new LawnMower(0, Lane1Ypos, 1);

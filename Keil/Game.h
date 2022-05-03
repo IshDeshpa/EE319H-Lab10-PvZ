@@ -80,13 +80,13 @@
 #define LangButtonYpos 10
 
 #define SpXSize 10 //size of all seed packet sprites
-#define SpYSize 10 
+#define SpYSize 8 
 #define SpOffset SpXSize+2
 #define SpYpos 115	//y position of all seed packets
 #define FspXpos 1		//x position of left most packet
 #define SspXpos FspXpos + SpOffset * 1
-#define TspXpos FspXpos + SpOffset * 2
-#define	FospXpos FspXpos + SpOffset * 3
+#define TspXpos FspXpos + (SpOffset * 2)
+#define	FospXpos FspXpos + (SpOffset * 3)
 #define FispXpos FspXpos + SpOffset * 4
 #define SispXpos FspXpos + SpOffset * 5
 #define SespXpos FspXpos + SpOffset * 6
@@ -457,12 +457,12 @@ class Chomper : public Plant{
 class Button : public GameObject{
 	protected:
 		//does nothing in Button
-		void buttonFunction();
+		virtual void buttonFunction();
 	public:
 		//calls gameobject with parameters as passed in
 		Button(uint8_t x, uint8_t y, SpriteType* sprite, Sound* sfx);
 		//plays sound, calls buttonFunction
-		void buttonHit();
+		virtual void buttonHit();
 
 };
 
@@ -656,6 +656,7 @@ class GameObjectList{
 	public:
 		//Constructor
 		GameObjectList(GameObject** GOlist);
+		GameObjectList();
 		//Destructor
 		~GameObjectList();
 		//Add Object

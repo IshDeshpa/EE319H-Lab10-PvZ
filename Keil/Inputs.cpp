@@ -13,22 +13,22 @@ void Inputs_Init(){
 		while((SYSCTL_PRGPIO_R&SYSCTL_PRGPIO_R0) == 0){};
 		while((SYSCTL_PRADC_R&SYSCTL_PRADC_R0) == 0){};
 		GPIO_PORTC_DEN_R |= 0xC0;	//BR1, BL1
-		GPIO_PORTD_DEN_R |= 0x06;	//A1, B1
+		GPIO_PORTD_DEN_R |= 0xC0;	//A1, B1
 		GPIO_PORTE_DEN_R |= 0x03; //Joysticks
 		
 		GPIO_PORTC_DIR_R &= ~0xC0;
-		GPIO_PORTD_DIR_R &= ~0x06;
+		GPIO_PORTD_DIR_R &= ~0xC0;
 		GPIO_PORTE_DIR_R &= ~0x03;
 		
 		GPIO_PORTC_PDR_R |= 0xC0;	//BR1, BL1
-		GPIO_PORTD_PDR_R |= 0x06;	//A1, B1
+		GPIO_PORTD_PDR_R |= 0xC0;	//A1, B1
 
 		GPIO_PORTC_AMSEL_R &= ~0xC0;          // disable analog functionality
-		GPIO_PORTD_AMSEL_R &= ~0x06;          // disable analog functionality
+		GPIO_PORTD_AMSEL_R &= ~0xC0;          // disable analog functionality
 		GPIO_PORTE_AMSEL_R |= 0x03;          // disable analog functionality
 			
 		GPIO_PORTC_AFSEL_R &= ~0xC0;          // disable analog functionality
-		GPIO_PORTD_AFSEL_R &= ~0x06;          // disable analog functionality
+		GPIO_PORTD_AFSEL_R &= ~0xC0;          // disable analog functionality
 		GPIO_PORTE_AFSEL_R |= 0x03;          // disable analog functionality
 			
 		//GPIO_PORTE_PCTL_R = (GPIO_PORTF_PCTL_R&0x000000FF)+0x00000000;
@@ -52,17 +52,17 @@ void getJoyXY(uint32_t data[2]){
 }
 
 uint8_t getA(){
-	if(A && !((GPIO_PORTD_DATA_R & 0x02) >> 1)){
+	if(A && !((GPIO_PORTD_DATA_R & 0x80) >> 7)){
 		A = 0;
 	}
-	return (GPIO_PORTD_DATA_R & 0x02) >> 1;
+	return (GPIO_PORTD_DATA_R & 0x80) >> 7;
 }
 
 uint8_t getB(){
-	if(B && !((GPIO_PORTD_DATA_R & 0x04) >> 2)){
+	if(B && !((GPIO_PORTD_DATA_R & 0x40) >> 6)){
 		B = 0;
 	}
-	return (GPIO_PORTD_DATA_R & 0x04) >> 2;
+	return (GPIO_PORTD_DATA_R & 0x40) >> 6;
 }
 
 uint8_t getRB(){
