@@ -607,9 +607,9 @@ void Display_RenderSprite(int16_t x, int16_t y, const uint16_t *image, int16_t w
 	for(x=w; x>0; x--){
 		for(y=h; y>0; y--){
 			if(image[i] != greenScreen){
-				xchg_spi((uint8_t)(image[i] >> 8), DC_DATA);
+				xchg_spi((uint8_t)(Display_SwapColor(image[i]) >> 8), DC_DATA);
 																					// send the bottom 8 bits
-				xchg_spi((uint8_t)image[i], DC_DATA);
+				xchg_spi((uint8_t)Display_SwapColor(image[i]), DC_DATA);
 			}
 			else{
 				uint16_t screenInd = originalX+(_width)*convY(originalY+h-1) + (x-1) + (h-y-1)*_width;
@@ -717,7 +717,7 @@ void Display_RenderCursor(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t c
 	for(x=w; x>0; x--){
 		for(y=h; y>0; y--){
 			if(!(x-1 < w-borderWidth && x-1 >= borderWidth && y-1 < h-borderWidth && y-1 >= borderWidth)){
-				Display_DrawPixel(originalX+x-1, originalY+y-1, ~color);
+				Display_DrawPixel(originalX+x-1, originalY+y-1, Display_SwapColor(color));
 			}
 			i += originalWidth;                        // go to the next pixel
 		}

@@ -103,7 +103,7 @@
 
 
 #define LaneYOffset gridY //change later
-#define Lane1Ypos gridX
+#define Lane1Ypos ZeroY
 #define Lane2Ypos Lane1Ypos + gridY * 1
 #define Lane3Ypos Lane1Ypos + gridY * 2
 #define Lane4Ypos Lane1Ypos + gridY * 3
@@ -112,7 +112,7 @@
 #define ZombieStartXpos
 #define collectTolerance 30
 //change later:
-#define transparentColor 0x6969
+#define transparentColor 0xFB56
 #define ZeroX 10
 #define ZeroY	5
 #define gridX 15

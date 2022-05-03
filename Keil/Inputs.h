@@ -14,5 +14,7 @@ extern uint8_t LB;
 extern uint8_t RB;
 extern uint8_t A;
 extern uint8_t B;
+extern uint8_t JoyX;
+extern uint8_t JoyY;
 
 #endif

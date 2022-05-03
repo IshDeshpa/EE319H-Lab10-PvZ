@@ -6,6 +6,8 @@ uint8_t LB = 0;
 uint8_t RB = 0;
 uint8_t A = 0;
 uint8_t B = 0;
+uint8_t JoyY = 0;
+uint8_t JoyX = 0;
 
 void Inputs_Init(){
 		SYSCTL_RCGCGPIO_R |= 0x1C;

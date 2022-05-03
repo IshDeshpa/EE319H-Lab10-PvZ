@@ -68,6 +68,7 @@
 extern "C" void DisableInterrupts(void);
 extern "C" void EnableInterrupts(void);
 extern "C" void SysTick_Handler(void);
+void SysTick_Init();
 
 int main(void){
 	DisableInterrupts();
@@ -76,6 +77,7 @@ int main(void){
   Output_Init();
 	Inputs_Init();
 	DAC_Init();
+	SysTick_Init();
   EnableInterrupts();
 	globalInits();
 	
@@ -90,6 +92,20 @@ int main(void){
 	};
 }
 
-void Systick_Handler(){
+void SysTick_Init(){
+	NVIC_ST_CTRL_R = 0;         // disable SysTick during setup
+
+  NVIC_ST_RELOAD_R = 80000000/gameTickRate;// reload value
+
+  NVIC_ST_CURRENT_R = 0;      // any write to current clears it
+
+  NVIC_SYS_PRI3_R = (NVIC_SYS_PRI3_R&0x00FFFFFF)|0x40000000; // priority 2          
+
+  NVIC_ST_CTRL_R = 0x07; // enable SysTick with core clock and interrupts
+
+  // enable interrupts after all initialization is finished
+}
+
+void SysTick_Handler(){
 	currentScene->tick();
 }
