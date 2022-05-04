@@ -122,8 +122,8 @@
 	//packet load times;
 #define LoadTime 100
 #define bigWaveSize 10 //number of zombies in a big wave
-#define stickLeftTolerance 1000
-#define stickRightTolerance 3000
+#define stickLeftTolerance 3000
+#define stickRightTolerance 1000
 #define stickUpTolerance 3000
 #define stickDownTolerance 1000
 
@@ -694,6 +694,8 @@ class GridCursor{
 	public:
 		uint8_t calcX();
 		uint8_t calcY();
+		uint8_t calcOldX();
+		uint8_t calcOldY();
 	public:
 		uint8_t gridXpos;	//for spawning plants
 		uint8_t gridYpos;	//unused for select
@@ -721,6 +723,7 @@ class Scene{
 	
 		
 		SelectCursor* select; //menuing and seed packets
+		GridCursor* grid;
 	public:
 		const uint16_t* backgroundBMP;	// Background of the scene as a bitmap
 		GameObjectList* Zombies;	// List of all objects on the scene these are arrays of pointers
@@ -730,7 +733,7 @@ class Scene{
 		GameObjectList* Projectiles;
 		GridCursor* planter; //locked to the grid hopefully
 		// Constructor
-		Scene(GameObjectList* but, GameObjectList* lwm, const uint16_t* bg);
+		Scene(GameObjectList* but, GameObjectList* lwm, const uint16_t* bg, uint8_t hasGrid);
 		// Destructor
 		//~Scene();
 	

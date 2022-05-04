@@ -6591,21 +6591,23 @@ void GridCursor::refresh(){
 void GridCursor::updatePos(){
 	uint32_t stickPos[2] = {0, 0};
 	getJoyXY(stickPos);
-	if(stickPos[0] < stickLeftTolerance && this->gridXpos > 1 && !JoyX){
+	if(stickPos[0] > stickLeftTolerance && this->gridXpos > 1 && !JoyX){
 		this->oldGridX = this->gridXpos;
 		this->gridXpos--;
 		this->redraw = 1;
 		JoyX = 1;
 	}
-	else if(stickPos[0] > stickRightTolerance && this->gridXpos < 9 && !JoyX){
+	else if(stickPos[0] < stickRightTolerance && this->gridXpos < 9 && !JoyX){
 		this->oldGridX = this->gridXpos;
 		this->gridXpos++;
 		this->redraw = 1;
 		JoyX = 1;
 	}
-	else{
+	
+	if(stickPos[0] >= stickRightTolerance && stickPos[0] <= stickLeftTolerance && JoyX){
 		JoyX = 0;
 	}
+	
 	if(stickPos[1] < stickDownTolerance && this->gridYpos > 1 && !JoyY){
 		this->oldGridY = this->gridYpos;
 		this->gridYpos--;
@@ -6618,9 +6620,11 @@ void GridCursor::updatePos(){
 		this->redraw = 1;
 		JoyY = 1;
 	}
-	else{
+	
+	if(stickPos[1] <= stickUpTolerance && stickPos[1] >= stickDownTolerance && JoyY){
 		JoyY = 0;
 	}
+	
 	if(getB()){
 		if(gridOpen()){
 			this->grid[this->gridXpos - 1][this->gridYpos - 1] = 0;
@@ -6647,7 +6651,7 @@ void GameObjectList::tryRmv(uint8_t col, uint8_t row){
 void GridCursor::render(){
 	if(this->redraw){
 		this->redraw = 0;
-		Display_UnrenderCursor(this->calcX() - borderWidth, this->calcY() - borderWidth, transparentSprite->width + 2*borderWidth, transparentSprite->length + 2*borderWidth, currentScene->backgroundBMP);
+		Display_UnrenderCursor(this->calcOldX() - borderWidth, this->calcOldY() - borderWidth, transparentSprite->width + 2*borderWidth, transparentSprite->length + 2*borderWidth, currentScene->backgroundBMP);
 		Display_RenderCursor(this->calcX() - borderWidth, this->calcY() - borderWidth, transparentSprite->width + 2*borderWidth, transparentSprite->length + 2*borderWidth, CURSOR_COLOR);
 	}
 }
@@ -6659,6 +6663,13 @@ uint8_t GridCursor::calcY(){
 	return ZeroY + (this->gridYpos-1)*gridY;
 }
 
+uint8_t GridCursor::calcOldX(){
+	return ZeroX + (this->oldGridX-1)*gridX;
+}
+uint8_t GridCursor::calcOldY(){
+	return ZeroY + (this->oldGridY-1)*gridY;
+}
+
 uint8_t GridCursor::gridOpen(){
 	return this->grid[this->gridXpos-1][this->gridYpos-1];
 }
@@ -6668,7 +6679,7 @@ void GridCursor::fillGrid(){
 void GridCursor::emptyGrid(uint8_t col, uint8_t row){
 	this->grid[col-1][row-1] = 0;	
 }
-Scene::Scene(GameObjectList* but, GameObjectList* lwm, const uint16_t* bg){
+Scene::Scene(GameObjectList* but, GameObjectList* lwm, const uint16_t* bg, uint8_t hasGrid){
 		this->Buttons = but;
 		this->Plants = new GameObjectList();
 		this->Zombies = new GameObjectList();
@@ -6682,6 +6693,10 @@ Scene::Scene(GameObjectList* but, GameObjectList* lwm, const uint16_t* bg){
 		this->sunTimer = 0;
 		this->sunAmount = 0;
 		this->select = new SelectCursor(but);
+		if(hasGrid)
+			this->grid = new GridCursor();
+		else
+			this->grid = 0;
 }
 void Scene::refresh(){
 	if(this->select != 0)
@@ -6691,16 +6706,17 @@ void Scene::refresh(){
 			return;
 		}
 	}
+	if(this->grid != 0){
+		this->grid->refresh();
+	}
 	if(this->planter != 0){
 			this->planter->refresh();
 	}
-	
 	this->Buttons->refresh();
 	this->Plants->refresh();
 	this->Zombies->refresh();
 	this->Lawnmowers->refresh();
 	this->Projectiles->refresh();
-	
 }
 void Scene::tick(){
 	this->Buttons->tick();
@@ -7143,6 +7159,6 @@ void globalInits(){
 	GameObject* lmwArr[6] = {LM1, LM2, LM3, LM4, LM5, 0};
 	lawnMowers = new GameObjectList(lmwArr);
 	
-	menu  = new Scene(menuButtons, 0, menuBackground);
-	campaign = new Scene(singlePlayerButtons, lawnMowers, lawnBackground);
+	menu  = new Scene(menuButtons, 0, menuBackground, 0);
+	campaign = new Scene(singlePlayerButtons, lawnMowers, lawnBackground, 1);
 }
