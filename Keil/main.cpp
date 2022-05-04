@@ -90,6 +90,7 @@ int main(void){
 	loadScene(menu);
 	while(1){
 		currentScene->refresh();
+		currentScene->collisions();
 	};
 }
 

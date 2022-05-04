@@ -77,7 +77,7 @@ void Zombie::attack(Plant* plt){
 void Zombie::tick(){
 	Entity::tick();
 	if(this->damageTimer>0)this->damageTimer--;
-	if(!this->isEating && Random32() % (this->speed+1) > 0)this->distanceDiff++;
+	if(!this->isEating && Random32() % (7 - this->speed) == 0)this->distanceDiff++;
 }
 void Zombie::takeDamage(uint8_t dam){
 	this->health -= dam;
@@ -107,7 +107,7 @@ void FlagZombie::advance(){
 
 ArmorZombie::ArmorZombie(uint8_t x, uint8_t y, uint8_t lane, SpriteType* fullWalk, SpriteType* fullEat)
 : Zombie(x, y, lane){
-	this->sprite = fullWalkFSM;
+	this->sprite = fullWalk;
 	this->fullEatFSM = fullEat;
 	this->fullWalkFSM = fullWalk;
 }
@@ -131,6 +131,8 @@ void ArmorZombie::advance(){
 		if(Random32() % 100 == 0) this->soundFX->play();
 	}
 	else{
+		if(this->sprite == this->fullEatFSM)this->sprite = this->eatFSM;
+		if(this->sprite == this->fullWalkFSM)this->sprite = this->walkFSM;
 		Zombie::advance();
 	}
 }
@@ -168,7 +170,7 @@ void PoleZombie::attack(Plant* plt){
 	if(this->hasPole){
 		this->previousSprite = this->sprite;
 		this->sprite = polevaultZombieJumpSprite;
-		this->distanceDiff += 20;
+		this->distanceDiff += 30;
 		this->hasPole = 0;
 		redraw = 1;
 	}
@@ -179,18 +181,20 @@ void PoleZombie::attack(Plant* plt){
 
 BucketZombie::BucketZombie(uint8_t x, uint8_t y, uint8_t lane)
 : ArmorZombie(x, y, lane, bucketZombieSprite, bucketZombieEatSprite){
-	
+	this->health = defaultZombieHealth + bucketHealth;
 }
 
 FootballZombie::FootballZombie(uint8_t x, uint8_t y, uint8_t lane)
 : ArmorZombie(x, y, lane, footballZombieSprite, footballZombieEatSprite){
 	this->speed = footballSpeed;
+	this->health = defaultZombieHealth + helmetHealth;
 }
 
 JackZombie::JackZombie(uint8_t x, uint8_t y, uint8_t lane)
 : Zombie(x, y, lane){
 	this->speed = jackZombieSpeed;
 	this->walkFSM = jackZombieSprite;
+	this->sprite = walkFSM;
 }
 
 void JackZombie::attack(){

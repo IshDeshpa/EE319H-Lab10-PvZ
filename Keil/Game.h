@@ -11,7 +11,7 @@
 #define FX_BUFFER_SIZE 16
 
 //Main game balancing controls
-#define gameMovementSpeed 1 //Based on ticks?
+#define gameMovementSpeed 1 //Based on ticks? DO NOT CHANGE
 #define gameFPS 10 //could be uncapped?
 #define gameTickRate 20 //controls attackRates and animations
 #define damageRatio 1
@@ -23,8 +23,8 @@
 #define icePeaSpeed speedMultiplier
 #define sunSpeed 1*speedMultiplier
 #define zombieSpeed 1*speedMultiplier
-#define poleVaultSpeed zombieSpeed*3
-#define jackZombieSpeed zombieSpeed*2
+#define poleVaultSpeed zombieSpeed*4
+#define jackZombieSpeed zombieSpeed*3
 #define footballSpeed poleVaultSpeed
 #define newspaperAngrySpeed jackZombieSpeed
 #define lawnmowerSpeed 3
@@ -122,7 +122,7 @@
 #define shootOffsetY 8
 	//packet load times;
 #define LoadTime 100
-#define bigWaveSize 10 //number of zombies in a big wave
+#define bigWaveSize 4 //number of zombies in a big wave
 #define stickLeftTolerance 3800
 #define stickRightTolerance 500
 #define stickUpTolerance 3800
@@ -217,7 +217,6 @@ class Entity: public GameObject{
 		//entity tick will decrement animationTime
 		void tick();
 		virtual void hurt(uint8_t damage);
-		virtual void attack();
 };
 
 // Projectile
@@ -333,7 +332,7 @@ class Plant : public Entity{
 		uint8_t projID;
 		uint8_t col;
 		//create projectile
-		void attack();
+		virtual void attack();
 		//idk why I put this here
 		void advance();
 	public:
@@ -560,7 +559,7 @@ class Zombie: public Entity{
 			 uint8_t speed, uint8_t lane);
 		void tick();
 		// do attacking sequence if hostile
-		void attack(Plant* plt);
+		virtual void attack(Plant* plt);
 		void stopEating();
 		void takeDamage(uint8_t dam);
 };
@@ -729,6 +728,7 @@ class Scene{
 		uint8_t inputTimer;
 		int16_t sunAmount;
 		uint8_t hasGrid;
+		int32_t zombieTimer;
 		
 		SelectCursor* select; //menuing and seed packets
 	public:

@@ -6381,7 +6381,6 @@ Entity::Entity(SpriteType* sp, Sound* sfx, uint8_t xpos, uint8_t ypos,
 		this->animationTimer = anim;
 		this->hostile = hostl;
 }
-void Entity::attack(){}
 void Entity::tick(){
 	if(this->animationTimer > 0) this->animationTimer--;
 }
@@ -6422,8 +6421,10 @@ GameObject::GameObject(SpriteType* sp, Sound* sfx, uint8_t x, uint8_t y, uint8_t
 	this->y = y;
 	this->redraw = 1;
 	this->lane = lane;
-	this->oldx = 0;
-	this->oldy = 0;
+	this->oldx = x;
+	this->oldy = y
+		
+	;
 	this->previousSprite = sp;
 }
 void GameObject::refresh(){
@@ -6694,6 +6695,7 @@ Scene::Scene(GameObjectList* but, GameObjectList* lwm, const uint16_t* bg, uint8
 		this->sunAmount = 200;
 		this->select = new SelectCursor(but);
 		this->hasGrid = hasGrid;
+		this->zombieTimer = 1;
 		if(hasGrid)
 			this->planter = new GridCursor();
 		else
@@ -6717,14 +6719,27 @@ void Scene::refresh(){
 	this->Projectiles->refresh();
 }
 void Scene::tick(){
+	Random32();
 	this->Buttons->tick();
 	this->Plants->tick();
 	this->Zombies->tick();
 	this->Lawnmowers->tick();
 	this->Projectiles->tick();
 	
+	GameTime++;
+	
+	
+	
+	
 	if(this->hasGrid){
 		this->planter->redraw = 1;
+		
+		if(this->zombieTimer == 0){
+			this->zombieTimer = 500 - GameTime/1000;
+			this->spawnZombie(Random32()%8, Random32()%5 + 1);
+		}
+		else this->zombieTimer--;
+	
 		if(this->sunTimer!=0) this->sunTimer--;
 		else{
 			this->Lawnmowers->redrawSet();
@@ -6755,7 +6770,7 @@ uint8_t Scene::changeSun(int16_t amount){
 void Scene::renderSun(){
 	if(this->sunAmount>=0){	//>= 0 because it's signed, don't wanna do negatives ig
 		//TO-DO
-				Display_RenderSprite(2, 110, sunSprite->bmp, sunSprite->width, sunSprite->length, transparentColor, currentScene->backgroundBMP);
+				Display_RenderSprite(1, 106, sunSprite->bmp, sunSprite->width, sunSprite->length, transparentColor, currentScene->backgroundBMP);
 				Display_SetCursor(0, 11);
 				Display_OutUDec(sunAmount, 0x0000);
 	}
@@ -6931,7 +6946,7 @@ void Scene::collisions(){
 		Zombie* zm = (Zombie*)zmList[i];
 		uint8_t eatingFlag = 0;
 		for(int j = this->Plants->indexPtr - 1; j >= 0; j--){
-			Plant* pt = (Plant*)ptList[i];
+			Plant* pt = (Plant*)ptList[j];
 			if(zm->getLane() == pt->getLane()
 				&& zm->getX() > pt->getX() 
 				&& zm->getX() < pt->getX() + pt->sprite->width)
@@ -6967,7 +6982,7 @@ void Scene::collisions(){
 	for(int i = this->Zombies->indexPtr - 1; i >=0; i--) {
 		for(int j = this->Projectiles->indexPtr - 1; j >= 0; j--){
 			Zombie* zm = (Zombie*)zmList[i];
-			Projectile* pr = (Projectile*)prList[i];
+			Projectile* pr = (Projectile*)prList[j];
 			if(pr->getLane() == zm->getLane()
 				&& pr->getX() > zm->getX() 
 				&& pr->getX() < zm->getX() + zm->sprite->width)

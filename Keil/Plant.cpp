@@ -82,8 +82,7 @@ void Wallnut::advance(){
 	Plant::advance();
 	if(this->health < wallNutHealth/2){
 		this->previousSprite = this->sprite;
-		this->sprite = damagedWallnut;
-		this->redraw = 1;
+		this->sprite = wallNutDamagedSprite;
 	}
 }
 void Wallnut::tick(){

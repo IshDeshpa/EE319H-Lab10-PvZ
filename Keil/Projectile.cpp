@@ -137,6 +137,7 @@ void Sun::advance(){
 		this->unrender();
 		this->soundFX->play();
 		currentScene->Projectiles->tryRmv(this);
+		this->redraw = 0;
 		return;
 	}
 	else if(this->upTimer == 0){
