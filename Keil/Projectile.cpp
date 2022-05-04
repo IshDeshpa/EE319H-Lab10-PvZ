@@ -15,7 +15,8 @@ void Projectile::advance(){
 		this->redraw = 1;
 	}
 	if(this->getX()>170){
-		this->collided();
+		this->unrender();
+		currentScene->Projectiles->tryRmv(this);
 	}
 }
 void Projectile::tick(){
@@ -43,7 +44,8 @@ void LawnMower::advance(){
 	}
 }
 int LawnMower::collided(){
-	return 0;
+	
+	this->isMoving = 1;
 }
 void LawnMower::tick(){
 	if(this->isMoving == 1) this->distanceDiff += this->speed;
@@ -119,6 +121,7 @@ void SmallExplosion::advance(){
 
 void SmallExplosion::tick(){
 	this->explosionTimer--;
+	if(this->explosionTimer % 3 == 0) this->redraw = 1;
 }
 
 Chomp::Chomp(uint8_t x, uint8_t y, uint8_t lane): Ohko(x, y, lane, transparentSprite, chompSound){

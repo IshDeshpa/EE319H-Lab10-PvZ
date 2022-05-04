@@ -55,7 +55,8 @@ void Zombie::advance(){
 		this->sprite = this->walkFSM;
 		this->redraw = 1;
 	}
-	if(Random32() % 1000 == 0) this->soundFX->play();
+	if(Random32() % 1000000 == 0) 
+		this->soundFX->play();
 }
 
 void Zombie::stopEating(){
@@ -127,11 +128,19 @@ void ArmorZombie::advance(){
 			this->sprite = this->fullWalkFSM;
 			this->redraw = 1;
 		}
-		if(Random32() % 10000 == 0) this->soundFX->play();
+		if(Random32() % 1000000 == 0) this->soundFX->play();
 	}
 	else{
-		if(this->sprite == this->fullEatFSM)this->sprite = this->eatFSM;
-		if(this->sprite == this->fullWalkFSM)this->sprite = this->walkFSM;
+		if(this->sprite == this->fullEatFSM){
+			this->previousSprite = this->sprite;
+			this->sprite = this->eatFSM;
+			this->redraw = 1;
+		}
+		if(this->sprite == this->fullWalkFSM){
+			this->previousSprite = this->sprite;
+			this->sprite = this->walkFSM;
+			this->redraw = 1;
+		}
 		Zombie::advance();
 	}
 }
@@ -196,7 +205,7 @@ JackZombie::JackZombie(uint8_t x, uint8_t y, uint8_t lane)
 	this->sprite = walkFSM;
 }
 
-void JackZombie::attack(){
+void JackZombie::attack(Plant* plt){
 	this->unrender(); 
 	currentScene->spawnProjectile(explosionID, this->x, this->y, this->lane);
 	this->health = 0;

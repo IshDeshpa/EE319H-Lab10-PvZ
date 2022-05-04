@@ -625,7 +625,7 @@ class JackZombie: public Zombie{
 	public:
 		// Constructor
 		JackZombie(uint8_t x, uint8_t y, uint8_t lane);
-		void attack();
+		void attack(Plant* plt);
 };
 
 // Polevault zombie. Jumps over plants.

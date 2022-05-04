@@ -6734,8 +6734,8 @@ void Scene::tick(){
 	if(this->hasGrid){
 		this->planter->redraw = 1;
 		
-		if(this->zombieTimer == 0){
-			this->zombieTimer = 500 - GameTime/1000;
+		if(this->zombieTimer <= 0){
+			this->zombieTimer = 500 - GameTime/200;
 			this->spawnZombie(Random32()%8, Random32()%5 + 1);
 		}
 		else this->zombieTimer--;
@@ -6942,6 +6942,7 @@ void Scene::collisions(){
 	GameObject** zmList = this->Zombies->objects;
 	GameObject** ptList = this->Plants->objects;
 	GameObject** prList = this->Projectiles->objects;
+	GameObject** lmList = this->Lawnmowers->objects;
 	for(int i = this->Zombies->indexPtr - 1; i >=0; i--) {
 		Zombie* zm = (Zombie*)zmList[i];
 		uint8_t eatingFlag = 0;
@@ -6980,12 +6981,31 @@ void Scene::collisions(){
 		}
 	}
 	for(int i = this->Zombies->indexPtr - 1; i >=0; i--) {
+		for(int j = this->Lawnmowers->indexPtr - 1; j >= 0; j--){
+			Zombie* zm = (Zombie*)zmList[i];
+			Projectile* lm = (Projectile*)lmList[j];
+			if(lm->getLane() == zm->getLane() 
+				&& zm->getX() < lm->getX() + lm->sprite->width)
+			{
+				zm->takeDamage(lm->damage);
+				lm->collided();
+				if(zm->health<=0){
+					zm->unrender();
+					this->Zombies->tryRmv(zm);
+					break;
+				}
+			}
+		}
+	}
+	for(int i = this->Zombies->indexPtr - 1; i >=0; i--) {
 		for(int j = this->Projectiles->indexPtr - 1; j >= 0; j--){
 			Zombie* zm = (Zombie*)zmList[i];
 			Projectile* pr = (Projectile*)prList[j];
-			if(pr->getLane() == zm->getLane()
-				&& pr->getX() > zm->getX() 
-				&& pr->getX() < zm->getX() + zm->sprite->width)
+			if(pr->getLane() == zm->getLane() && (
+				(pr->getX() + pr->sprite->width - 3 > zm->getX() 
+				&& pr->getX() + pr->sprite->width - 3 < zm->getX() + zm->sprite->width)
+				|| (zm->getX() + zm->sprite->width > pr->getX() 
+				&& zm->getX() < pr->getX() + pr->sprite->width)))
 			{
 				zm->takeDamage(pr->damage);
 				pr->collided();
