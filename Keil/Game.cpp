@@ -6412,6 +6412,9 @@ GameObject::GameObject(SpriteType* sp, Sound* sfx, uint8_t x, uint8_t y){
 	this->soundFX = sfx;
 	this->x = x;
 	this->y = y;
+	this->oldx = x;
+	this->oldy = y;
+	this->previousSprite = sp;
 	this->redraw = 1;
 }
 GameObject::GameObject(SpriteType* sp, Sound* sfx, uint8_t x, uint8_t y, uint8_t lane){
@@ -6422,9 +6425,7 @@ GameObject::GameObject(SpriteType* sp, Sound* sfx, uint8_t x, uint8_t y, uint8_t
 	this->redraw = 1;
 	this->lane = lane;
 	this->oldx = x;
-	this->oldy = y
-		
-	;
+	this->oldy = y;
 	this->previousSprite = sp;
 }
 void GameObject::refresh(){
@@ -6483,10 +6484,11 @@ GameObject* GameObjectList::operator[](uint8_t i){
 }
 		//Remove Object at index
 void GameObjectList::GORmv(uint8_t i){
-	this->indexPtr--;
 	for(int j = i; j < indexPtr; j++){
 		objects[j] = objects[j+1];
 	}
+	objects[this->indexPtr] = 0;
+	this->indexPtr--;
 }
 void GameObjectList::redrawSet(){
 	for(int i = 0; i<indexPtr; i++){
@@ -6499,7 +6501,7 @@ void GameObjectList::tryRmv(GameObject* go){
 	while(i<this->indexPtr){
 		if(objects[i] == go){
 			this->GORmv(i);
-			delete(go);
+			delete go;
 			return;
 		}
 		i++;

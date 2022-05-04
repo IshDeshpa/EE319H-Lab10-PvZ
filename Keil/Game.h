@@ -266,18 +266,21 @@ class FrozenPea : public Projectile{
 
 // One hit KO (e.g. Cherry Bomb, Potato Mine, Chomper)
 class Ohko: public Projectile{
+	protected:
+		uint8_t explosionTimer;
+		void advance();
 	public:
 		//set projectile variable to defined OHKO damage, OHKO (transparent) sprite, sfx, speed = 0, collision = 1
 		Ohko(uint8_t x, uint8_t y, uint8_t lane);
 		//Special constructor does same as other constructor, but sets sprite to argument
 		Ohko(uint8_t x, uint8_t y, uint8_t lane, SpriteType* sprite, Sound* sound);	
+		
+		void tick();
 };
 
 class Explosion : public Ohko{
 	protected:	
-		uint8_t explosionTimer;
 		//change advance so the projectile goes away after explosionTimer 
-		void advance();
 		void render();
 		void unrender();
 	public:
@@ -286,21 +289,15 @@ class Explosion : public Ohko{
 	  Explosion(uint8_t x, uint8_t y, uint8_t lane);
 		//change collided so the projectile does not go away when collision happens
 		int collided();
-		//tick decrements explosionTimer;
-		void tick();
 		
 };
 
 class SmallExplosion : public Ohko{
-	protected:	
-		void advance();
-		uint8_t explosionTimer;
 	public:
 		//call Ohko constructor in this square, use small explosion sprite
 		SmallExplosion(uint8_t x, uint8_t y, uint8_t lane);
 		//change collided so the projectile does not go away when collision happens
 		int collided();
-		void tick();
 };
 
 class Chomp : public Ohko{

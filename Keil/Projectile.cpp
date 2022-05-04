@@ -71,6 +71,21 @@ Ohko::Ohko(uint8_t x, uint8_t y, uint8_t lane, SpriteType* sprite, Sound* sound)
 
 }
 
+
+
+void Ohko::advance(){
+	if(this->explosionTimer == 0){
+		this->unrender();
+		currentScene->Projectiles->tryRmv(this);
+		this->redraw = 0;
+	}
+}
+
+void Ohko::tick(){
+	this->explosionTimer--;
+	if(this->explosionTimer % 3 == 0) this->redraw = 1;
+}
+
 Explosion::Explosion(uint8_t x, uint8_t y, uint8_t lane) : Ohko(x, y, lane, largeExplosionSprite, explosionSound){
 	currentScene->spawnProjectile(ohkoID, x + gridX, y + gridY, lane + 1);
 	currentScene->spawnProjectile(ohkoID, x + gridX, y, lane);
@@ -91,18 +106,8 @@ void Explosion::unrender(){
 	Display_UnrenderSprite(this->oldx - 20, this->oldy - 20, this->previousSprite->width, this->previousSprite->length, currentScene->retBG());
 }
 
-void Explosion::advance(){
-	if(this->explosionTimer == 0){
-		this->unrender();
-		currentScene->Projectiles->tryRmv(this);
-	}
-}
-
 int Explosion::collided(){
 	return 0;
-}
-void Explosion::tick(){
-	this->explosionTimer--;
 }
 
 SmallExplosion::SmallExplosion(uint8_t x, uint8_t y, uint8_t lane) : Ohko(x, y, lane, smallExplosionSprite, explosionSound){
@@ -112,17 +117,7 @@ SmallExplosion::SmallExplosion(uint8_t x, uint8_t y, uint8_t lane) : Ohko(x, y, 
 int SmallExplosion::collided(){
 	return 0;
 }
-void SmallExplosion::advance(){
-	if(this->explosionTimer == 0){
-		this->unrender();
-		currentScene->Projectiles->tryRmv(this);
-	}
-}
 
-void SmallExplosion::tick(){
-	this->explosionTimer--;
-	if(this->explosionTimer % 3 == 0) this->redraw = 1;
-}
 
 Chomp::Chomp(uint8_t x, uint8_t y, uint8_t lane): Ohko(x, y, lane, transparentSprite, chompSound){
 this->soundFX->play();
