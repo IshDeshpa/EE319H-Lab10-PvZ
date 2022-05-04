@@ -56,6 +56,7 @@ void SeedPacket::buttonFunction(){
 	
 		this->loadTimer = this->loadTime;
 		this->sprite = this->gray;
+		this->redraw = 1;
 		this->isReady = 0;
 		currentScene->spawnPlant(plantID);
 }

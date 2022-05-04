@@ -6746,7 +6746,7 @@ void Scene::renderSun(){
 	if(this->sunAmount>=0){	//>= 0 because it's signed, don't wanna do negatives ig
 		//TO-DO
 				Display_RenderSprite(2, 110, sunSprite->bmp, sunSprite->width, sunSprite->length, transparentColor, currentScene->backgroundBMP);
-				Display_SetCursor(1, 15);
+				Display_SetCursor(5, 5);
 				Display_OutUDec(sunAmount, 0x0000);
 	}
 }
@@ -6985,40 +6985,71 @@ void globalInits(){
 	peashooterSprite->nextSprite = peashooterSprite2;
 	peashooterSprite2->nextSprite = peashooterSprite3;
 	peashooterSprite3->nextSprite = peashooterSprite4;
-	peashooterSprite4->nextSprite = peashooterSprite;
+	//peashooterSprite4->nextSprite = peashooterSprite;
 
 	snowPeaSprite = new SpriteType( snowPeaBMP, 16, 16,  snowPeaSprite2);
 	snowPeaSprite2 = new SpriteType( snowPeaBMP2, 16, 16,  snowPeaSprite3);
 	snowPeaSprite3 = new SpriteType( snowPeaBMP3, 16, 16, snowPeaSprite4);
 	snowPeaSprite4 = new SpriteType(snowPeaBMP2, 16, 16, snowPeaSprite);
-
+	
+	snowPeaSprite->nextSprite = snowPeaSprite2;
+	snowPeaSprite2->nextSprite = snowPeaSprite3;
+	snowPeaSprite3->nextSprite = snowPeaSprite4;
+	//snowPeaSprite4->nextSprite = snowPeaSprite;
+	
+	
 	repeaterSprite = new SpriteType(repeaterBMP, 16, 16, repeaterSprite2);
 	repeaterSprite2 = new SpriteType(repeaterBMP2, 16, 16, repeaterSprite);
+	repeaterSprite->nextSprite = repeaterSprite2;
+	//repeaterSprite2->nextSprite = repeaterSprite;
 
 	sunflowerSprite = new SpriteType(sunflowerBMP, 16, 16, sunflowerSprite2);
 	sunflowerSprite2 = new SpriteType(sunflowerBMP2, 16, 16, sunflowerSprite);
+	
+	sunflowerSprite->nextSprite = sunflowerSprite2;
+	//sunflowerSprite2->nextSprite = sunflowerSprite;
 
 	cherryBombSprite = new SpriteType(cherryBombBMP, 16, 16, cherryBombSprite2);
 	cherryBombSprite2 = new SpriteType(cherryBombBMP2, 16, 16, cherryBombSprite3);
 	cherryBombSprite3 = new SpriteType(cherryBombBMP3, 16, 16, cherryBombSprite4);
 	cherryBombSprite4 = new SpriteType(cherryBombBMP2, 16, 16, cherryBombSprite);
+	
+	cherryBombSprite->nextSprite = cherryBombSprite2;
+	cherryBombSprite2->nextSprite = cherryBombSprite3;
+	cherryBombSprite3->nextSprite = cherryBombSprite4;
+	//cherryBombSprite4->nextSprite = cherryBombSprite;
 
 	potatoMineSprite = new SpriteType(potatoMineBMP, 16, 16, potatoMineSprite);
 	potatoMineReadySprite = new SpriteType(potatoMineReadyBMP, 16, 16, potatoMineReadySprite2);
 	potatoMineReadySprite2 = new SpriteType(potatoMineReadyBMP2, 16, 16, potatoMineReadySprite);
 
+	potatoMineSprite->nextSprite = potatoMineSprite;
+	potatoMineReadySprite->nextSprite = potatoMineReadySprite2;
+	//potatoMineReadySprite2->nextSprite = potatoMineReadySprite;
+	
+
 	chomperSprite = new SpriteType(chomperBMP, 16, 16, chomperSprite2);
 	chomperSprite2 = new SpriteType(chomperBMP2, 16, 16, chomperSprite3);
 	chomperSprite3 = new SpriteType(chomperBMP3, 15, 16, chomperSprite4);
 	chomperSprite4 = new SpriteType(chomperBMP2, 16, 16, chomperSprite);
-
+	chomperSprite->nextSprite = chomperSprite2;
+	chomperSprite2->nextSprite = chomperSprite3;
+	chomperSprite3->nextSprite = chomperSprite4;
+	//chomperSprite4->nextSprite = chomperSprite;
+	
 	chomperChewSprite = new SpriteType(chomperChewBMP, 16, 16, chomperChewSprite2);
 	chomperChewSprite2 = new SpriteType(chomperChewBMP2, 16, 16, chomperChewSprite);
 	
-	chomperAttackSprite = new SpriteType(chomperAttackBMP, 25, 16, chomperAttackSprite);
+	chomperChewSprite->nextSprite = chomperChewSprite2;
+	//chomperChewSprite2->nextSprite = chomperChewSprite;
+	
+	chomperAttackSprite = new SpriteType(chomperAttackBMP, 25, 16, chomperChewSprite);
 
 	wallNutSprite = new SpriteType(wallNutBMP, 16, 16, wallNutSprite);
 	wallNutDamagedSprite = new SpriteType(wallNutBMP2, 16, 16, wallNutDamagedSprite);
+	
+	wallNutSprite->nextSprite = wallNutSprite;
+	wallNutDamagedSprite->nextSprite = wallNutDamagedSprite;
 
 	frozenPeaSprite = new SpriteType(frozenPeaBMP, 7, 7, frozenPeaSprite);
 	peaSprite = new SpriteType(peaBMP, 7, 7, peaSprite);
@@ -7034,7 +7065,7 @@ void globalInits(){
 	regularZombieSprite->nextSprite = regularZombieSprite2;
 	regularZombieSprite2->nextSprite = regularZombieSprite3;
 	regularZombieSprite3->nextSprite = regularZombieSprite4;
-	regularZombieSprite4->nextSprite = regularZombieSprite;
+	//regularZombieSprite4->nextSprite = regularZombieSprite;
 	
 	regularZombieEatSprite = new SpriteType(regularZombieEatBMP, 20, 29, regularZombieEatSprite2);
 	regularZombieEatSprite2 = new SpriteType(regularZombieEatBMP2, 20, 29, regularZombieEatSprite3);
@@ -7043,31 +7074,53 @@ void globalInits(){
 	regularZombieEatSprite->nextSprite = regularZombieEatSprite2;
 	regularZombieEatSprite2->nextSprite = regularZombieEatSprite3;
 	regularZombieEatSprite3->nextSprite = regularZombieEatSprite4;
-	regularZombieEatSprite4->nextSprite = regularZombieEatSprite;
+	//regularZombieEatSprite4->nextSprite = regularZombieEatSprite;
 
 	bucketZombieSprite = new SpriteType(bucketZombieBMP, 16, 27, bucketZombieSprite2);
 	bucketZombieSprite2 = new SpriteType(bucketZombieBMP2, 15, 28, bucketZombieSprite3);
 	bucketZombieSprite3 = new SpriteType(bucketZombieBMP3, 14, 27, bucketZombieSprite4);
 	bucketZombieSprite4 = new SpriteType(bucketZombieBMP2, 15, 28, bucketZombieSprite);
+	
+	bucketZombieSprite->nextSprite = bucketZombieSprite2;
+	bucketZombieSprite2->nextSprite = bucketZombieSprite3;
+	bucketZombieSprite3->nextSprite = bucketZombieSprite4;
+	//bucketZombieSprite4->nextSprite = bucketZombieSprite;
+
 
 	bucketZombieEatSprite = new SpriteType(bucketZombieEatBMP, 18, 29, bucketZombieEatSprite2);
 	bucketZombieEatSprite2 = new SpriteType(bucketZombieEatBMP2, 18, 29, bucketZombieEatSprite);
+	
+	bucketZombieEatSprite->nextSprite = bucketZombieEatSprite2;
 	
 	newspaperZombieSprite = new SpriteType(newspaperZombieBMP, 22, 27, newspaperZombieSprite2);
 	newspaperZombieSprite2 = new SpriteType(newspaperZombieBMP2, 17, 29, newspaperZombieSprite3);
 	newspaperZombieSprite3 = new SpriteType(newspaperZombieBMP3, 23, 28, newspaperZombieSprite4);
 	newspaperZombieSprite4 = new SpriteType(newspaperZombieBMP2, 17, 29, newspaperZombieSprite);
 
+	newspaperZombieSprite->nextSprite = newspaperZombieSprite2;
+	newspaperZombieSprite2->nextSprite = newspaperZombieSprite3;
+	newspaperZombieSprite3->nextSprite = newspaperZombieSprite4;
+	//newspaperZombieSprite4->nextSprite = newspaperZombieSprite;
+
 	newspaperZombieEatSprite = new SpriteType(newspaperZombieEatBMP, 19, 28, newspaperZombieEatSprite2);
 	newspaperZombieEatSprite2 = new SpriteType(newspaperZombieEatBMP2, 18, 29, newspaperZombieEatSprite);
 
+	newspaperZombieEatSprite->nextSprite = newspaperZombieEatSprite2;
+	
 	polevaultZombieRunSprite = new SpriteType(polevaultZombieRunBMP, 30, 28, polevaultZombieRunSprite2);
 	polevaultZombieRunSprite2 = new SpriteType(polevaultZombieRunBMP2, 30, 28, polevaultZombieRunSprite3);
 	polevaultZombieRunSprite3 = new SpriteType(polevaultZombieRunBMP3, 30, 27, polevaultZombieRunSprite4);
 	polevaultZombieRunSprite4 = new SpriteType(polevaultZombieRunBMP2, 30, 28, polevaultZombieRunSprite);
 
+	polevaultZombieRunSprite->nextSprite = polevaultZombieRunSprite2;
+	polevaultZombieRunSprite2->nextSprite = polevaultZombieRunSprite3;
+	polevaultZombieRunSprite3->nextSprite = polevaultZombieRunSprite4;
+	//newspaperZombieSprite4->nextSprite = newspaperZombieSprite;
+
 	polevaultZombieEatSprite = new SpriteType(polevaultZombieEatBMP, 16, 30, polevaultZombieEatSprite2);
 	polevaultZombieEatSprite2 = new SpriteType(polevaultZombieEatBMP2, 18, 30, polevaultZombieEatSprite);
+
+	polevaultZombieEatSprite->nextSprite = polevaultZombieEatSprite2;
 
 	polevaultZombieJumpSprite = new SpriteType(polevaultZombieJumpBMP, 32, 30, polevaultZombieJumpSprite);
 
@@ -7076,10 +7129,21 @@ void globalInits(){
 	polevaultZombieWalkSprite3 = new SpriteType(polevaultZombieWalkBMP3, 16, 30, polevaultZombieWalkSprite4);
 	polevaultZombieWalkSprite4 = new SpriteType(polevaultZombieWalkBMP2, 14, 30, polevaultZombieWalkSprite);
 
-	jackZombieSprite = new SpriteType(jackZombieBMP, 17, 27, jackZombieSprite2);
-	jackZombieSprite2 = new SpriteType(jackZombieBMP2, 15, 29, jackZombieSprite3);
-	jackZombieSprite3 = new SpriteType(jackZombieBMP3, 15, 28, jackZombieSprite4);
+	polevaultZombieJumpSprite->nextSprite = polevaultZombieWalkSprite;
+	polevaultZombieWalkSprite->nextSprite = polevaultZombieWalkSprite2;
+	polevaultZombieWalkSprite2->nextSprite = polevaultZombieWalkSprite3;
+	polevaultZombieWalkSprite3->nextSprite = polevaultZombieWalkSprite4;
+	//newspaperZombieSprite4->nextSprite = newspaperZombieSprite;
+	
+	
+	
+	
 	jackZombieSprite4 = new SpriteType(jackZombieBMP2, 15, 29, jackZombieSprite);
+	jackZombieSprite3 = new SpriteType(jackZombieBMP3, 15, 28, jackZombieSprite4);
+	jackZombieSprite2 = new SpriteType(jackZombieBMP2, 15, 29, jackZombieSprite3);
+	jackZombieSprite = new SpriteType(jackZombieBMP, 17, 27, jackZombieSprite2);
+	
+	jackZombieSprite4->nextSprite = jackZombieSprite;
 
 	footballZombieSprite = new SpriteType(bucketZombieBMP, 16, 27, bucketZombieSprite2);
 	footballZombieSprite2 = new SpriteType(bucketZombieBMP2, 15, 28, bucketZombieSprite3);
@@ -7089,22 +7153,30 @@ void globalInits(){
 	footballZombieEatSprite = new SpriteType(bucketZombieEatBMP, 18, 29, bucketZombieEatSprite2);
 	footballZombieEatSprite2 = new SpriteType(bucketZombieEatBMP2, 18, 29, bucketZombieEatSprite);
 
-	flagZombieSprite = new SpriteType(flagZombieBMP, 19, 30, flagZombieSprite2);
-	flagZombieSprite2 = new SpriteType(flagZombieBMP2, 18, 30, flagZombieSprite3);
-	flagZombieSprite3 = new SpriteType(flagZombieBMP3, 21, 30, flagZombieSprite4);
+
 	flagZombieSprite4 = new SpriteType(flagZombieBMP2, 18, 30, flagZombieSprite);
+	flagZombieSprite3 = new SpriteType(flagZombieBMP3, 21, 30, flagZombieSprite4);
+	flagZombieSprite2 = new SpriteType(flagZombieBMP2, 18, 30, flagZombieSprite3);
+	flagZombieSprite = new SpriteType(flagZombieBMP, 19, 30, flagZombieSprite2);
+	flagZombieSprite4->nextSprite = flagZombieSprite;
 
 	flagZombieEatSprite = new SpriteType(flagZombieEatBMP, 20, 28, flagZombieEatSprite2);
 	flagZombieEatSprite2 = new SpriteType(flagZombieEatBMP2, 20, 28, flagZombieEatSprite);
+	flagZombieEatSprite->nextSprite = flagZombieEatSprite2;
 
-	coneZombieSprite = new SpriteType(coneZombieBMP, 15, 28, coneZombieSprite2);
-	coneZombieSprite2 = new SpriteType(coneZombieBMP2, 13, 29, coneZombieSprite3);
-	coneZombieSprite3 = new SpriteType(coneZombieBMP3, 14, 29, coneZombieSprite4);
 	coneZombieSprite4 = new SpriteType(coneZombieBMP2, 13, 29, coneZombieSprite);
+	coneZombieSprite3 = new SpriteType(coneZombieBMP3, 14, 29, coneZombieSprite4);
+	coneZombieSprite2 = new SpriteType(coneZombieBMP2, 13, 29, coneZombieSprite3);
+	coneZombieSprite = new SpriteType(coneZombieBMP, 15, 28, coneZombieSprite2);
+	coneZombieSprite4->nextSprite = coneZombieSprite;
+
+	
+
 
 	coneZombieEatSprite = new SpriteType(coneZombieEatBMP, 15, 28, coneZombieEatSprite2);
 	coneZombieEatSprite2 = new SpriteType(coneZombieEatBMP2, 17, 29, coneZombieEatSprite);
-
+	coneZombieEatSprite->nextSprite = coneZombieEatSprite2;
+	
 	vsEnglish = new SpriteType(vsEnglishBMP, 50, 30, vsEnglish);
 	vsSpanish = new SpriteType(vsSpanishBMP, 50, 30, vsSpanish);
 	campaignEnglish = new SpriteType(campaignEnglishBMP, 50, 30, campaignEnglish);

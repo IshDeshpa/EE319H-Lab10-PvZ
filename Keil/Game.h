@@ -115,7 +115,7 @@
 #define transparentColor 0xFB56
 #define ZeroX 10
 #define ZeroY	5
-#define gridX 15
+#define gridX 18
 #define gridY 20
 #define shootOffsetX 15
 #define shootOffsetY 8
