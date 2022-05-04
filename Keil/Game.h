@@ -20,6 +20,7 @@
 
 #define speedMultiplier gameMovementSpeed
 #define peaSpeed 3*speedMultiplier
+#define icePeaSpeed speedMultiplier
 #define sunSpeed 1*speedMultiplier
 #define zombieSpeed 1*speedMultiplier
 #define poleVaultSpeed zombieSpeed*3
@@ -113,19 +114,19 @@
 #define collectTolerance 30
 //change later:
 #define transparentColor 0xFB56
-#define ZeroX 10
+#define ZeroX 14
 #define ZeroY	5
-#define gridX 18
+#define gridX 16
 #define gridY 20
 #define shootOffsetX 15
 #define shootOffsetY 8
 	//packet load times;
 #define LoadTime 100
 #define bigWaveSize 10 //number of zombies in a big wave
-#define stickLeftTolerance 0xFEA
-#define stickRightTolerance 0x65
-#define stickUpTolerance 0xFEA
-#define stickDownTolerance 0x65
+#define stickLeftTolerance 3800
+#define stickRightTolerance 500
+#define stickUpTolerance 3800
+#define stickDownTolerance 500
 
 #define sceneInputRate 10
 
@@ -209,13 +210,14 @@ class Entity: public GameObject{
 		// Advance to the next state of the entity and call attack?
 		void advance();
 		// do attacking sequence if hostile
-		void attack();
+		
 	public:
 		//constructor with all new parameters, calls parent constructor for first 4
 		Entity(SpriteType* sp, Sound* sfx, uint8_t xpos, uint8_t ypos, uint8_t hp, uint8_t anim, uint8_t hostl, uint8_t lane);
 		//entity tick will decrement animationTime
 		void tick();
-		void hurt(uint8_t damage);
+		virtual void hurt(uint8_t damage);
+		virtual void attack();
 };
 
 // Projectile
@@ -230,7 +232,7 @@ class Projectile: public GameObject{
 		uint8_t damage;	// Damage
 		//constructor with all new parameters, calls parent constructor for first 4
 		Projectile(SpriteType* sp, Sound* sfx, uint8_t xpos, uint8_t ypos, uint8_t spd, uint8_t dam, uint8_t lane);
-		int collided();
+		virtual int collided();
 		//projectile tick will change their xpos by their speed and set redraw to 1, if speed > 0
 		void tick();
 };
@@ -444,6 +446,7 @@ class Chomper : public Plant{
 		//change range detection to one tile
 		void advance();
 		//if no invisible hitbox projectile, we need to make attack do the collision
+		void attack();
 		
 	public:
 			//constructor calls Plant constructor with defined chomper empty sprite, defined chomp sound, x and y arguments
@@ -452,6 +455,7 @@ class Chomper : public Plant{
 			//set full sprite to defined full chomper sprite, and empty to empty sprite
 			//mouthFull = 0
 		Chomper(uint8_t x, uint8_t y, uint8_t lane);
+		void hurt(uint8_t dam);
 };
 
 
@@ -669,6 +673,7 @@ class GameObjectList{
 		void tryRmv(GameObject* go);
 		void tryRmv(uint8_t col, uint8_t row);
 		void refresh();
+		void redrawSet();
 		uint8_t getLength();
 		//will tick every existing member of objects
 		void tick();
@@ -727,7 +732,7 @@ class Scene{
 		
 		SelectCursor* select; //menuing and seed packets
 	public:
-		const uint16_t* backgroundBMP;	// Background of the scene as a bitmap
+		const uint16_t* backgroundBMP;	// Background of the git as a bitmap
 		GameObjectList* Zombies;	// List of all objects on the scene these are arrays of pointers
 		GameObjectList* Plants;
 		GameObjectList* Buttons;
@@ -985,6 +990,7 @@ extern Scene* currentScene;
 
 //for if jack zombie explodes
 extern int screenWipe;
+extern int GameTime;
 
 //global functions
 void loadScene(Scene* s);

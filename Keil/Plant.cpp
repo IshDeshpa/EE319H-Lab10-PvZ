@@ -79,6 +79,7 @@ Wallnut::Wallnut(uint8_t x, uint8_t y, uint8_t lane)
 	
 }
 void Wallnut::advance(){
+	Plant::advance();
 	if(this->health < wallNutHealth/2){
 		this->previousSprite = this->sprite;
 		this->sprite = damagedWallnut;
@@ -86,7 +87,7 @@ void Wallnut::advance(){
 	}
 }
 void Wallnut::tick(){
-//do nothing
+	Plant::tick();
 }
 CherryBomb::CherryBomb(uint8_t x, uint8_t y, uint8_t lane)
 : Plant(cherryBombSprite, x, y, defaultPlantHealth,
@@ -148,19 +149,25 @@ chomperChewTime, sunID, lane){
 }
 void Chomper::advance(){
 	Entity::advance();
-	if(mouthFull == 0) {
-		this->previousSprite = this->sprite;
-		this->sprite = this->bite;
-		this->redraw = 1;
-		this->attack();
-		this->attackTimer = this->attackRate;
-		this->mouthFull = 1;
-	}
-	else if(attackTimer == 0){
+	if(attackTimer == 0 && this->mouthFull == 1){
 		this->previousSprite = this->sprite;
 		this->sprite = this->empty;
 		this->redraw = 1;
 		this->mouthFull = 0;
 	}
 }
-	
+void Chomper::attack(){
+	//do nothing ig
+}
+void Chomper::hurt(uint8_t dam){
+	if(mouthFull == 0) {
+		this->previousSprite = this->sprite;
+		this->animationTimer = 3*this->animationTime;
+		this->sprite = this->bite;
+		this->redraw = 1;
+		this->attack();
+		this->attackTimer = this->attackRate;
+		this->mouthFull = 1;
+	}
+	else Plant::hurt(dam);
+}

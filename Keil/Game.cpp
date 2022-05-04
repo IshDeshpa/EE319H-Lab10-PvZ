@@ -2,6 +2,7 @@
 
 //GLOBALS SECTION
 int screenWipe = 0;
+int GameTime = 0;
 //lawnmower sprite and sound
 const uint16_t lawnmowerBMP[342] = {// 'Lawnmower', 19x18px
 0xfb56, 0x0000, 0x0000, 0x0000, 0xfb56, 0xfb56, 0xfb56, 0xfb56, 0xfb56, 0xfb56, 0xfb56, 0xfb56, 0xfb56, 0xfb56, 0xfb56, 0xfb56, 
@@ -6380,6 +6381,7 @@ Entity::Entity(SpriteType* sp, Sound* sfx, uint8_t xpos, uint8_t ypos,
 		this->animationTimer = anim;
 		this->hostile = hostl;
 }
+void Entity::attack(){}
 void Entity::tick(){
 	if(this->animationTimer > 0) this->animationTimer--;
 }
@@ -6448,7 +6450,7 @@ uint8_t GameObject::getLane(){
 //does nothing
 void GameObject::tick(){}
 //does nothing
-int GameObject::collided(){}
+int GameObject::collided(){return 0;}
 
 
 //Constructor
@@ -6482,9 +6484,15 @@ GameObject* GameObjectList::operator[](uint8_t i){
 void GameObjectList::GORmv(uint8_t i){
 	this->indexPtr--;
 	for(int j = i; j < indexPtr; j++){
-		objects[i] = objects[i+1];
+		objects[j] = objects[j+1];
 	}
 }
+void GameObjectList::redrawSet(){
+	for(int i = 0; i<indexPtr; i++){
+		objects[i]->redraw = 1;
+	}
+}
+
 void GameObjectList::tryRmv(GameObject* go){
 	uint8_t i = 0;
 	while(i<this->indexPtr){
@@ -6716,8 +6724,10 @@ void Scene::tick(){
 	this->Projectiles->tick();
 	
 	if(this->hasGrid){
+		this->planter->redraw = 1;
 		if(this->sunTimer!=0) this->sunTimer--;
 		else{
+			this->Lawnmowers->redrawSet();
 			this->spawnProjectile(sunID, Random()/2, 100, 0);
 			sunTimer = sunRate;
 		}
@@ -6746,7 +6756,7 @@ void Scene::renderSun(){
 	if(this->sunAmount>=0){	//>= 0 because it's signed, don't wanna do negatives ig
 		//TO-DO
 				Display_RenderSprite(2, 110, sunSprite->bmp, sunSprite->width, sunSprite->length, transparentColor, currentScene->backgroundBMP);
-				Display_SetCursor(5, 5);
+				Display_SetCursor(0, 11);
 				Display_OutUDec(sunAmount, 0x0000);
 	}
 }
@@ -7245,4 +7255,7 @@ void globalInits(){
 	
 	menu  = new Scene(menuButtons, 0, menuBackground, 0);
 	campaign = new Scene(singlePlayerButtons, lawnMowers, lawnBackground, 1);
+	
+	screenWipe = 0;
+	GameTime = 0;
 }

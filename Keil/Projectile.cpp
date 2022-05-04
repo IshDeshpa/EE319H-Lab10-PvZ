@@ -31,7 +31,7 @@ LawnMower::LawnMower(uint8_t x, uint8_t y, uint8_t lane) : Projectile(lmSprite, 
 	this->isMoving  = 0;
 }
 void LawnMower::advance(){
-	if(this->x >170){
+	if(this->x >170 && this->x < 250){
 		this->unrender();
 		currentScene->Projectiles->tryRmv(this);
 		return;
@@ -57,7 +57,7 @@ Pea::Pea(uint8_t x, uint8_t y, uint8_t lane) : Projectile(peaSprite, peaSound, x
 	
 }
 
-FrozenPea::FrozenPea(uint8_t x, uint8_t y, uint8_t lane) : Projectile(peaSprite, peaSound, x, y, peaSpeed, peaDamage, lane){
+FrozenPea::FrozenPea(uint8_t x, uint8_t y, uint8_t lane) : Projectile(frozenPeaSprite, peaSound, x, y, icePeaSpeed, peaDamage, lane){
 
 }
 
@@ -126,7 +126,7 @@ this->soundFX->play();
 }
 
 Sun::Sun(uint8_t x, uint8_t y, uint8_t isMoving) : Projectile(sunSprite, sunSound, x, y, sunSpeed, 0, 6){
-	this->distance = 100;
+	this->distance = 80;
 	this->isMoving = !isMoving;	//input is flipped
 	this->upTimer = sunProductionRate;
 }
