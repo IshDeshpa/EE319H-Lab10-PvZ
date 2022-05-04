@@ -28,7 +28,8 @@ Sound::Sound(){
 }*/
 
 void Sound::increment(){
-	if(this->bufferPtr >= this->bufferSize){
+	if(this->bufferPtr >= this->bufferSize-1){
+		this->bufferPtr = 0;
 		sounds[this->ind] = 0;
 		this->ind = -1;
 	}

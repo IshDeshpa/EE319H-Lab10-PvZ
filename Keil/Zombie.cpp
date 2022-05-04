@@ -55,8 +55,7 @@ void Zombie::advance(){
 		this->sprite = this->walkFSM;
 		this->redraw = 1;
 	}
-	if(Random32() % 100 == 0) this->soundFX->play();
-	
+	if(Random32() % 1000 == 0) this->soundFX->play();
 }
 
 void Zombie::stopEating(){
@@ -128,7 +127,7 @@ void ArmorZombie::advance(){
 			this->sprite = this->fullWalkFSM;
 			this->redraw = 1;
 		}
-		if(Random32() % 100 == 0) this->soundFX->play();
+		if(Random32() % 10000 == 0) this->soundFX->play();
 	}
 	else{
 		if(this->sprite == this->fullEatFSM)this->sprite = this->eatFSM;
