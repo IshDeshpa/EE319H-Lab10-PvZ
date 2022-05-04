@@ -122,10 +122,10 @@
 	//packet load times;
 #define LoadTime 100
 #define bigWaveSize 10 //number of zombies in a big wave
-#define stickLeftTolerance 4000
-#define stickRightTolerance 1000
-#define stickUpTolerance 3900
-#define stickDownTolerance 100
+#define stickLeftTolerance 0xFEA
+#define stickRightTolerance 0x65
+#define stickUpTolerance 0xFEA
+#define stickDownTolerance 0x65
 
 #define sceneInputRate 10
 
@@ -311,7 +311,7 @@ class Chomp : public Ohko{
 class Sun : public Projectile{
 	protected:
   uint8_t upTimer;
-	int8_t distance;
+	int16_t distance;
 	uint8_t isMoving;
 		//change advance so if collision with cursor, collect sun
 		void advance();
@@ -723,7 +723,7 @@ class Scene{
 		uint8_t inputRate;
 		uint8_t inputTimer;
 		int16_t sunAmount;
-	
+		uint8_t hasGrid;
 		
 		SelectCursor* select; //menuing and seed packets
 	public:

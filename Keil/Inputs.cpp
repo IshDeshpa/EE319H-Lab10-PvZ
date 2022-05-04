@@ -6,12 +6,12 @@ uint8_t LB = 0;
 uint8_t RB = 0;
 uint8_t A = 0;
 uint8_t B = 0;
-uint8_t JoyY = 0;
 uint8_t JoyX = 0;
+uint8_t JoyY = 0;
 
 void Inputs_Init(){
 		SYSCTL_RCGCGPIO_R |= 0x1C;
-		SYSCTL_RCGCADC_R |= 0x01;
+		SYSCTL_RCGCADC_R |= 0x03;
 		while((SYSCTL_PRGPIO_R&SYSCTL_PRGPIO_R0) == 0){};
 		while((SYSCTL_PRADC_R&SYSCTL_PRADC_R0) == 0){};
 		GPIO_PORTC_DEN_R |= 0xC0;	//BR1, BL1
@@ -40,17 +40,29 @@ void Inputs_Init(){
 		ADC0_ACTSS_R &= ~0x0001;	// Sample sequencer 0
 		ADC0_SAC_R = 6;	// 4x hardware sampling
 		ADC0_EMUX_R &= ~0x000F;
-		ADC0_SSMUX0_R = 0x0023;	// Read PE1 and PE0
-		ADC0_SSCTL0_R = 0x0060;
+		ADC0_SSMUX0_R = 0x0002;	// Read PE1
+		ADC0_SSCTL0_R = 0x0006;
 		ADC0_IM_R &= ~0x0001;
 		ADC0_ACTSS_R |= 0x0001;
+		
+		ADC1_PC_R = 0x01;
+		ADC1_SSPRI_R = 0x3210;
+		ADC1_ACTSS_R &= ~0x0001;	// Sample sequencer 0
+		ADC1_SAC_R = 6;	// 4x hardware sampling
+		ADC1_EMUX_R &= ~0x000F;
+		ADC1_SSMUX0_R = 0x0003;	// Read PE0
+		ADC1_SSCTL0_R = 0x0006;
+		ADC1_IM_R &= ~0x0001;
+		ADC1_ACTSS_R |= 0x0001;
 }
 void getJoyXY(uint32_t data[2]){
 	ADC0_PSSI_R = 0x0001;
-	while((ADC0_RIS_R&0x01) == 0){};
-	data[1] = ADC0_SSFIFO0_R&0xFFF;
+	ADC1_PSSI_R = 0x0001;
+	while((ADC0_RIS_R&0x01) == 0 && (ADC1_RIS_R&0x01) == 0){};
 	data[0] = ADC0_SSFIFO0_R&0xFFF;
+	data[1] = ADC1_SSFIFO0_R&0xFFF;
 	ADC0_ISC_R = 0x0004;
+	ADC1_ISC_R = 0x0004;
 }
 
 uint8_t getA(){

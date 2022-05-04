@@ -85,6 +85,7 @@ int main(void){
 	//Display_DrawBitmap(0, 0, background, 160, 128);
 	
 	//biteSound = new Sound(bite, 2099);
+	
 	//biteSound->play();
 	loadScene(menu);
 	while(1){

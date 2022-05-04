@@ -147,14 +147,14 @@ extern "C" void DisableInterrupts(void);
 extern "C" void EnableInterrupts(void);
 uint8_t xchg_spi(unsigned char c, uint8_t dc){
 	DisableInterrupts();
-	volatile uint8_t response;
+	volatile uint8_t response = 1;
                                         // wait until SSI0 not busy/transmit FIFO empty
   while((SSI0_SR_R&SSI_SR_BSY)==SSI_SR_BSY){};
 	D_C(dc);
 	SSI0_DR_R = c;                        // data out
-  while((SSI0_SR_R&SSI_SR_RNE)==0){};   // wait until response
+  //while((SSI0_SR_R&SSI_SR_RNE)==0){};   // wait until response
 		
-	response = SSI0_DR_R;
+	//response = SSI0_DR_R;
 	EnableInterrupts();
 	return response;
 }

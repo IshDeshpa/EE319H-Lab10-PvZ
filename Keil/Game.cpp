@@ -6592,34 +6592,26 @@ void GridCursor::updatePos(){
 	uint32_t stickPos[2] = {0, 0};
 	getJoyXY(stickPos);
 	if(stickPos[0] > stickLeftTolerance && this->gridXpos > 1 && !JoyX){
-		this->oldGridX = this->gridXpos;
 		this->gridXpos--;
 		this->redraw = 1;
 		JoyX = 1;
 	}
 	else if(stickPos[0] < stickRightTolerance && this->gridXpos < 9 && !JoyX){
-		this->oldGridX = this->gridXpos;
 		this->gridXpos++;
 		this->redraw = 1;
 		JoyX = 1;
 	}
 	
-	
-	
 	if(stickPos[1] < stickDownTolerance && this->gridYpos > 1 && !JoyY){
-		this->oldGridY = this->gridYpos;
 		this->gridYpos--;
 		this->redraw = 1;
 		JoyY = 1;
 	}
 	else if(stickPos[1] > stickUpTolerance && this->gridYpos < 5 && !JoyY){
-		this->oldGridY = this->gridYpos;
 		this->gridYpos++;
 		this->redraw = 1;
 		JoyY = 1;
 	}
-	
-	
 	
 	if(getB()){
 		if(this->gridOpen()){
@@ -6649,6 +6641,8 @@ void GridCursor::render(){
 		this->redraw = 0;
 		Display_UnrenderCursor(this->calcOldX() - borderWidth, this->calcOldY() - borderWidth, transparentSprite->width + 2*borderWidth, transparentSprite->length + 2*borderWidth, currentScene->backgroundBMP);
 		Display_RenderCursor(this->calcX() - borderWidth, this->calcY() - borderWidth, transparentSprite->width + 2*borderWidth, transparentSprite->length + 2*borderWidth, CURSOR_COLOR);
+		this->oldGridX = this->gridXpos;
+		this->oldGridY = this->gridYpos;
 	}
 }
 
@@ -6691,6 +6685,7 @@ Scene::Scene(GameObjectList* but, GameObjectList* lwm, const uint16_t* bg, uint8
 		this->sunTimer = 0;
 		this->sunAmount = 200;
 		this->select = new SelectCursor(but);
+		this->hasGrid = hasGrid;
 		if(hasGrid)
 			this->planter = new GridCursor();
 		else
@@ -6720,17 +6715,19 @@ void Scene::tick(){
 	this->Lawnmowers->tick();
 	this->Projectiles->tick();
 	
-	if(this->sunTimer!=0) this->sunTimer--;
-	else{
-		this->spawnProjectile(sunID, 125, 125, 0);
-		sunTimer = sunRate;
+	if(this->hasGrid){
+		if(this->sunTimer!=0) this->sunTimer--;
+		else{
+			this->spawnProjectile(sunID, Random()/2, 100, 0);
+			sunTimer = sunRate;
+		}
+		if(this->inputTimer == 0){
+			JoyX = 0;
+			JoyY = 0;
+			this->inputTimer = this->inputRate;
+		}
+		else inputTimer--;
 	}
-	if(this->inputTimer == 0){
-		JoyX = 0;
-		JoyY = 0;
-		this->inputTimer = this->inputRate;
-	}
-	else inputTimer--;
 }
 const uint16_t* Scene::retBG(){
 	return this->backgroundBMP;

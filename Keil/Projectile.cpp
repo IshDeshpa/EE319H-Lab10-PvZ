@@ -126,7 +126,7 @@ this->soundFX->play();
 }
 
 Sun::Sun(uint8_t x, uint8_t y, uint8_t isMoving) : Projectile(sunSprite, sunSound, x, y, sunSpeed, 0, 6){
-	this->distance = 50;
+	this->distance = 100;
 	this->isMoving = !isMoving;	//input is flipped
 	this->upTimer = sunProductionRate;
 }
