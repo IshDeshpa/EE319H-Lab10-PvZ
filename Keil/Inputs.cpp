@@ -38,7 +38,7 @@ void Inputs_Init(){
 		ADC0_PC_R = 0x01;
 		ADC0_SSPRI_R = 0x3210;
 		ADC0_ACTSS_R &= ~0x0001;	// Sample sequencer 0
-		ADC0_SAC_R = 2;	// 4x hardware sampling
+		ADC0_SAC_R = 6;	// 4x hardware sampling
 		ADC0_EMUX_R &= ~0x000F;
 		ADC0_SSMUX0_R = 0x0023;	// Read PE1 and PE0
 		ADC0_SSCTL0_R = 0x0060;

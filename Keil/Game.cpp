@@ -6604,9 +6604,7 @@ void GridCursor::updatePos(){
 		JoyX = 1;
 	}
 	
-	if(stickPos[0] >= stickRightTolerance && stickPos[0] <= stickLeftTolerance && JoyX){
-		JoyX = 0;
-	}
+	
 	
 	if(stickPos[1] < stickDownTolerance && this->gridYpos > 1 && !JoyY){
 		this->oldGridY = this->gridYpos;
@@ -6621,12 +6619,10 @@ void GridCursor::updatePos(){
 		JoyY = 1;
 	}
 	
-	if(stickPos[1] <= stickUpTolerance && stickPos[1] >= stickDownTolerance && JoyY){
-		JoyY = 0;
-	}
+	
 	
 	if(getB()){
-		if(gridOpen()){
+		if(this->gridOpen()){
 			this->grid[this->gridXpos - 1][this->gridYpos - 1] = 0;
 			currentScene->Plants->tryRmv(this->gridXpos, this->gridYpos);
 			plantingSound->play();
@@ -6681,6 +6677,8 @@ void GridCursor::emptyGrid(uint8_t col, uint8_t row){
 }
 Scene::Scene(GameObjectList* but, GameObjectList* lwm, const uint16_t* bg, uint8_t hasGrid){
 		this->Buttons = but;
+		this->inputRate = sceneInputRate;
+		this->inputTimer = sceneInputRate;
 		this->Plants = new GameObjectList();
 		this->Zombies = new GameObjectList();
 		if(lwm != 0)
@@ -6691,12 +6689,12 @@ Scene::Scene(GameObjectList* but, GameObjectList* lwm, const uint16_t* bg, uint8
 		this->backgroundBMP = bg;
 		this->sunRate = sunProductionRate;
 		this->sunTimer = 0;
-		this->sunAmount = 0;
+		this->sunAmount = 200;
 		this->select = new SelectCursor(but);
 		if(hasGrid)
-			this->grid = new GridCursor();
+			this->planter = new GridCursor();
 		else
-			this->grid = 0;
+			this->planter = 0;
 }
 void Scene::refresh(){
 	if(this->select != 0)
@@ -6705,9 +6703,6 @@ void Scene::refresh(){
 		if(currentScene != this){
 			return;
 		}
-	}
-	if(this->grid != 0){
-		this->grid->refresh();
 	}
 	if(this->planter != 0){
 			this->planter->refresh();
@@ -6724,11 +6719,18 @@ void Scene::tick(){
 	this->Zombies->tick();
 	this->Lawnmowers->tick();
 	this->Projectiles->tick();
+	
 	if(this->sunTimer!=0) this->sunTimer--;
 	else{
-		this->spawnProjectile(sunID, 50, 125, 0);
+		this->spawnProjectile(sunID, 125, 125, 0);
 		sunTimer = sunRate;
 	}
+	if(this->inputTimer == 0){
+		JoyX = 0;
+		JoyY = 0;
+		this->inputTimer = this->inputRate;
+	}
+	else inputTimer--;
 }
 const uint16_t* Scene::retBG(){
 	return this->backgroundBMP;
@@ -6747,7 +6749,7 @@ void Scene::renderSun(){
 	if(this->sunAmount>=0){	//>= 0 because it's signed, don't wanna do negatives ig
 		//TO-DO
 				Display_RenderSprite(2, 110, sunSprite->bmp, sunSprite->width, sunSprite->length, transparentColor, currentScene->backgroundBMP);
-				Display_SetCursor(4, 114);
+				Display_SetCursor(1, 15);
 				Display_OutUDec(sunAmount, 0x0000);
 	}
 }
@@ -6762,6 +6764,7 @@ void Scene::renderSun(){
 
 
 void Scene::spawnProjectile(uint8_t projID, uint8_t x, uint8_t y, uint8_t lane){
+	if(lane == 0) this->Projectiles->GOAdd(new Sun(x, y, lane));
 	if(lane<1 || lane > 5){
 		return;
 	}
@@ -6895,8 +6898,8 @@ void Scene::spawnZombie(uint8_t zombieID, uint8_t lane){
 }
 
 int Scene::cursorHit(int16_t x, int16_t y){
-	if((int16_t)this->planter->calcX() - x < collectTolerance && this->planter->calcX() - x > -collectTolerance
-		&& this->planter->calcY()- y < collectTolerance && this->planter->calcY() - y > collectTolerance)
+	if(this->planter != 0 && (int16_t)this->planter->calcX() - x < collectTolerance && this->planter->calcX() - x > -collectTolerance
+		&& this->planter->calcY()- y < collectTolerance && this->planter->calcY() - y > -collectTolerance)
 		return 1;
 	return 0;
 }
@@ -6982,6 +6985,10 @@ void globalInits(){
 	peashooterSprite2 = new SpriteType(peashooterBMP2, 16, 16, peashooterSprite3);
 	peashooterSprite3 = new SpriteType(peashooterBMP3, 16, 16, peashooterSprite4);
 	peashooterSprite4 = new SpriteType(peashooterBMP2, 16, 16, peashooterSprite);
+	peashooterSprite->nextSprite = peashooterSprite2;
+	peashooterSprite2->nextSprite = peashooterSprite3;
+	peashooterSprite3->nextSprite = peashooterSprite4;
+	peashooterSprite4->nextSprite = peashooterSprite;
 
 	snowPeaSprite = new SpriteType( snowPeaBMP, 16, 16,  snowPeaSprite2);
 	snowPeaSprite2 = new SpriteType( snowPeaBMP2, 16, 16,  snowPeaSprite3);
@@ -7027,11 +7034,19 @@ void globalInits(){
 	regularZombieSprite2 = new SpriteType(regularZombieBMP2, 17, 29, regularZombieSprite3);
 	regularZombieSprite3 = new SpriteType(regularZombieBMP3, 17, 29, regularZombieSprite4);
 	regularZombieSprite4 = new SpriteType(regularZombieBMP2, 17, 29, regularZombieSprite);
+	regularZombieSprite->nextSprite = regularZombieSprite2;
+	regularZombieSprite2->nextSprite = regularZombieSprite3;
+	regularZombieSprite3->nextSprite = regularZombieSprite4;
+	regularZombieSprite4->nextSprite = regularZombieSprite;
 	
 	regularZombieEatSprite = new SpriteType(regularZombieEatBMP, 20, 29, regularZombieEatSprite2);
 	regularZombieEatSprite2 = new SpriteType(regularZombieEatBMP2, 20, 29, regularZombieEatSprite3);
 	regularZombieEatSprite3 = new SpriteType(regularZombieEatBMP3, 20, 29, regularZombieEatSprite4);
 	regularZombieEatSprite4 = new SpriteType(regularZombieEatBMP2, 20, 29, regularZombieEatSprite);
+	regularZombieEatSprite->nextSprite = regularZombieEatSprite2;
+	regularZombieEatSprite2->nextSprite = regularZombieEatSprite3;
+	regularZombieEatSprite3->nextSprite = regularZombieEatSprite4;
+	regularZombieEatSprite4->nextSprite = regularZombieEatSprite;
 
 	bucketZombieSprite = new SpriteType(bucketZombieBMP, 16, 27, bucketZombieSprite2);
 	bucketZombieSprite2 = new SpriteType(bucketZombieBMP2, 15, 28, bucketZombieSprite3);
@@ -7136,14 +7151,14 @@ void globalInits(){
 	seedPacketSprites[6] = cherryBombPacket;
 	seedPacketSprites[7] = wallNutPacket;
 	
-	peaSeed = new SeedPacket(1, SpYpos, peashooterID, LoadTime, peashooterCost);
-	sunSeed = new SeedPacket(13, SpYpos, sunflowerID, LoadTime, sunflowerCost);
-	snowSeed = new SeedPacket(25, SpYpos, snowPeaID, LoadTime, snowPeaCost);
-	repSeed = new SeedPacket(37, SpYpos, repeaterID, LoadTime, repeaterCost);
-	chompSeed = new SeedPacket(49, SpYpos, chomperID, LoadTime, chomperCost);
-	mineSeed = new SeedPacket(61, SpYpos, potatoMineID, LoadTime, potatoMineCost);
-	bombSeed = new SeedPacket(73, SpYpos, cherryBombID, LoadTime, cherryBombCost);
-	wallSeed = new SeedPacket(85, SpYpos, wallNutID, LoadTime, wallNutCost);
+	peaSeed = new SeedPacket(21, SpYpos, peashooterID, LoadTime, peashooterCost);
+	sunSeed = new SeedPacket(33, SpYpos, sunflowerID, LoadTime, sunflowerCost);
+	snowSeed = new SeedPacket(45, SpYpos, snowPeaID, LoadTime, snowPeaCost);
+	repSeed = new SeedPacket(57, SpYpos, repeaterID, LoadTime, repeaterCost);
+	chompSeed = new SeedPacket(69, SpYpos, chomperID, LoadTime, chomperCost);
+	mineSeed = new SeedPacket(81, SpYpos, potatoMineID, LoadTime, potatoMineCost);
+	bombSeed = new SeedPacket(93, SpYpos, cherryBombID, LoadTime, cherryBombCost);
+	wallSeed = new SeedPacket(105, SpYpos, wallNutID, LoadTime, wallNutCost);
 	
 	GameObject* btnArr2[9] = {peaSeed, sunSeed, snowSeed, repSeed, chompSeed, mineSeed, bombSeed, wallSeed, 0};
 	singlePlayerButtons = new GameObjectList(btnArr2);

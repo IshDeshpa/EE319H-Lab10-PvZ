@@ -14,6 +14,9 @@ void Projectile::advance(){
 		this->distanceDiff = 0;
 		this->redraw = 1;
 	}
+	if(this->getX()>170){
+		this->collided();
+	}
 }
 void Projectile::tick(){
 	this->distanceDiff+=this->speed;

@@ -54,14 +54,14 @@ SeedPacket::SeedPacket(uint8_t x, uint8_t y, uint8_t plantID, uint8_t loadTime, 
 
 void SeedPacket::buttonFunction(){
 	
-		this->loadTimer = loadTime;
-		this->sprite = gray;
+		this->loadTimer = this->loadTime;
+		this->sprite = this->gray;
 		this->isReady = 0;
 		currentScene->spawnPlant(plantID);
 }
 void SeedPacket::buttonHit(){
 	if(this->isReady == 1 && currentScene->gridCheck() == 0 
-		&& currentScene->changeSun(this->sunCost)){
+		&& currentScene->changeSun(-1*this->sunCost)){
 		buttonFunction();
 		this->soundFX->play();
 		this->isReady = 0;

@@ -18,7 +18,7 @@
 #define healthRatio 1
 #define animationRatio 1//general animation speed ratio
 
-#define speedMultiplier 0.1 * gameMovementSpeed
+#define speedMultiplier gameMovementSpeed
 #define peaSpeed 3*speedMultiplier
 #define sunSpeed 1*speedMultiplier
 #define zombieSpeed 1*speedMultiplier
@@ -82,8 +82,8 @@
 #define SpXSize 10 //size of all seed packet sprites
 #define SpYSize 8 
 #define SpOffset SpXSize+2
-#define SpYpos 115	//y position of all seed packets
-#define FspXpos 1		//x position of left most packet
+#define SpYpos 118	//y position of all seed packets
+#define FspXpos 18		//x position of left most packet
 #define SspXpos FspXpos + SpOffset * 1
 #define TspXpos FspXpos + (SpOffset * 2)
 #define	FospXpos FspXpos + (SpOffset * 3)
@@ -118,15 +118,16 @@
 #define gridX 15
 #define gridY 20
 #define shootOffsetX 15
-#define shootOffsetY 15
+#define shootOffsetY 8
 	//packet load times;
 #define LoadTime 100
 #define bigWaveSize 10 //number of zombies in a big wave
-#define stickLeftTolerance 3000
+#define stickLeftTolerance 4000
 #define stickRightTolerance 1000
-#define stickUpTolerance 3000
-#define stickDownTolerance 1000
+#define stickUpTolerance 3900
+#define stickDownTolerance 100
 
+#define sceneInputRate 10
 
 
 // Sprite contains a pointer to a bitmap, and has a length and width in pixels.
@@ -515,7 +516,7 @@ class SeedPacket : public Button{
 		SpriteType* gray;
 		uint8_t loadTime;
 		uint8_t loadTimer;
-		uint8_t sunCost;
+		int16_t sunCost;
 		uint8_t plantID; //0 for peashooter, 1 for repeater, 2 for snowpea, 3 for wallnut, 4 for cherry bomb, 5 for mine, 6 for chomper, 7 for sunflower
 		//change buttonFunction to call global spawn plant with plantID
 		void buttonFunction();
@@ -719,11 +720,12 @@ class Scene{
 		
 		uint8_t sunRate;
 		uint8_t sunTimer;
+		uint8_t inputRate;
+		uint8_t inputTimer;
 		int16_t sunAmount;
 	
 		
 		SelectCursor* select; //menuing and seed packets
-		GridCursor* grid;
 	public:
 		const uint16_t* backgroundBMP;	// Background of the scene as a bitmap
 		GameObjectList* Zombies;	// List of all objects on the scene these are arrays of pointers
