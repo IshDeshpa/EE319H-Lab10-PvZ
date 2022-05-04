@@ -6487,13 +6487,13 @@ void GameObjectList::GORmv(uint8_t i){
 }
 void GameObjectList::tryRmv(GameObject* go){
 	uint8_t i = 0;
-	uint8_t end = this->indexPtr;
-	while(i<end){
+	while(i<this->indexPtr){
 		if(objects[i] == go){
 			this->GORmv(i);
 			delete(go);
 			return;
 		}
+		i++;
 	}
 }
 void GameObjectList::refresh(){
@@ -6633,8 +6633,7 @@ void GridCursor::updatePos(){
 
 void GameObjectList::tryRmv(uint8_t col, uint8_t row){
 	uint8_t i = 0;
-	uint8_t end = this->indexPtr;
-	while(i<end){
+	while(i<this->indexPtr){
 		if(((Plant*)objects[i])->getCol() == col && objects[i]->getLane() == row){
 			GameObject* go = this->objects[i];
 			this->GORmv(i);
@@ -6642,6 +6641,7 @@ void GameObjectList::tryRmv(uint8_t col, uint8_t row){
 			delete(go);
 			return;
 		}
+		i++;
 	}
 }
 void GridCursor::render(){
