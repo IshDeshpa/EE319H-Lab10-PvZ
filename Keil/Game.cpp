@@ -6397,7 +6397,12 @@ void Entity::hurt(uint8_t damage){
 
 
 void GameObject::unrender(){
-	Display_UnrenderSprite(this->oldx, this->oldy, this->previousSprite->width, this->previousSprite->length, currentScene->retBG());
+	if(this->redraw == 0){
+		this->previousSprite = this->sprite;
+		this->oldx = this->x;
+		this->oldy = this->y;
+	}
+	Display_UnrenderSprite(this->oldx, this->oldy, this->previousSprite->bmp, this->previousSprite->width, this->previousSprite->length, currentScene->retBG());
 }
 void GameObject::render(){
 	Display_RenderSprite(this->x, this->y, this->sprite->bmp, this->sprite->width, this->sprite->length, transparentColor, currentScene->retBG());
@@ -6434,9 +6439,9 @@ void GameObject::refresh(){
 		this->previousSprite = this->sprite;
 		advance();
 		if(this->redraw == 1){	
-			this->redraw = 0;
 			unrender();
 			render();
+			this->redraw = 0;
 		}
 }
 
@@ -6639,6 +6644,7 @@ void GameObjectList::tryRmv(uint8_t col, uint8_t row){
 	while(i<this->indexPtr){
 		if(((Plant*)objects[i])->getCol() == col && objects[i]->getLane() == row){
 			GameObject* go = this->objects[i];
+			currentScene->planter->emptyGrid(col, row);
 			this->GORmv(i);
 			go->unrender();
 			delete(go);
@@ -6679,6 +6685,14 @@ void GridCursor::fillGrid(){
 }
 void GridCursor::emptyGrid(uint8_t col, uint8_t row){
 	this->grid[col-1][row-1] = 0;	
+}
+void GridCursor::clearGrid(){
+	for(int i = 0; i<9; i++)
+	{
+		for(int j = 0; j<5; j++){
+			this->grid[i][j] = 0;
+		}
+	}
 }
 Scene::Scene(GameObjectList* but, GameObjectList* lwm, const uint16_t* bg, uint8_t hasGrid){
 		this->Buttons = but;
@@ -6737,7 +6751,8 @@ void Scene::tick(){
 		this->planter->redraw = 1;
 		
 		if(this->zombieTimer <= 0){
-			this->zombieTimer = 500 - GameTime/200;
+			this->zombieTimer = 500 - GameTime/7;
+			if (this->zombieTimer < 30) this->zombieTimer = 30;
 			this->spawnZombie(Random32()%8, Random32()%5 + 1);
 		}
 		else this->zombieTimer--;
@@ -6929,15 +6944,24 @@ int Scene::cursorHit(int16_t x, int16_t y){
 }
 
 void Scene::wipe(){
-	for(int i = this->Zombies->indexPtr; i>=0; i--){
+	for(int i = this->Zombies->indexPtr - 1; i>=0; i--){
 		Zombies->objects[i]->unrender();
 		Zombies->GORmv(i);
+		delete Zombies->objects[i];
 	}
-	for(int i = this->Plants->indexPtr; i>=0; i--){
-		Zombies->objects[i]->unrender();
-		Zombies->GORmv(i);
+	for(int i = this->Projectiles->indexPtr - 1; i>=0; i--){
+		Projectiles->objects[i]->unrender();
+		Projectiles->GORmv(i);
+		delete Projectiles->objects[i];
 	}
-	screenWipe = 1;
+	for(int i = this->Plants->indexPtr - 1; i>=0; i--){
+		Plant* pt = (Plant*)Plants->objects[i];
+		pt->unrender();
+		Plants->GORmv(i);
+		currentScene->planter->emptyGrid(pt->getCol(), pt->getLane());
+		delete pt;
+	}
+	screenWipe = 0;
 }
 
 void Scene::collisions(){
@@ -6973,8 +6997,8 @@ void Scene::collisions(){
 			}
 		}
 		if(screenWipe){
-			screenWipe = 0;
-			break;
+			currentScene->wipe();
+			return;
 		}
 		if(zm != 0){
 			if(eatingFlag == 0){
@@ -6993,6 +7017,7 @@ void Scene::collisions(){
 				lm->collided();
 				if(zm->health<=0){
 					zm->unrender();
+					zm->redraw = 0;
 					this->Zombies->tryRmv(zm);
 					break;
 				}
@@ -7103,7 +7128,8 @@ void globalInits(){
 	smallExplosionSprite = new SpriteType(smallExplosionBMP, 25, 23, smallExplosionSprite);
 	largeExplosionSprite = new SpriteType(largeExplosionBMP, 25, 23, largeExplosionSprite);
 	sunSprite = new SpriteType(sunBMP, 16, 16, sunSprite);
-	transparentSprite = new SpriteType(transparentBMP, 16, 16, transparentSprite);
+	//transparentSprite = new SpriteType(transparentBMP, 16, 16, transparentSprite);
+	transparentSprite = new SpriteType(wallNutBMP2, 16, 16, transparentSprite);
 
 	regularZombieSprite = new SpriteType(regularZombieBMP, 17, 29, regularZombieSprite2);
 	regularZombieSprite2 = new SpriteType(regularZombieBMP2, 17, 29, regularZombieSprite3);

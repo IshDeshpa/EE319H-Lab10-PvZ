@@ -99,10 +99,9 @@ CherryBomb::CherryBomb(uint8_t x, uint8_t y, uint8_t lane)
 void CherryBomb::attack(){
 	Plant::attack();
 	this->unrender();
+	this->redraw = 0;
 	currentScene->planter->emptyGrid(this->col, this->lane);
 	currentScene->Plants->tryRmv(this);
-	//TO-DO: have the grid set this plant's spot to 0
-	//currentScene->planter->g
 }
 
 PotatoMine::PotatoMine(uint8_t x, uint8_t y, uint8_t lane)
@@ -124,6 +123,7 @@ void PotatoMine::hurt(uint8_t dam){
 	if(this->grown == 1){
 		Plant::attack();
 		this->unrender();
+		this->redraw = 0;
 		currentScene->planter->emptyGrid(this->col, this->lane);
 		currentScene->Plants->tryRmv(this);
 	}
@@ -141,7 +141,7 @@ sunProductionRate, sunID, lane)
 
 Chomper::Chomper(uint8_t x, uint8_t y, uint8_t lane)
 : Plant (chomperSprite, x, y, defaultPlantHealth, 1, 
-chomperChewTime, sunID, lane){
+chomperChewTime, chompID, lane){
 	this->empty = chomperSprite;
 	this->bite = chomperAttackSprite;
 	this->mouthFull = 0;
@@ -161,10 +161,11 @@ void Chomper::attack(){
 void Chomper::hurt(uint8_t dam){
 	if(mouthFull == 0) {
 		this->previousSprite = this->sprite;
-		this->animationTimer = 3*this->animationTime;
+		this->unrender();
+		this->animationTimer = 2*this->animationTime;
 		this->sprite = this->bite;
 		this->redraw = 1;
-		this->attack();
+		Plant::attack();
 		this->attackTimer = this->attackRate;
 		this->mouthFull = 1;
 	}

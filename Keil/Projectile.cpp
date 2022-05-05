@@ -17,6 +17,7 @@ void Projectile::advance(){
 	if(this->getX()>170){
 		this->unrender();
 		currentScene->Projectiles->tryRmv(this);
+		this->redraw = 0;
 	}
 }
 void Projectile::tick(){
@@ -26,6 +27,7 @@ int Projectile::collided(){
 	this->unrender();
 	currentScene->Projectiles->tryRmv(this);
 	this->soundFX->play();
+	this->redraw = 0;
 	return 1;
 }
 LawnMower::LawnMower(uint8_t x, uint8_t y, uint8_t lane) : Projectile(lmSprite, lmSound, x, y, lawnmowerSpeed, lawnmowerDamage, lane) {
@@ -34,7 +36,8 @@ LawnMower::LawnMower(uint8_t x, uint8_t y, uint8_t lane) : Projectile(lmSprite, 
 void LawnMower::advance(){
 	if(this->x >170 && this->x < 250){
 		this->unrender();
-		currentScene->Projectiles->tryRmv(this);
+		currentScene->Lawnmowers->tryRmv(this);
+		this->redraw = 0;
 		return;
 	}
 	else if(this->distanceDiff!=0){
@@ -103,7 +106,7 @@ void Explosion::render(){
 	Display_RenderSprite(this->x - 20, this->y - 20, this->sprite->bmp, this->sprite->width, this->sprite->length, transparentColor, currentScene->retBG());
 }
 void Explosion::unrender(){
-	Display_UnrenderSprite(this->oldx - 20, this->oldy - 20, this->previousSprite->width, this->previousSprite->length, currentScene->retBG());
+	Display_UnrenderSprite(this->oldx - 20, this->oldy - 20, this->previousSprite->bmp, this->previousSprite->width, this->previousSprite->length, currentScene->retBG());
 }
 
 int Explosion::collided(){

@@ -712,6 +712,7 @@ class GridCursor{
 		void refresh();
 		uint8_t gridOpen(); //returns 1 if no plant, returns 0 if plant
 		void fillGrid();
+		void clearGrid();
 		void emptyGrid(uint8_t col, uint8_t row);
 		
 };
@@ -723,12 +724,13 @@ class Scene{
 		uint8_t sunTimer;
 		uint8_t inputRate;
 		uint8_t inputTimer;
-		int16_t sunAmount;
+		
 		uint8_t hasGrid;
 		int32_t zombieTimer;
 		
 		SelectCursor* select; //menuing and seed packets
 	public:
+		int16_t sunAmount;
 		const uint16_t* backgroundBMP;	// Background of the git as a bitmap
 		GameObjectList* Zombies;	// List of all objects on the scene these are arrays of pointers
 		GameObjectList* Plants;
