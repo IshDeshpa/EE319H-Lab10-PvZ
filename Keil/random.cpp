@@ -36,6 +36,10 @@ uint32_t Random32(void){
   return M;
 }
 
+void Random32change(){
+	M += Random32();
+}
+
 //------------Random------------
 // Return random number, 0 to 255
 // Linear congruential generator 

@@ -231,7 +231,7 @@ void SSI0_Init(uint32_t CPSDVSR){
   // initialize SSI0
   GPIO_PORTA_AFSEL_R |= 0x34;           // enable alt funct on PA2,4,5
   GPIO_PORTA_PUR_R |= 0x3C;             // enable weak pullup on PA2,3,4,5
-	GPIO_PORTA_DR4R_R |= 0xFC;            // 4mA drive on all outputs
+	GPIO_PORTA_DR8R_R |= 0xFC;            // 4mA drive on all outputs
 	GPIO_PORTA_DEN_R |= 0x34;             // enable digital I/O on PA2,4,5
                                         // configure PA2,4,5 as SSI
   GPIO_PORTA_PCTL_R = (GPIO_PORTA_PCTL_R&0xFF00F0FF)+0x00220200;

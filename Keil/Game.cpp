@@ -6608,6 +6608,7 @@ void GridCursor::updatePos(){
 	uint32_t stickPos[2] = {0, 0};
 	getJoyXY(stickPos);
 	if(stickPos[0] > stickLeftTolerance && this->gridXpos > 1 && !JoyX){
+		Random32change();
 		this->gridXpos--;
 		this->redraw = 1;
 		JoyX = 1;
@@ -6624,6 +6625,7 @@ void GridCursor::updatePos(){
 		JoyY = 1;
 	}
 	else if(stickPos[1] > stickUpTolerance && this->gridYpos < 5 && !JoyY){
+		Random32change();
 		this->gridYpos++;
 		this->redraw = 1;
 		JoyY = 1;
@@ -6752,15 +6754,17 @@ void Scene::tick(){
 		
 		if(this->zombieTimer <= 0){
 			this->zombieTimer = 500 - GameTime/7;
-			if (this->zombieTimer < 30) this->zombieTimer = 30;
-			this->spawnZombie(Random32()%8, Random32()%5 + 1);
+			if (this->zombieTimer < 40) this->zombieTimer = 40;
+			int zombienum = Random32()%8;
+			if(zombienum > 5 && Random32() % 3 > 0) zombienum = regularZombieID;
+			this->spawnZombie(zombienum, Random32()%5 + 1);
 		}
 		else this->zombieTimer--;
 	
 		if(this->sunTimer!=0) this->sunTimer--;
 		else{
 			this->Lawnmowers->redrawSet();
-			this->spawnProjectile(sunID, Random()/2, 100, 0);
+			this->spawnProjectile(sunID, Random()/2 + 20, 100, 0);
 			sunTimer = sunRate;
 		}
 		if(this->inputTimer == 0){
@@ -7128,8 +7132,8 @@ void globalInits(){
 	smallExplosionSprite = new SpriteType(smallExplosionBMP, 25, 23, smallExplosionSprite);
 	largeExplosionSprite = new SpriteType(largeExplosionBMP, 25, 23, largeExplosionSprite);
 	sunSprite = new SpriteType(sunBMP, 16, 16, sunSprite);
-	//transparentSprite = new SpriteType(transparentBMP, 16, 16, transparentSprite);
-	transparentSprite = new SpriteType(wallNutBMP2, 16, 16, transparentSprite);
+	transparentSprite = new SpriteType(transparentBMP, 16, 16, transparentSprite);
+	//transparentSprite = new SpriteType(wallNutBMP2, 16, 16, transparentSprite);
 
 	regularZombieSprite = new SpriteType(regularZombieBMP, 17, 29, regularZombieSprite2);
 	regularZombieSprite2 = new SpriteType(regularZombieBMP2, 17, 29, regularZombieSprite3);

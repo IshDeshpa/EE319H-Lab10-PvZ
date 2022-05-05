@@ -194,6 +194,7 @@ void PoleZombie::attack(Plant* plt){
 				this->unrender();
 		this->previousSprite = this->sprite;
 		this->sprite = polevaultZombieJumpSprite;
+		this->animationTimer = 3*this->animationTime;
 	
 
 		this->distanceDiff += 30;
