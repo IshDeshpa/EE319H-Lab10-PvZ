@@ -79,14 +79,14 @@ Wallnut::Wallnut(uint8_t x, uint8_t y, uint8_t lane)
 	
 }
 void Wallnut::advance(){
+	Plant::advance();
 	if(this->health < wallNutHealth/2){
 		this->previousSprite = this->sprite;
-		this->sprite = damagedWallnut;
-		this->redraw = 1;
+		this->sprite = wallNutDamagedSprite;
 	}
 }
 void Wallnut::tick(){
-//do nothing
+	Plant::tick();
 }
 CherryBomb::CherryBomb(uint8_t x, uint8_t y, uint8_t lane)
 : Plant(cherryBombSprite, x, y, defaultPlantHealth,
@@ -99,10 +99,9 @@ CherryBomb::CherryBomb(uint8_t x, uint8_t y, uint8_t lane)
 void CherryBomb::attack(){
 	Plant::attack();
 	this->unrender();
+	this->redraw = 0;
 	currentScene->planter->emptyGrid(this->col, this->lane);
 	currentScene->Plants->tryRmv(this);
-	//TO-DO: have the grid set this plant's spot to 0
-	//currentScene->planter->g
 }
 
 PotatoMine::PotatoMine(uint8_t x, uint8_t y, uint8_t lane)
@@ -124,6 +123,7 @@ void PotatoMine::hurt(uint8_t dam){
 	if(this->grown == 1){
 		Plant::attack();
 		this->unrender();
+		this->redraw = 0;
 		currentScene->planter->emptyGrid(this->col, this->lane);
 		currentScene->Plants->tryRmv(this);
 	}
@@ -141,26 +141,33 @@ sunProductionRate, sunID, lane)
 
 Chomper::Chomper(uint8_t x, uint8_t y, uint8_t lane)
 : Plant (chomperSprite, x, y, defaultPlantHealth, 1, 
-chomperChewTime, sunID, lane){
+chomperChewTime, chompID, lane){
 	this->empty = chomperSprite;
 	this->bite = chomperAttackSprite;
 	this->mouthFull = 0;
 }
 void Chomper::advance(){
 	Entity::advance();
-	if(mouthFull == 0) {
-		this->previousSprite = this->sprite;
-		this->sprite = this->bite;
-		this->redraw = 1;
-		this->attack();
-		this->attackTimer = this->attackRate;
-		this->mouthFull = 1;
-	}
-	else if(attackTimer == 0){
+	if(attackTimer == 0 && this->mouthFull == 1){
 		this->previousSprite = this->sprite;
 		this->sprite = this->empty;
 		this->redraw = 1;
 		this->mouthFull = 0;
 	}
 }
-	
+void Chomper::attack(){
+	//do nothing ig
+}
+void Chomper::hurt(uint8_t dam){
+	if(mouthFull == 0) {
+		this->previousSprite = this->sprite;
+		this->unrender();
+		this->animationTimer = 2*this->animationTime;
+		this->sprite = this->bite;
+		this->redraw = 1;
+		Plant::attack();
+		this->attackTimer = this->attackRate;
+		this->mouthFull = 1;
+	}
+	else Plant::hurt(dam);
+}

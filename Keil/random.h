@@ -29,6 +29,7 @@ void Random_Init(uint32_t seed);
 //          bit 0 oscillates 0,1,0,1,...
 //          bit n cycles through a sequence of length n+1
 uint32_t Random32(void);
+void Random32change();
 
 //------------Random------------
 // Return random number, 0 to 255

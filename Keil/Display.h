@@ -51,7 +51,7 @@
 
 #define CURSOR_COLOR 0xE6C0
 
-#define borderWidth 2
+#define borderWidth 1
 
 // standard ascii 5x7 font
 // originally from glcdfont.c from Adafruit project
@@ -441,7 +441,7 @@ uint16_t Display_SwapColor(uint16_t x) ;
 void Display_DrawBitmap(int16_t x, int16_t y, const uint16_t *image, int16_t w, int16_t h);
 
 void Display_RenderSprite(int16_t x, int16_t y, const uint16_t *image, int16_t w, int16_t h, uint16_t greenScreen, const uint16_t* background);
-void Display_UnrenderSprite(int16_t x, int16_t y, int16_t w, int16_t h, const uint16_t* bg);
+void Display_UnrenderSprite(int16_t x, int16_t y, const uint16_t *image, int16_t w, int16_t h, const uint16_t* bg);
 void Display_RenderCursor(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
 void Display_UnrenderCursor(int16_t x, int16_t y, int16_t w, int16_t h, const uint16_t* bg);
 

@@ -14,6 +14,11 @@ void Projectile::advance(){
 		this->distanceDiff = 0;
 		this->redraw = 1;
 	}
+	if(this->getX()>170){
+		this->unrender();
+		currentScene->Projectiles->tryRmv(this);
+		this->redraw = 0;
+	}
 }
 void Projectile::tick(){
 	this->distanceDiff+=this->speed;
@@ -22,15 +27,17 @@ int Projectile::collided(){
 	this->unrender();
 	currentScene->Projectiles->tryRmv(this);
 	this->soundFX->play();
+	this->redraw = 0;
 	return 1;
 }
 LawnMower::LawnMower(uint8_t x, uint8_t y, uint8_t lane) : Projectile(lmSprite, lmSound, x, y, lawnmowerSpeed, lawnmowerDamage, lane) {
 	this->isMoving  = 0;
 }
 void LawnMower::advance(){
-	if(this->x >170){
+	if(this->x >170 && this->x < 250){
 		this->unrender();
-		currentScene->Projectiles->tryRmv(this);
+		currentScene->Lawnmowers->tryRmv(this);
+		this->redraw = 0;
 		return;
 	}
 	else if(this->distanceDiff!=0){
@@ -40,7 +47,8 @@ void LawnMower::advance(){
 	}
 }
 int LawnMower::collided(){
-	return 0;
+	
+	this->isMoving = 1;
 }
 void LawnMower::tick(){
 	if(this->isMoving == 1) this->distanceDiff += this->speed;
@@ -54,7 +62,7 @@ Pea::Pea(uint8_t x, uint8_t y, uint8_t lane) : Projectile(peaSprite, peaSound, x
 	
 }
 
-FrozenPea::FrozenPea(uint8_t x, uint8_t y, uint8_t lane) : Projectile(peaSprite, peaSound, x, y, peaSpeed, peaDamage, lane){
+FrozenPea::FrozenPea(uint8_t x, uint8_t y, uint8_t lane) : Projectile(frozenPeaSprite, peaSound, x, y, icePeaSpeed, peaDamage, lane){
 
 }
 
@@ -64,6 +72,21 @@ Ohko::Ohko(uint8_t x, uint8_t y, uint8_t lane) : Projectile(transparentSprite, p
 
 Ohko::Ohko(uint8_t x, uint8_t y, uint8_t lane, SpriteType* sprite, Sound* sound) : Projectile(sprite, sound, x, y, 0, ohkoDamage, lane){
 
+}
+
+
+
+void Ohko::advance(){
+	if(this->explosionTimer == 0){
+		this->unrender();
+		currentScene->Projectiles->tryRmv(this);
+		this->redraw = 0;
+	}
+}
+
+void Ohko::tick(){
+	this->explosionTimer--;
+	if(this->explosionTimer % 3 == 0) this->redraw = 1;
 }
 
 Explosion::Explosion(uint8_t x, uint8_t y, uint8_t lane) : Ohko(x, y, lane, largeExplosionSprite, explosionSound){
@@ -83,21 +106,11 @@ void Explosion::render(){
 	Display_RenderSprite(this->x - 20, this->y - 20, this->sprite->bmp, this->sprite->width, this->sprite->length, transparentColor, currentScene->retBG());
 }
 void Explosion::unrender(){
-	Display_UnrenderSprite(this->oldx - 20, this->oldy - 20, this->previousSprite->width, this->previousSprite->length, currentScene->retBG());
-}
-
-void Explosion::advance(){
-	if(this->explosionTimer == 0){
-		this->unrender();
-		currentScene->Projectiles->tryRmv(this);
-	}
+	Display_UnrenderSprite(this->oldx - 20, this->oldy - 20, this->previousSprite->bmp, this->previousSprite->width, this->previousSprite->length, currentScene->retBG());
 }
 
 int Explosion::collided(){
 	return 0;
-}
-void Explosion::tick(){
-	this->explosionTimer--;
 }
 
 SmallExplosion::SmallExplosion(uint8_t x, uint8_t y, uint8_t lane) : Ohko(x, y, lane, smallExplosionSprite, explosionSound){
@@ -107,23 +120,14 @@ SmallExplosion::SmallExplosion(uint8_t x, uint8_t y, uint8_t lane) : Ohko(x, y, 
 int SmallExplosion::collided(){
 	return 0;
 }
-void SmallExplosion::advance(){
-	if(this->explosionTimer == 0){
-		this->unrender();
-		currentScene->Projectiles->tryRmv(this);
-	}
-}
 
-void SmallExplosion::tick(){
-	this->explosionTimer--;
-}
 
 Chomp::Chomp(uint8_t x, uint8_t y, uint8_t lane): Ohko(x, y, lane, transparentSprite, chompSound){
 this->soundFX->play();
 }
 
 Sun::Sun(uint8_t x, uint8_t y, uint8_t isMoving) : Projectile(sunSprite, sunSound, x, y, sunSpeed, 0, 6){
-	this->distance = 50;
+	this->distance = 80;
 	this->isMoving = !isMoving;	//input is flipped
 	this->upTimer = sunProductionRate;
 }
@@ -134,6 +138,7 @@ void Sun::advance(){
 		this->unrender();
 		this->soundFX->play();
 		currentScene->Projectiles->tryRmv(this);
+		this->redraw = 0;
 		return;
 	}
 	else if(this->upTimer == 0){

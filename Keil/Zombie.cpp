@@ -1,5 +1,13 @@
 #include "Game.h"
 
+void GameOverCheck(uint8_t x){
+	if(x > 230 && x < 240){
+		currentScene->sunAmount = 0;
+		currentScene->wipe();
+		loadScene(menu);
+	}
+}
+
 Zombie::Zombie(SpriteType* sp, uint8_t xpos, uint8_t ypos, uint8_t hp, 
 			uint8_t anim, uint8_t speed, uint8_t lane)
 			: Entity(sp, brainsSound, xpos, ypos, hp, anim, 1, lane)
@@ -8,6 +16,7 @@ Zombie::Zombie(SpriteType* sp, uint8_t xpos, uint8_t ypos, uint8_t hp,
 	this->isEating = 0;
 	this->wasEating = 0;
 	this->damageTimer = 0;
+	this->distanceDiff = 0;
 	this->damageTime = ZombieAttackRate;
 	this->walkFSM = regularZombieSprite;
 	this->eatFSM = regularZombieEatSprite;
@@ -34,6 +43,7 @@ Zombie::Zombie(uint8_t xpos, uint8_t ypos, uint8_t lane)
 	this->isEating = 0;
 	this->wasEating = 0;
 	this->damageTimer = 0;
+	this->distanceDiff = 0;
 	this->damageTime = ZombieAttackRate;
 	this->walkFSM = regularZombieSprite;
 	this->eatFSM = regularZombieEatSprite;
@@ -55,8 +65,9 @@ void Zombie::advance(){
 		this->sprite = this->walkFSM;
 		this->redraw = 1;
 	}
-	if(Random32() % 100 == 0) this->soundFX->play();
-	
+	//if(Random32() % 1000000 == 0) 
+	//	this->soundFX->play();
+	GameOverCheck(this->x);
 }
 
 void Zombie::stopEating(){
@@ -77,7 +88,7 @@ void Zombie::attack(Plant* plt){
 void Zombie::tick(){
 	Entity::tick();
 	if(this->damageTimer>0)this->damageTimer--;
-	if(!this->isEating && Random32() % (this->speed+1) > 0)this->distanceDiff++;
+	if(!this->isEating && Random32() % (7 - this->speed) == 0)this->distanceDiff++;
 }
 void Zombie::takeDamage(uint8_t dam){
 	this->health -= dam;
@@ -88,7 +99,7 @@ FlagZombie::FlagZombie(uint8_t x, uint8_t y, uint8_t lane)
 	this->sprite = flagZombieSprite;
 	this->eatFSM = flagZombieEatSprite;
 	this->walkFSM = flagZombieSprite;
-	this->spawnDelay = 20;
+	this->spawnDelay = 30;
 	this->spawnTimer = 20;
 	this->numSpawn = bigWaveSize;
 }
@@ -99,15 +110,17 @@ void FlagZombie::tick(){
 }
 void FlagZombie::advance(){
 	Zombie::advance();
-	if(this->spawnTimer == 0)
+	if(this->spawnTimer == 0 && numSpawn > 0)
 	{
 		currentScene->spawnZombie(Random32()%7, Random32()%5 + 1);
+		this->spawnTimer = this->spawnDelay;
+		numSpawn--;
 	}
 }
 
 ArmorZombie::ArmorZombie(uint8_t x, uint8_t y, uint8_t lane, SpriteType* fullWalk, SpriteType* fullEat)
 : Zombie(x, y, lane){
-	this->sprite = fullWalkFSM;
+	this->sprite = fullWalk;
 	this->fullEatFSM = fullEat;
 	this->fullWalkFSM = fullWalk;
 }
@@ -128,11 +141,22 @@ void ArmorZombie::advance(){
 			this->sprite = this->fullWalkFSM;
 			this->redraw = 1;
 		}
-		if(Random32() % 100 == 0) this->soundFX->play();
+		if(Random32() % 1000000 == 0) this->soundFX->play();
 	}
 	else{
+		if(this->sprite == this->fullEatFSM){
+			this->previousSprite = this->sprite;
+			this->sprite = this->eatFSM;
+			this->redraw = 1;
+		}
+		if(this->sprite == this->fullWalkFSM){
+			this->previousSprite = this->sprite;
+			this->sprite = this->walkFSM;
+			this->redraw = 1;
+		}
 		Zombie::advance();
 	}
+	GameOverCheck(this->x);
 }
 ConeZombie::ConeZombie(uint8_t x, uint8_t y, uint8_t lane)
 : ArmorZombie(x, y, lane, coneZombieSprite, coneZombieEatSprite){
@@ -166,11 +190,17 @@ PoleZombie::PoleZombie(uint8_t x, uint8_t y, uint8_t lane)
 
 void PoleZombie::attack(Plant* plt){
 	if(this->hasPole){
+			this->redraw = 0;
+				this->unrender();
 		this->previousSprite = this->sprite;
 		this->sprite = polevaultZombieJumpSprite;
-		this->distanceDiff += 20;
+		this->animationTimer = 3*this->animationTime;
+	
+
+		this->distanceDiff += 30;
 		this->hasPole = 0;
-		redraw = 1;
+		this->speed = zombieSpeed;
+		this->redraw = 1;
 	}
 	else{
 		Zombie::attack(plt);
@@ -179,23 +209,26 @@ void PoleZombie::attack(Plant* plt){
 
 BucketZombie::BucketZombie(uint8_t x, uint8_t y, uint8_t lane)
 : ArmorZombie(x, y, lane, bucketZombieSprite, bucketZombieEatSprite){
-	
+	this->health = defaultZombieHealth + bucketHealth;
 }
 
 FootballZombie::FootballZombie(uint8_t x, uint8_t y, uint8_t lane)
 : ArmorZombie(x, y, lane, footballZombieSprite, footballZombieEatSprite){
 	this->speed = footballSpeed;
+	this->health = defaultZombieHealth + helmetHealth;
 }
 
 JackZombie::JackZombie(uint8_t x, uint8_t y, uint8_t lane)
 : Zombie(x, y, lane){
 	this->speed = jackZombieSpeed;
 	this->walkFSM = jackZombieSprite;
+	this->sprite = walkFSM;
 }
 
-void JackZombie::attack(){
+void JackZombie::attack(Plant* plt){
 	this->unrender(); 
 	currentScene->spawnProjectile(explosionID, this->x, this->y, this->lane);
 	this->health = 0;
+	screenWipe = 1;
 	
 }

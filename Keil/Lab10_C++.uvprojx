@@ -488,6 +488,31 @@
               <FileType>5</FileType>
               <FilePath>.\Inputs.h</FilePath>
             </File>
+            <File>
+              <FileName>Button.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Button.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>Game.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Game.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>Plant.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Plant.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>Projectile.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Projectile.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>Zombie.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Zombie.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

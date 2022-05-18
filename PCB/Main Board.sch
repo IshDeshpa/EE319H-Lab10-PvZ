@@ -112,10 +112,6 @@ Text Label 2100 3600 0    50   ~ 0
 D_C
 Text Label 2100 3700 0    50   ~ 0
 RESET
-Text Label 6350 3600 0    50   ~ 0
-CARD_CS
-Text Label 6350 4100 0    50   ~ 0
-A1
 Text Label 8250 2650 2    50   ~ 0
 DAC0
 Text Label 8250 2750 2    50   ~ 0
@@ -178,26 +174,8 @@ Text Label 6350 2700 0    50   ~ 0
 DAC0
 Text Label 6350 2800 0    50   ~ 0
 DAC1
-Text Label 6350 4000 0    50   ~ 0
-B1
-Text Label 6350 3700 0    50   ~ 0
-A2
-Text Label 6350 3800 0    50   ~ 0
-B2
-Text Label 4950 4100 2    50   ~ 0
-J1_X
-Text Label 4950 4200 2    50   ~ 0
-J1_Y
-Text Label 4950 4300 2    50   ~ 0
-J2_X
-Text Label 4950 4400 2    50   ~ 0
-J2_Y
-Text Label 4950 3900 2    50   ~ 0
-BL1
 Text Label 4950 4500 2    50   ~ 0
 BL2
-Text Label 4950 3800 2    50   ~ 0
-BR1
 Text Label 4950 4600 2    50   ~ 0
 BR2
 Text Notes 1650 4550 0    50   ~ 0
@@ -288,21 +266,6 @@ F3 "DACOUT" I L 8800 2800 50
 $EndSheet
 Text Label 8400 2700 0    50   ~ 0
 DAC[0..7]
-$Comp
-L EK-TM4C123GXL:EK-TM4C123GXL U1
-U 1 1 622C0FA6
-P 5650 3600
-F 0 "U1" H 5650 5067 50  0000 C CNN
-F 1 "EK-TM4C123GXL" H 5650 4976 50  0000 C CNN
-F 2 "EK-TM4C123GXL:MODULE_EK-TM4C123GXL" H 5650 3600 50  0001 L BNN
-F 3 "" H 5650 3600 50  0001 L BNN
-F 4 "N/A" H 5650 3600 50  0001 L BNN "MAXIMUM_PACKAGE_HIEGHT"
-F 5 "Texas Instruments" H 5650 3600 50  0001 L BNN "MANUFACTURER"
-F 6 "April 2013" H 5650 3600 50  0001 L BNN "PARTREV"
-F 7 "Manufacturer Recommendations" H 5650 3600 50  0001 L BNN "STANDARD"
-	1    5650 3600
-	1    0    0    -1  
-$EndComp
 Text Notes 2900 4300 1    50   ~ 0
 BUTTONS
 Text Notes 2900 3500 1    50   ~ 0
@@ -330,34 +293,6 @@ Wire Notes Line
 	2950 3800 2950 4300
 Wire Notes Line
 	2950 4300 3000 4300
-$Comp
-L Connector_Generic:Conn_01x03 J3
-U 1 1 624FE089
-P 4450 3700
-F 0 "J3" H 4368 3375 50  0000 C CNN
-F 1 "UART" H 4368 3466 50  0000 C CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical" H 4450 3700 50  0001 C CNN
-F 3 "~" H 4450 3700 50  0001 C CNN
-	1    4450 3700
-	-1   0    0    1   
-$EndComp
-$Comp
-L power:GND #PWR09
-U 1 1 624FE8DC
-P 4650 3800
-F 0 "#PWR09" H 4650 3550 50  0001 C CNN
-F 1 "GND" H 4655 3627 50  0000 C CNN
-F 2 "" H 4650 3800 50  0001 C CNN
-F 3 "" H 4650 3800 50  0001 C CNN
-	1    4650 3800
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	4950 3600 4650 3600
-Wire Wire Line
-	4650 3700 4950 3700
-Text Label 6350 3900 0    50   ~ 0
-TEXAS
 Text Label 7250 3900 2    50   ~ 0
 TEXAS
 Text Label 8800 2800 2    50   ~ 0
@@ -375,11 +310,76 @@ F 3 "~" H 7450 3900 50  0001 C CNN
 	1    7450 3900
 	1    0    0    -1  
 $EndComp
-NoConn ~ 6350 4300
-NoConn ~ 6350 4400
 NoConn ~ 6350 4500
 NoConn ~ 6350 4600
 NoConn ~ 6350 4700
 Wire Bus Line
 	8400 2700 8400 3450
+NoConn ~ 6350 4400
+NoConn ~ 6350 4300
+Text Label 6350 3900 0    50   ~ 0
+TEXAS
+Wire Wire Line
+	4650 3700 4950 3700
+Wire Wire Line
+	4950 3600 4650 3600
+$Comp
+L power:GND #PWR09
+U 1 1 624FE8DC
+P 4650 3800
+F 0 "#PWR09" H 4650 3550 50  0001 C CNN
+F 1 "GND" H 4655 3627 50  0000 C CNN
+F 2 "" H 4650 3800 50  0001 C CNN
+F 3 "" H 4650 3800 50  0001 C CNN
+	1    4650 3800
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector_Generic:Conn_01x03 J3
+U 1 1 624FE089
+P 4450 3700
+F 0 "J3" H 4368 3375 50  0000 C CNN
+F 1 "UART" H 4368 3466 50  0000 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical" H 4450 3700 50  0001 C CNN
+F 3 "~" H 4450 3700 50  0001 C CNN
+	1    4450 3700
+	-1   0    0    1   
+$EndComp
+$Comp
+L EK-TM4C123GXL:EK-TM4C123GXL U1
+U 1 1 622C0FA6
+P 5650 3600
+F 0 "U1" H 5650 5067 50  0000 C CNN
+F 1 "EK-TM4C123GXL" H 5650 4976 50  0000 C CNN
+F 2 "EK-TM4C123GXL:MODULE_EK-TM4C123GXL" H 5650 3600 50  0001 L BNN
+F 3 "" H 5650 3600 50  0001 L BNN
+F 4 "N/A" H 5650 3600 50  0001 L BNN "MAXIMUM_PACKAGE_HIEGHT"
+F 5 "Texas Instruments" H 5650 3600 50  0001 L BNN "MANUFACTURER"
+F 6 "April 2013" H 5650 3600 50  0001 L BNN "PARTREV"
+F 7 "Manufacturer Recommendations" H 5650 3600 50  0001 L BNN "STANDARD"
+	1    5650 3600
+	1    0    0    -1  
+$EndComp
+Text Label 4950 3800 2    50   ~ 0
+BR1
+Text Label 4950 3900 2    50   ~ 0
+BL1
+Text Label 4950 4400 2    50   ~ 0
+J2_Y
+Text Label 4950 4300 2    50   ~ 0
+J2_X
+Text Label 4950 4200 2    50   ~ 0
+J1_Y
+Text Label 4950 4100 2    50   ~ 0
+J1_X
+Text Label 6350 3800 0    50   ~ 0
+B2
+Text Label 6350 3700 0    50   ~ 0
+A2
+Text Label 6350 4000 0    50   ~ 0
+B1
+Text Label 6350 4100 0    50   ~ 0
+A1
+Text Label 6350 3600 0    50   ~ 0
+CARD_CS
 $EndSCHEMATC

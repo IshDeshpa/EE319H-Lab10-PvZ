@@ -28,7 +28,8 @@ Sound::Sound(){
 }*/
 
 void Sound::increment(){
-	if(this->bufferPtr >= this->bufferSize){
+	if(this->bufferPtr >= this->bufferSize-1){
+		this->bufferPtr = 0;
 		sounds[this->ind] = 0;
 		this->ind = -1;
 	}
@@ -86,12 +87,16 @@ void DAC_Out(uint32_t data){
 
 void playAllSounds(){
 	uint8_t total = 0;
+	uint8_t ct = 0;
 	for(int i=0; i<NUM_SOUNDS; i++){
 		if(sounds[i] != 0){
 			uint8_t sample = sounds[i]->getSample();
 			total += sample;
+			ct++;
 			sounds[i]->increment();
 		}
 	}
-	DAC_Out(total);
+	if(ct != 0){
+		DAC_Out(total/ct);
+	}
 }

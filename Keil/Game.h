@@ -11,19 +11,20 @@
 #define FX_BUFFER_SIZE 16
 
 //Main game balancing controls
-#define gameMovementSpeed 1 //Based on ticks?
+#define gameMovementSpeed 1 //Based on ticks? DO NOT CHANGE
 #define gameFPS 10 //could be uncapped?
 #define gameTickRate 20 //controls attackRates and animations
 #define damageRatio 1
 #define healthRatio 1
 #define animationRatio 1//general animation speed ratio
 
-#define speedMultiplier 0.1 * gameMovementSpeed
+#define speedMultiplier gameMovementSpeed
 #define peaSpeed 3*speedMultiplier
+#define icePeaSpeed speedMultiplier
 #define sunSpeed 1*speedMultiplier
 #define zombieSpeed 1*speedMultiplier
-#define poleVaultSpeed zombieSpeed*3
-#define jackZombieSpeed zombieSpeed*2
+#define poleVaultSpeed zombieSpeed*4
+#define jackZombieSpeed zombieSpeed*3
 #define footballSpeed poleVaultSpeed
 #define newspaperAngrySpeed jackZombieSpeed
 #define lawnmowerSpeed 3
@@ -80,13 +81,13 @@
 #define LangButtonYpos 10
 
 #define SpXSize 10 //size of all seed packet sprites
-#define SpYSize 10 
+#define SpYSize 8 
 #define SpOffset SpXSize+2
-#define SpYpos 115	//y position of all seed packets
-#define FspXpos 1		//x position of left most packet
+#define SpYpos 118	//y position of all seed packets
+#define FspXpos 18		//x position of left most packet
 #define SspXpos FspXpos + SpOffset * 1
-#define TspXpos FspXpos + SpOffset * 2
-#define	FospXpos FspXpos + SpOffset * 3
+#define TspXpos FspXpos + (SpOffset * 2)
+#define	FospXpos FspXpos + (SpOffset * 3)
 #define FispXpos FspXpos + SpOffset * 4
 #define SispXpos FspXpos + SpOffset * 5
 #define SespXpos FspXpos + SpOffset * 6
@@ -103,7 +104,7 @@
 
 
 #define LaneYOffset gridY //change later
-#define Lane1Ypos gridX
+#define Lane1Ypos ZeroY
 #define Lane2Ypos Lane1Ypos + gridY * 1
 #define Lane3Ypos Lane1Ypos + gridY * 2
 #define Lane4Ypos Lane1Ypos + gridY * 3
@@ -112,32 +113,33 @@
 #define ZombieStartXpos
 #define collectTolerance 30
 //change later:
-#define transparentColor 0x6969
-#define ZeroX 10
+#define transparentColor 0xFB56
+#define ZeroX 14
 #define ZeroY	5
-#define gridX 15
+#define gridX 16
 #define gridY 20
 #define shootOffsetX 15
-#define shootOffsetY 15
+#define shootOffsetY 8
 	//packet load times;
 #define LoadTime 100
-#define bigWaveSize 10 //number of zombies in a big wave
-#define stickLeftTolerance 1000
-#define stickRightTolerance 3000
-#define stickUpTolerance 3000
-#define stickDownTolerance 1000
+#define bigWaveSize 4 //number of zombies in a big wave
+#define stickLeftTolerance 3800
+#define stickRightTolerance 500
+#define stickUpTolerance 3800
+#define stickDownTolerance 500
 
+#define sceneInputRate 10
 
 
 // Sprite contains a pointer to a bitmap, and has a length and width in pixels.
 class SpriteType{
 	public:
-		uint16_t* bmp;	// Bitmap of half words to encode RGB info
+		const uint16_t* bmp;	// Bitmap of half words to encode RGB info
 		uint8_t length;	// Length
 		uint8_t width;	// Width
 		SpriteType* nextSprite;	// Sprite pointer for animation FSM (each sprite only has one next sprite)
 	public:
-		SpriteType(uint16_t* bmp, uint8_t length, uint8_t width, SpriteType* nextSprite);
+		SpriteType(const uint16_t* bmp, uint8_t length, uint8_t width, SpriteType* nextSprite);
 };
 
 
@@ -159,7 +161,7 @@ class GameObject{
 		void unrender();
 		
 		// Advance to the next state of the game object (should be overloaded)
-		void advance();
+		virtual void advance();
 	
 		// Render the current state of the game object
 		void render();
@@ -187,11 +189,11 @@ class GameObject{
 		//GameObject operator=(GameObject& other);
 		
 		// Unrender, advance to next state of the game object and render
-		void refresh();
+		virtual void refresh();
 		//game object tick will not do anything
-		void tick();
+		virtual void tick();
 		//game object collide will not do anything
-		void collided();
+		int collided();
 		uint8_t getX();
 		uint8_t getY();
 		uint8_t getLane();
@@ -208,13 +210,13 @@ class Entity: public GameObject{
 		// Advance to the next state of the entity and call attack?
 		void advance();
 		// do attacking sequence if hostile
-		void attack();
+		
 	public:
 		//constructor with all new parameters, calls parent constructor for first 4
 		Entity(SpriteType* sp, Sound* sfx, uint8_t xpos, uint8_t ypos, uint8_t hp, uint8_t anim, uint8_t hostl, uint8_t lane);
 		//entity tick will decrement animationTime
 		void tick();
-		void hurt(uint8_t damage);
+		virtual void hurt(uint8_t damage);
 };
 
 // Projectile
@@ -229,7 +231,7 @@ class Projectile: public GameObject{
 		uint8_t damage;	// Damage
 		//constructor with all new parameters, calls parent constructor for first 4
 		Projectile(SpriteType* sp, Sound* sfx, uint8_t xpos, uint8_t ypos, uint8_t spd, uint8_t dam, uint8_t lane);
-		int collided();
+		virtual int collided();
 		//projectile tick will change their xpos by their speed and set redraw to 1, if speed > 0
 		void tick();
 };
@@ -264,18 +266,21 @@ class FrozenPea : public Projectile{
 
 // One hit KO (e.g. Cherry Bomb, Potato Mine, Chomper)
 class Ohko: public Projectile{
+	protected:
+		uint8_t explosionTimer;
+		void advance();
 	public:
 		//set projectile variable to defined OHKO damage, OHKO (transparent) sprite, sfx, speed = 0, collision = 1
 		Ohko(uint8_t x, uint8_t y, uint8_t lane);
 		//Special constructor does same as other constructor, but sets sprite to argument
 		Ohko(uint8_t x, uint8_t y, uint8_t lane, SpriteType* sprite, Sound* sound);	
+		
+		void tick();
 };
 
 class Explosion : public Ohko{
 	protected:	
-		uint8_t explosionTimer;
 		//change advance so the projectile goes away after explosionTimer 
-		void advance();
 		void render();
 		void unrender();
 	public:
@@ -284,21 +289,15 @@ class Explosion : public Ohko{
 	  Explosion(uint8_t x, uint8_t y, uint8_t lane);
 		//change collided so the projectile does not go away when collision happens
 		int collided();
-		//tick decrements explosionTimer;
-		void tick();
 		
 };
 
 class SmallExplosion : public Ohko{
-	protected:	
-		void advance();
-		uint8_t explosionTimer;
 	public:
 		//call Ohko constructor in this square, use small explosion sprite
 		SmallExplosion(uint8_t x, uint8_t y, uint8_t lane);
 		//change collided so the projectile does not go away when collision happens
 		int collided();
-		void tick();
 };
 
 class Chomp : public Ohko{
@@ -310,7 +309,7 @@ class Chomp : public Ohko{
 class Sun : public Projectile{
 	protected:
   uint8_t upTimer;
-	int8_t distance;
+	int16_t distance;
 	uint8_t isMoving;
 		//change advance so if collision with cursor, collect sun
 		void advance();
@@ -330,7 +329,7 @@ class Plant : public Entity{
 		uint8_t projID;
 		uint8_t col;
 		//create projectile
-		void attack();
+		virtual void attack();
 		//idk why I put this here
 		void advance();
 	public:
@@ -443,6 +442,7 @@ class Chomper : public Plant{
 		//change range detection to one tile
 		void advance();
 		//if no invisible hitbox projectile, we need to make attack do the collision
+		void attack();
 		
 	public:
 			//constructor calls Plant constructor with defined chomper empty sprite, defined chomp sound, x and y arguments
@@ -451,18 +451,19 @@ class Chomper : public Plant{
 			//set full sprite to defined full chomper sprite, and empty to empty sprite
 			//mouthFull = 0
 		Chomper(uint8_t x, uint8_t y, uint8_t lane);
+		void hurt(uint8_t dam);
 };
 
 
 class Button : public GameObject{
 	protected:
 		//does nothing in Button
-		void buttonFunction();
+		virtual void buttonFunction();
 	public:
 		//calls gameobject with parameters as passed in
 		Button(uint8_t x, uint8_t y, SpriteType* sprite, Sound* sfx);
 		//plays sound, calls buttonFunction
-		void buttonHit();
+		virtual void buttonHit();
 
 };
 
@@ -515,7 +516,7 @@ class SeedPacket : public Button{
 		SpriteType* gray;
 		uint8_t loadTime;
 		uint8_t loadTimer;
-		uint8_t sunCost;
+		int16_t sunCost;
 		uint8_t plantID; //0 for peashooter, 1 for repeater, 2 for snowpea, 3 for wallnut, 4 for cherry bomb, 5 for mine, 6 for chomper, 7 for sunflower
 		//change buttonFunction to call global spawn plant with plantID
 		void buttonFunction();
@@ -555,7 +556,7 @@ class Zombie: public Entity{
 			 uint8_t speed, uint8_t lane);
 		void tick();
 		// do attacking sequence if hostile
-		void attack(Plant* plt);
+		virtual void attack(Plant* plt);
 		void stopEating();
 		void takeDamage(uint8_t dam);
 };
@@ -621,7 +622,7 @@ class JackZombie: public Zombie{
 	public:
 		// Constructor
 		JackZombie(uint8_t x, uint8_t y, uint8_t lane);
-		void attack();
+		void attack(Plant* plt);
 };
 
 // Polevault zombie. Jumps over plants.
@@ -656,6 +657,7 @@ class GameObjectList{
 	public:
 		//Constructor
 		GameObjectList(GameObject** GOlist);
+		GameObjectList();
 		//Destructor
 		~GameObjectList();
 		//Add Object
@@ -667,6 +669,7 @@ class GameObjectList{
 		void tryRmv(GameObject* go);
 		void tryRmv(uint8_t col, uint8_t row);
 		void refresh();
+		void redrawSet();
 		uint8_t getLength();
 		//will tick every existing member of objects
 		void tick();
@@ -680,6 +683,7 @@ class SelectCursor{
 		GameObject* button;
 		GameObject* oldButton;
 		uint8_t redraw;
+		uint8_t updated;
 		GameObjectList* targetButtons;
 		void render();
 		void updatePos();
@@ -692,6 +696,8 @@ class GridCursor{
 	public:
 		uint8_t calcX();
 		uint8_t calcY();
+		uint8_t calcOldX();
+		uint8_t calcOldY();
 	public:
 		uint8_t gridXpos;	//for spawning plants
 		uint8_t gridYpos;	//unused for select
@@ -706,6 +712,7 @@ class GridCursor{
 		void refresh();
 		uint8_t gridOpen(); //returns 1 if no plant, returns 0 if plant
 		void fillGrid();
+		void clearGrid();
 		void emptyGrid(uint8_t col, uint8_t row);
 		
 };
@@ -715,13 +722,16 @@ class Scene{
 		
 		uint8_t sunRate;
 		uint8_t sunTimer;
-		int16_t sunAmount;
-		Sound* music;
-	
+		uint8_t inputRate;
+		uint8_t inputTimer;
+		
+		uint8_t hasGrid;
+		int32_t zombieTimer;
 		
 		SelectCursor* select; //menuing and seed packets
 	public:
-		const uint16_t* backgroundBMP;	// Background of the scene as a bitmap
+		int16_t sunAmount;
+		const uint16_t* backgroundBMP;	// Background of the git as a bitmap
 		GameObjectList* Zombies;	// List of all objects on the scene these are arrays of pointers
 		GameObjectList* Plants;
 		GameObjectList* Buttons;
@@ -729,7 +739,7 @@ class Scene{
 		GameObjectList* Projectiles;
 		GridCursor* planter; //locked to the grid hopefully
 		// Constructor
-		Scene(GameObjectList* but, GameObjectList* lwm, const uint16_t* bg, Sound* msc);
+		Scene(GameObjectList* but, GameObjectList* lwm, const uint16_t* bg, uint8_t hasGrid);
 		// Destructor
 		//~Scene();
 	
@@ -754,22 +764,10 @@ class Scene{
 		void wipe();
 };
 
-// Basic zombie.
-
-
-
 //bitmaps
-extern uint16_t menuBackground[1];
-extern uint16_t lawnBackground[1];
+extern const uint16_t menuBackground[20480];
+extern const uint16_t lawnBackground[20480];
 	
-//projectile sprites
-extern SpriteType* frozenPeaSprite;
-extern SpriteType* peaSprite;
-extern SpriteType* smallExplosionSprite;
-extern SpriteType* largeExplosionSprite;
-extern SpriteType* sunSprite;
-extern SpriteType* transparentSprite;
-
 enum zombieIDS{
 	regularZombieID, coneZombieID, bucketZombieID, footballZombieID, 
 	newspaperZombieID, poleVaultZombieID, jackZombieID, flagZombieID
@@ -782,95 +780,119 @@ smallExplosionID, explosionID, sunID};
 enum plantIDS{
 	peashooterID, sunflowerID, snowPeaID, repeaterID, chomperID, potatoMineID, cherryBombID, wallNutID
 };
-//TO-DO make 3 of each of these except for a couple
+
 //plant sprites
 extern SpriteType* peashooterSprite;
+extern SpriteType* peashooterSprite2;
+extern SpriteType* peashooterSprite3;
+extern SpriteType* peashooterSprite4;
+
 extern SpriteType* snowPeaSprite;
+extern SpriteType* snowPeaSprite2;
+extern SpriteType* snowPeaSprite3;
+extern SpriteType* snowPeaSprite4;
+
 extern SpriteType* repeaterSprite;
+extern SpriteType* repeaterSprite2;
+
 extern SpriteType* sunflowerSprite;
+extern SpriteType* sunflowerSprite2;
+
 extern SpriteType* cherryBombSprite;
+extern SpriteType* cherryBombSprite2;
+extern SpriteType* cherryBombSprite3;
+
 extern SpriteType* potatoMineSprite;
 extern SpriteType* potatoMineReadySprite;
+extern SpriteType* potatoMineReadySprite2;
+
 extern SpriteType* chomperSprite;
+extern SpriteType* chomperSprite2;
+extern SpriteType* chomperSprite3;
+extern SpriteType* chomperSprite4;
 extern SpriteType* chomperChewSprite;
 extern SpriteType* chomperAttackSprite;
-extern SpriteType* wallNutSprite;
 
-extern SpriteType* peashooterSprite2;
-extern SpriteType* snowPeaSprite2;
-extern SpriteType* repeaterSprite2;
-extern SpriteType* sunflowerSprite2;
-extern SpriteType* cherryBombSprite2;
-extern SpriteType* potatoMineReadySprite2;
-extern SpriteType* chomperSprite2;
-extern SpriteType* chomperChewSprite2;
+extern SpriteType* wallNutSprite;
 extern SpriteType* wallNutDamagedSprite;
 
-extern SpriteType* peashooterSprite3;
-extern SpriteType* snowPeaSprite3;
-extern SpriteType* repeaterSprite3;
-extern SpriteType* sunflowerSprite3;
-extern SpriteType* cherryBombSprite3;
-extern SpriteType* chomperSprite3;
-extern SpriteType* chomperChewSprite3;
+//projectile sprites
+extern SpriteType* frozenPeaSprite;
+extern SpriteType* peaSprite;
+extern SpriteType* smallExplosionSprite;
+extern SpriteType* largeExplosionSprite;
+extern SpriteType* sunSprite;
+extern SpriteType* transparentSprite;
+
 //Zombie sprites
 extern SpriteType* regularZombieSprite;
-extern SpriteType* regularZombieEatSprite;
-extern SpriteType* bucketZombieSprite;
-extern SpriteType* bucketZombieEatSprite;
-extern SpriteType* newspaperZombieSprite;
-extern SpriteType* newspaperZombieEatSprite;
-extern SpriteType* polevaultZombieRunSprite;
-extern SpriteType* polevaultZombieJumpSprite;
-extern SpriteType* polevaultZombieWalkSprite;
-extern SpriteType* polevaultZombieEatSprite;
-extern SpriteType* jackZombieSprite;
-extern SpriteType* footballZombieSprite;
-extern SpriteType* footballZombieEatSprite;
-extern SpriteType* flagZombieSprite;
-extern SpriteType* flagZombieEatSprite;
-extern SpriteType* coneZombieSprite;
-extern SpriteType* coneZombieEatSprite;
-
 extern SpriteType* regularZombieSprite2;
-extern SpriteType* regularZombieEatSprite2;
-extern SpriteType* bucketZombieSprite2;
-extern SpriteType* bucketZombieEatSprite2;
-extern SpriteType* newspaperZombieSprite2;
-extern SpriteType* newspaperZombieEatSprite2;
-extern SpriteType* polevaultZombieRunSprite2;
-extern SpriteType* polevaultZombieWalkSprite2;
-extern SpriteType* polevaultZombieEatSprite2;
-extern SpriteType* jackZombieSprite2;
-extern SpriteType* footballZombieSprite2;
-extern SpriteType* footballZombieEatSprite2;
-extern SpriteType* flagZombieSprite2;
-extern SpriteType* flagZombieEatSprite2;
-extern SpriteType* coneZombieSprite2;
-extern SpriteType* coneZombieEatSprite2;
-
 extern SpriteType* regularZombieSprite3;
+extern SpriteType* regularZombieSprite4;
+
+extern SpriteType* regularZombieEatSprite;
+extern SpriteType* regularZombieEatSprite2;
 extern SpriteType* regularZombieEatSprite3;
+extern SpriteType* regularZombieEatSprite4;
+
+extern SpriteType* bucketZombieSprite;
+extern SpriteType* bucketZombieSprite2;
 extern SpriteType* bucketZombieSprite3;
-extern SpriteType* bucketZombieEatSprite3;
+extern SpriteType* bucketZombieSprite4;
+
+extern SpriteType* bucketZombieEatSprite;
+extern SpriteType* bucketZombieEatSprite2;
+
+extern SpriteType* newspaperZombieSprite;
+extern SpriteType* newspaperZombieSprite2;
 extern SpriteType* newspaperZombieSprite3;
-extern SpriteType* newspaperZombieEatSprite3;
+
+extern SpriteType* newspaperZombieEatSprite;
+extern SpriteType* newspaperZombieEatSprite2;
+
+extern SpriteType* polevaultZombieRunSprite;
+extern SpriteType* polevaultZombieRunSprite2;
 extern SpriteType* polevaultZombieRunSprite3;
+extern SpriteType* polevaultZombieRunSprite4;
+
+extern SpriteType* polevaultZombieEatSprite;
+extern SpriteType* polevaultZombieEatSprite2;
+
+extern SpriteType* polevaultZombieJumpSprite;
+
+extern SpriteType* polevaultZombieWalkSprite;
+extern SpriteType* polevaultZombieWalkSprite2;
 extern SpriteType* polevaultZombieWalkSprite3;
-extern SpriteType* polevaultZombieEatSprite3;
+extern SpriteType* polevaultZombieWalkSprite4;
+
+extern SpriteType* jackZombieSprite;
+extern SpriteType* jackZombieSprite2;
 extern SpriteType* jackZombieSprite3;
+extern SpriteType* jackZombieSprite4;
+
+extern SpriteType* footballZombieSprite;
+extern SpriteType* footballZombieSprite2;
 extern SpriteType* footballZombieSprite3;
-extern SpriteType* footballZombieEatSprite3;
+extern SpriteType* footballZombieSprite4;
+
+extern SpriteType* footballZombieEatSprite;
+extern SpriteType* footballZombieEatSprite2;
+
+extern SpriteType* flagZombieSprite;
+extern SpriteType* flagZombieSprite2;
 extern SpriteType* flagZombieSprite3;
-extern SpriteType* flagZombieEatSprite3;
+extern SpriteType* flagZombieSprite4;
+
+extern SpriteType* flagZombieEatSprite;
+extern SpriteType* flagZombieEatSprite2;
+
+extern SpriteType* coneZombieSprite;
+extern SpriteType* coneZombieSprite2;
 extern SpriteType* coneZombieSprite3;
-extern SpriteType* coneZombieEatSprite3;
+extern SpriteType* coneZombieSprite4;
 
-
-
-
-
-
+extern SpriteType* coneZombieEatSprite;
+extern SpriteType* coneZombieEatSprite2;
 
 //button sprites
 extern SpriteType* vsEnglish;
@@ -881,22 +903,22 @@ extern SpriteType* languageEnglish;
 extern SpriteType* languageSpanish;
 
 //seed packet sprites
-extern SpriteType* p0;
-extern SpriteType* p1;
-extern SpriteType* p2; 
-extern SpriteType* p3;
-extern SpriteType* p4; 
-extern SpriteType* p5; 
-extern SpriteType* p6;
-extern SpriteType* p7;
+extern SpriteType* peashooterPacket;
+extern SpriteType* sunflowerPacket;
+extern SpriteType* snowPeaPacket; 
+extern SpriteType* repeaterPacket;
+extern SpriteType* chomperPacket; 
+extern SpriteType* potatoMinePacket; 
+extern SpriteType* cherryBombPacket;
+extern SpriteType* wallNutPacket;
 extern SpriteType* seedPacketGraySprite;
 extern SpriteType* seedPacketSprites[8];
-
 
 //button sounds
 extern Sound* menuSound;
 extern Sound* plantingSound;
 
+// other sounds
 extern Sound* peaSound;
 extern Sound* chompSound;	//for when chomper bites zombie
 extern Sound* explosionSound;
@@ -967,9 +989,11 @@ extern Scene* currentScene;
 
 //for if jack zombie explodes
 extern int screenWipe;
+extern int GameTime;
 
 //global functions
 void loadScene(Scene* s);
+void globalInits(void);
 
 
 #endif
