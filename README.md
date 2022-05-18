@@ -3,9 +3,10 @@ Luke Mason and Ishan Deshpande's EE319H Final Project: Plants vs Zombies
 
 This is a close representation of the real PvZ mobile/console game.
 
-**Game description:**
+# Game description:
 A mob of fun-loving zombies is about to invade your home, and your only defense is an arsenal of 49 zombie-zapping plants. Use peashooters, wall-nuts, cherry bombs and more to mulchify 26 types of zombies before they can reach your front door.
 
+# Project notes:
 The TM4C has 256kB of flash memory (read only for our purposes), and 32kB of SRAM. Additionally, the display, the ST7735R TFT LCD display, was 160x128p, and could support a microSD card of 4GB formatted in FAT16. 
 
 The sprites and sound effects took up almost all 256kB flash, and the in game objects took up almost all of our 32kB SRAM. In total, there were almost 100 sprites, and 7 sound effects. Each plant and zombie had animations with up to 7 sprites. For sound, we used an 8-bit DAC, and the MC34119P amplifier chip, which was paired with a 1MOhm feedback potentiometer, and a high pass filter for sound smoothing.
