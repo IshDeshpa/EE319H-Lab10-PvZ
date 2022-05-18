@@ -4,7 +4,7 @@ Luke Mason and Ishan Deshpande's EE319H Final Project: Plants vs Zombies
 This is a close representation of the real PvZ mobile/console game.
 
 # Game description:
-A mob of fun-loving zombies is about to invade your home, and your only defense is an arsenal of 49 zombie-zapping plants. Use peashooters, wall-nuts, cherry bombs and more to mulchify 8 different types of zombies before they can reach your front door.
+A mob of fun-loving zombies is about to invade your home, and your only defense is an arsenal of 8 zombie-zapping plants. Use peashooters, wall-nuts, cherry bombs and more to mulchify 8 different types of zombies before they can reach your front door.
 
 # Project notes:
 The TM4C has 256kB of flash memory (read only for our purposes), and 32kB of SRAM. Additionally, the display, the ST7735R TFT LCD display, was 160x128p, and could support a microSD card of 4GB formatted in FAT16. 
